@@ -15,5 +15,9 @@ spring:
     change-log: classpath:/db/changelog/db.changelog-master.yaml # default
     enabled: true
 
+#logging:
+#  pattern:
+#    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+
 file:
   directory: images
