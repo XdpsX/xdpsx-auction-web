@@ -11,11 +11,14 @@ import com.xdpsx.auction.repository.UserRepository;
 import com.xdpsx.auction.security.TokenProvider;
 import com.xdpsx.auction.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +27,7 @@ public class AuthServiceImpl implements AuthService {
     private final TokenProvider tokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Override
     public TokenResponse register(RegisterRequest request) {
@@ -48,5 +52,28 @@ public class AuthServiceImpl implements AuthService {
         );
         User user = (User) authentication.getPrincipal();
         return tokenProvider.generateToken(user);
+    }
+
+    @Override
+    public TokenResponse refreshToken(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")){
+            return null;
+        }
+        final String refreshToken = authHeader.substring(7);
+        final String userEmail = tokenProvider.extractUsername(refreshToken);
+        if (userEmail != null) {
+            User user = userRepository.findByEmail(userEmail)
+                    .orElse(null);
+            if (user != null &&
+                    tokenProvider.isRefreshTokenValid(refreshToken, user) &&
+                    Boolean.FALSE.equals(redisTemplate.hasKey(refreshToken))
+            ){
+
+                redisTemplate.opsForValue().set(refreshToken, "REFRESH",
+                        tokenProvider.getTTL(refreshToken), TimeUnit.MILLISECONDS);
+                return tokenProvider.generateToken(user);
+            }
+        }
+        return null;
     }
 }

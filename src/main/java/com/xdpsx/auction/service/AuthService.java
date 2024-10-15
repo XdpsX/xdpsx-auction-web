@@ -7,4 +7,5 @@ import com.xdpsx.auction.dto.auth.TokenResponse;
 public interface AuthService {
     TokenResponse register(RegisterRequest request);
     TokenResponse login(LoginRequest request);
+    TokenResponse refreshToken(String authHeader);
 }

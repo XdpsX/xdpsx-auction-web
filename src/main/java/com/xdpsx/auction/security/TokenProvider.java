@@ -20,23 +20,26 @@ import java.util.Date;
 @Slf4j
 @Component
 public class TokenProvider {
-    @Value("${app.jwt.secret}")
-    private String SECRET_KEY;
+    @Value("${app.jwt.access.secret}")
+    private String ACCESS_SECRET_KEY;
 
-    @Value("${app.jwt.access-expiration.seconds}")
+    @Value("${app.jwt.access.expiration.seconds}")
     private Long ACCESS_EXPIRATION_SECONDS;
 
-    @Value("${app.jwt.refresh-expiration.seconds}")
+    @Value("${app.jwt.refresh.secret}")
+    private String REFRESH_SECRET_KEY;
+
+    @Value("${app.jwt.refresh.expiration.seconds}")
     private Long REFRESH_EXPIRATION_SECONDS;
 
     public TokenResponse generateToken(User user) {
         return TokenResponse.builder()
-                .accessToken(generateToken(user, ACCESS_EXPIRATION_SECONDS))
-                .refreshToken(generateToken(user, REFRESH_EXPIRATION_SECONDS))
+                .accessToken(generateToken(user, ACCESS_EXPIRATION_SECONDS, ACCESS_SECRET_KEY))
+                .refreshToken(generateToken(user, REFRESH_EXPIRATION_SECONDS, REFRESH_SECRET_KEY))
                 .build();
     }
 
-    public String generateToken(User user, long expirationSeconds) {
+    public String generateToken(User user, long expirationSeconds, String secretKey) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(user.getUsername())
@@ -51,7 +54,7 @@ public class TokenProvider {
         JWSObject jwsObject = new JWSObject(header, payload);
 
         try {
-            jwsObject.sign(new MACSigner(SECRET_KEY.getBytes()));
+            jwsObject.sign(new MACSigner(secretKey.getBytes()));
             return jwsObject.serialize();
         } catch (JOSEException e) {
             log.error("Cannot create token", e);
@@ -70,10 +73,18 @@ public class TokenProvider {
         }
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
+    public boolean isAccessTokenValid(String token, UserDetails userDetails) {
+        return isTokenValid(token, userDetails, ACCESS_SECRET_KEY);
+    }
+
+    public boolean isRefreshTokenValid(String token, UserDetails userDetails) {
+        return isTokenValid(token, userDetails, REFRESH_SECRET_KEY);
+    }
+
+    private boolean isTokenValid(String token, UserDetails userDetails, String secretKey) {
         try {
             SignedJWT signedJWT = SignedJWT.parse(token);
-            MACVerifier verifier = new MACVerifier(SECRET_KEY.getBytes());
+            MACVerifier verifier = new MACVerifier(secretKey.getBytes());
             if (!signedJWT.verify(verifier)) {
                 return false;
             }

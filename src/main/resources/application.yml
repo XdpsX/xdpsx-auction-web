@@ -31,10 +31,13 @@ file:
 
 app:
   jwt:
-    secret: AxdbTQmW/abSjS3TpqhS2rHHUTtK8ESb0xq9uueSj34=
-    access-expiration:
-      seconds: 3600
-    refresh-expiration:
-      seconds: 36000
+    access:
+      secret: AxdbTQmW/abSjS3TpqhS2rHHUTtK8ESb0xq9uueSj34=
+      expiration:
+        seconds: 3600
+    refresh:
+        secret: fv0Q2PIP4I9oUhg1rYKqK2jHv4RFMDei
+        expiration:
+          seconds: 36000
   cors:
     allowed-origins: http://localhost:3000,http://localhost:3001

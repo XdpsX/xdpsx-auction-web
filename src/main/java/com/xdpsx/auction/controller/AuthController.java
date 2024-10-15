@@ -6,11 +6,9 @@ import com.xdpsx.auction.dto.auth.TokenResponse;
 import com.xdpsx.auction.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -27,6 +25,17 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request) {
         TokenResponse response = authService.login(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<TokenResponse> refreshToken(
+            @RequestHeader("Authorization") String authHeader
+    ) {
+        TokenResponse response = authService.refreshToken(authHeader);
+        if (response == null ){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
         return ResponseEntity.ok(response);
     }
 }
