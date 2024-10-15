@@ -8,7 +8,6 @@ import com.xdpsx.auction.model.User;
 import com.xdpsx.auction.model.enums.AuthProvider;
 import com.xdpsx.auction.model.enums.Role;
 import com.xdpsx.auction.repository.UserRepository;
-import com.xdpsx.auction.security.CustomUserDetails;
 import com.xdpsx.auction.security.TokenProvider;
 import com.xdpsx.auction.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -39,8 +38,7 @@ public class AuthServiceImpl implements AuthService {
                 .role(Role.USER)
                 .build();
         User savedUser = userRepository.save(user);
-        String accessToken = tokenProvider.generateToken(savedUser);
-        return TokenResponse.builder().accessToken(accessToken).build();
+        return tokenProvider.generateToken(savedUser);
     }
 
     @Override
@@ -48,8 +46,7 @@ public class AuthServiceImpl implements AuthService {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
-        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
-        String accessToken = tokenProvider.generateToken(user);
-        return TokenResponse.builder().accessToken(accessToken).build();
+        User user = (User) authentication.getPrincipal();
+        return tokenProvider.generateToken(user);
     }
 }

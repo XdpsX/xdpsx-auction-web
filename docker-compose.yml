@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   mysql:
-#    container_name: mysql
+    container_name: mysql_container
     image: mysql:8.4
     hostname: ${MYSQL_HOST}
     environment:
@@ -18,9 +18,21 @@ services:
       - mysql:/var/lib/mysql
     networks:
       - auction-network
+  redis:
+    image: redis:7.4
+    container_name: redis_container
+    hostname: ${REDIS_HOST}
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    volumes:
+      - redis:/data
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}" ]
 
 volumes:
   mysql:
+  redis:
 
 networks:
   auction-network:

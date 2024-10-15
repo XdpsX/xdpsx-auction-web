@@ -14,6 +14,13 @@ spring:
   liquibase:
     change-log: classpath:/db/changelog/db.changelog-master.yaml # default
     enabled: true
+  cache:
+    type: redis
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
 
 #logging:
 #  pattern:
@@ -25,7 +32,9 @@ file:
 app:
   jwt:
     secret: AxdbTQmW/abSjS3TpqhS2rHHUTtK8ESb0xq9uueSj34=
-    expiration:
+    access-expiration:
       seconds: 3600
+    refresh-expiration:
+      seconds: 36000
   cors:
     allowed-origins: http://localhost:3000,http://localhost:3001
