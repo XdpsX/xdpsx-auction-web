@@ -40,6 +40,9 @@ public class User extends AbstractAuditEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;
 
+    @OneToMany
+    private List<Auction> auctions;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(ROLE_PREFIX + role.name()));

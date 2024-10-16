@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,6 +26,9 @@ public class Category extends AbstractAuditEntity {
 
     @OneToOne
     private Media image;
+
+    @OneToMany
+    private List<Auction> auctions;
 
     public String getImgUrl(){
         if (image == null){
