@@ -1,28 +1,35 @@
 package com.xdpsx.auction.service.impl;
 
+import com.xdpsx.auction.constant.ErrorCode;
+import com.xdpsx.auction.dto.PageResponse;
+import com.xdpsx.auction.dto.category.CategoryDetailsDto;
 import com.xdpsx.auction.dto.category.CategoryRequest;
 import com.xdpsx.auction.dto.category.CategoryResponse;
+import com.xdpsx.auction.exception.InUseException;
 import com.xdpsx.auction.exception.DuplicateException;
 import com.xdpsx.auction.exception.NotFoundException;
+import com.xdpsx.auction.mapper.PageMapper;
 import com.xdpsx.auction.model.Category;
 import com.xdpsx.auction.model.Media;
 import com.xdpsx.auction.repository.CategoryRepository;
+import com.xdpsx.auction.repository.specification.SimpleSpecification;
 import com.xdpsx.auction.service.CategoryService;
 import com.xdpsx.auction.service.MediaService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.xdpsx.auction.constant.FileConstants.CATEGORY_IMAGE_FOLDER;
-import static com.xdpsx.auction.constant.FileConstants.CATEGORY_IMAGE_MIN_WIDTH;
-
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
+    private final PageMapper pageMapper;
     private final MediaService mediaService;
     private final CategoryRepository categoryRepository;
+    private final SimpleSpecification<Category> specification;
 
     @Override
     public List<CategoryResponse> listPublishedCategories() {
@@ -31,68 +38,90 @@ public class CategoryServiceImpl implements CategoryService {
                 .toList();
     }
 
-    @Transactional
     @Override
-    public CategoryResponse createCategory(CategoryRequest request) {
-        if (categoryRepository.existsByName(request.getName())){
-            throw new DuplicateException("Category name=%s already exists".formatted(request.getName()));
-        }
-        if (categoryRepository.existsBySlug(request.getSlug())){
-            throw new DuplicateException("Category slug=%s already exists".formatted(request.getSlug()));
-        }
+    public CategoryDetailsDto getCategoryById(Integer id) {
+        Category category = fetchCategory(id);
+        return CategoryDetailsDto.fromModel(category);
+    }
+
+    @Override
+    public PageResponse<CategoryDetailsDto> getPageCategories(int pageNum, int pageSize,
+                                                              String keyword, String sort, Boolean hasPublished) {
+        Page<Category> categoryPage = categoryRepository.findAll(
+                specification.getSimpleSpec(keyword, sort, hasPublished),
+                PageRequest.of(pageNum - 1, pageSize)
+        );
+        return pageMapper.toPageCategoryResponse(categoryPage);
+    }
+
+    @Override
+    public CategoryDetailsDto createCategory(CategoryRequest request) {
+        checkNameExists(request.getName());
+        checkSlugExists(request.getSlug());
         Category category = Category.builder()
                 .name(request.getName())
                 .slug(request.getSlug())
                 .isPublished(request.isPublished())
                 .build();
-//        if (request.getFile() != null){
-//            Media image = mediaService.saveMedia(request.getFile(), CATEGORY_IMAGE_FOLDER, CATEGORY_IMAGE_MIN_WIDTH);
-//            category.setImage(image);
-//        }
+        if (request.getImageId() != null){
+            Media image = mediaService.getMedia(request.getImageId());
+            category.setImage(image);
+        }
         Category savedCategory = categoryRepository.save(category);
-        return CategoryResponse.fromModel(savedCategory);
+        return CategoryDetailsDto.fromModel(savedCategory);
     }
 
     @Transactional
     @Override
-    public CategoryResponse updateCategory(Integer id, CategoryRequest request) {
-        Category existingCat = categoryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Category with id=%s not found".formatted(id)));
+    public CategoryDetailsDto updateCategory(Integer id, CategoryRequest request) {
+        Category categoryToEdit = fetchCategory(id);
 
-        // Update name
-        if (!existingCat.getName().equals(request.getName())){
-            if (categoryRepository.existsByName(request.getName())){
-                throw new DuplicateException("Category with name=%s already exists".formatted(request.getName()));
-            }
-            existingCat.setName(request.getName());
+        if (!categoryToEdit.getName().equals(request.getName())){
+            checkNameExists(request.getName());
         }
-
-        // Update slug
-        if (!existingCat.getSlug().equals(request.getSlug())){
-            if (categoryRepository.existsBySlug(request.getSlug())){
-                throw new DuplicateException("Category with slug=%s already exists".formatted(request.getSlug()));
-            }
-            existingCat.setSlug(request.getSlug());
+        if (!categoryToEdit.getSlug().equals(request.getSlug())){
+            checkSlugExists(request.getSlug());
         }
-
-        existingCat.setPublished(request.isPublished());
+        categoryToEdit.setName(request.getName());
+        categoryToEdit.setSlug(request.getSlug());
+        categoryToEdit.setPublished(request.isPublished());
 
         // Update file
-//        if (request.getFile() != null){
-//            mediaService.deleteMedia(existingCat.getImage().getId());
-//            Media image = mediaService.saveMedia(request.getFile(), CATEGORY_IMAGE_FOLDER, CATEGORY_IMAGE_MIN_WIDTH);
-//            existingCat.setImage(image);
-//        }
-        Category savedCategory = categoryRepository.save(existingCat);
-        return CategoryResponse.fromModel(savedCategory);
+        if (request.getImageId() != null){
+            mediaService.deleteMedia(categoryToEdit.getImage().getId());
+            Media image = mediaService.getMedia(request.getImageId());
+            categoryToEdit.setImage(image);
+        }
+        Category updatedCategory = categoryRepository.save(categoryToEdit);
+        return CategoryDetailsDto.fromModel(updatedCategory);
     }
 
     @Transactional
     @Override
     public void deleteCategory(Integer id) {
-        Category existingCat = categoryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Category with id=%s not found".formatted(id)));
-        categoryRepository.delete(existingCat);
-        mediaService.deleteMedia(existingCat.getImage().getId());
+        Category category = fetchCategory(id);
+        long countCategories = categoryRepository.countCategoriesUsed(category.getId());
+        if (countCategories > 0){
+            throw new InUseException(ErrorCode.CATEGORY_IN_USE, category.getName());
+        }
+        categoryRepository.delete(category);
+        mediaService.deleteMedia(category.getImage().getId());
+    }
+
+    private Category fetchCategory(Integer id) {
+        return categoryRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.CATEGORY_NOT_FOUND, id));
+    }
+
+    private void checkSlugExists(String slug) {
+        if (categoryRepository.existsBySlug(slug)){
+            throw new DuplicateException(ErrorCode.SLUG_DUPLICATED, slug);
+        }
+    }
+
+    private void checkNameExists(String name) {
+        if (categoryRepository.existsByName(name)){
+            throw new DuplicateException(ErrorCode.NAME_DUPLICATED, name);
+        }
     }
 }
