@@ -1,10 +1,10 @@
 package com.xdpsx.auction.exception.handler;
 
+import com.xdpsx.auction.dto.error.ErrorDetailsDto;
 import com.xdpsx.auction.dto.error.ErrorDto;
-import com.xdpsx.auction.exception.DuplicateException;
-import com.xdpsx.auction.exception.NotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.extern.slf4j.Slf4j;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -16,27 +16,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-@Slf4j
 @ControllerAdvice
-public class GlobalExceptionHandler {
-    private static final String ERROR_LOG_FORMAT = "Error: URI: {}, ErrorCode: {}, Message: {}";
-
-    @ExceptionHandler(DuplicateException.class)
-    public ResponseEntity<ErrorDto> handleDuplicate(DuplicateException ex, HttpServletRequest request) {
-        HttpStatus status = HttpStatus.CONFLICT;
-        String message = ex.getMessage();
-
-        return buildErrorResponse(status, message, ex, request);
-    }
-
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ErrorDto> handleNotFoundException(NotFoundException ex, HttpServletRequest request) {
-        HttpStatus status = HttpStatus.NOT_FOUND;
-        String message = ex.getMessage();
-
-        return buildErrorResponse(status, message, ex, request);
-    }
+public class GlobalExceptionHandler extends AbstractExceptionHandler{
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorDto> handleBadCredentials(BadCredentialsException ex, HttpServletRequest request){
@@ -46,10 +29,28 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(status, message, ex, request);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorDto> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpServletRequest request) {
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorDetailsDto> handleConstraintViolationException(ConstraintViolationException ex,
+                                                                              HttpServletRequest request) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
-        String message = "Request information is not valid";
+
+        Set<ConstraintViolation<?>> fieldErrorsList = ex.getConstraintViolations();
+        Map<String, String> fieldErrors = new HashMap<>();
+
+        for (ConstraintViolation<?> fieldError : fieldErrorsList) {
+            String[] fieldPathSplit = fieldError.getPropertyPath().toString().split("\\.");
+            String fieldName = fieldPathSplit[fieldPathSplit.length - 1];
+//            fieldErrors.put(fieldName, fieldError.getMessage());
+            fieldErrors.merge(fieldName, fieldError.getMessage(),
+                    (existingMessage, newMessage) -> existingMessage + "; " + newMessage);
+        }
+        return buildErrorDetailsResponse(status, INVALID_REQUEST_INFORMATION_MESSAGE, fieldErrors, ex, request);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorDetailsDto> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex,
+                                                                                 HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
 
         List<FieldError> fieldErrorsList = ex.getBindingResult().getFieldErrors();
         Map<String, String> fieldErrors = new HashMap<>();
@@ -57,10 +58,11 @@ public class GlobalExceptionHandler {
         for (FieldError fieldError : fieldErrorsList) {
             String errorMessage = fieldError.getDefaultMessage();
             if (errorMessage != null) {
-                fieldErrors.merge(fieldError.getField(), errorMessage, (existingMessage, newMessage) -> existingMessage + "; " + newMessage);
+                fieldErrors.merge(fieldError.getField(), errorMessage,
+                        (existingMessage, newMessage) -> existingMessage + "; " + newMessage);
             }
         }
-        return buildErrorResponse(status, message, fieldErrors, ex, request);
+        return buildErrorDetailsResponse(status, INVALID_REQUEST_INFORMATION_MESSAGE, fieldErrors, ex, request);
     }
 
     @ExceptionHandler(Exception.class)
@@ -70,20 +72,4 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(status, message, ex, request);
     }
 
-    private ResponseEntity<ErrorDto> buildErrorResponse(HttpStatus status, String message,
-                                                                Exception ex, HttpServletRequest request){
-        return buildErrorResponse(status, message, null, ex, request);
-    }
-
-    private ResponseEntity<ErrorDto> buildErrorResponse(HttpStatus status, String message, Map<String, String> errors,
-                                                        Exception ex, HttpServletRequest request) {
-        ErrorDto error =
-                new ErrorDto(status.toString(), message, errors);
-
-        if (request != null) {
-            log.error(ERROR_LOG_FORMAT, request.getServletPath(), status.value(), message);
-        }
-        log.error(message, ex);
-        return ResponseEntity.status(status).body(error);
-    }
 }

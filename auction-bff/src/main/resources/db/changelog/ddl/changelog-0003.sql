@@ -6,7 +6,7 @@ CREATE TABLE users (
     avatar_id BIGINT,
     role VARCHAR(32) NOT NULL,
     provider VARCHAR(32) NOT NULL,
-    created_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     FOREIGN KEY (avatar_id) REFERENCES medias(id) ON DELETE SET NULL
 );
