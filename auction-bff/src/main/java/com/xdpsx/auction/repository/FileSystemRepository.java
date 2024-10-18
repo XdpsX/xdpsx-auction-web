@@ -1,10 +1,13 @@
 package com.xdpsx.auction.repository;
 
 import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,17 +23,18 @@ public class FileSystemRepository {
     private String directory;
 
     public String storeFile(MultipartFile file, String folderName) {
-        String uploadDir = directory;
-        if (folderName != null && !folderName.isEmpty()) {
-            uploadDir = directory + File.separator + folderName;
-        }
+        return storeFile(file, folderName, null);
+    }
+
+    public String storeFile(MultipartFile file, String folderName, Integer width) {
+        String uploadDir = getUploadDirectory(folderName);
         File folder = new File(uploadDir);
-        checkExistingDirectory(folder);
-        checkPermissions(folder);
+        checkDirectoryExists(folder);
+        checkDirectoryPermissions(folder);
 
         Path filePath = buildFilePath(uploadDir, Objects.requireNonNull(file.getOriginalFilename()));
         try {
-            Files.write(filePath, file.getBytes());
+            storeImageFile(file, filePath, width);
         } catch (IOException e) {
             throw new RuntimeException("Failed to write file: " + filePath, e);
         }
@@ -40,7 +44,7 @@ public class FileSystemRepository {
     public InputStream getFile(String filePath) {
         Path path = Paths.get(filePath);
         if (!Files.exists(path)) {
-            throw new IllegalStateException(String.format(String.format("Directory %s does not exist.", filePath)));
+            throw new IllegalStateException(String.format("File %s does not exist.", filePath));
         }
 
         try {
@@ -66,20 +70,20 @@ public class FileSystemRepository {
         }
     }
 
-    private void checkExistingDirectory(File directory) {
-        if (!directory.exists()) {
-//            throw new IllegalStateException(String.format("Directory %s does not exist.", directory));
-            boolean created = directory.mkdirs();
-            if (!created) {
-                throw new IllegalStateException(String.format("Failed to create directory %s.", directory));
-            }
-            log.info("Directory {} created successfully.", directory);
-        } else {
-            log.info("Directory {} already exists.", directory);
-        }
+    private String getUploadDirectory(String folderName) {
+        return (folderName != null && !folderName.isEmpty())
+                ? directory + File.separator + folderName
+                : directory;
     }
 
-    private void checkPermissions(File directory) {
+    private void checkDirectoryExists(File directory) {
+        if (!directory.exists() && !directory.mkdirs()) {
+            throw new IllegalStateException(String.format("Failed to create directory %s.", directory));
+        }
+        log.info("Directory {} {}", directory, directory.exists() ? "already exists." : "created successfully.");
+    }
+
+    private void checkDirectoryPermissions(File directory) {
         if (!directory.canRead() || !directory.canWrite()) {
             throw new IllegalStateException(String.format("Directory %s is not accessible.", directory));
         }
@@ -93,6 +97,16 @@ public class FileSystemRepository {
         Path fileStorageLocation = Paths.get(uploadDir).toAbsolutePath().normalize();
         return fileStorageLocation.resolve(filename);
     }
+
+    private void storeImageFile(MultipartFile file, Path filePath, Integer width) throws IOException {
+        if (width != null){
+            BufferedImage originalImage = ImageIO.read(file.getInputStream());
+            Thumbnails.of(file.getInputStream())
+                    .size(width, (int) ((double) originalImage.getHeight() * width / originalImage.getWidth()))
+                    .toFile(filePath.toFile());
+        }else {
+            Files.write(filePath, file.getBytes());
+        }
+    }
+
 }
-
-

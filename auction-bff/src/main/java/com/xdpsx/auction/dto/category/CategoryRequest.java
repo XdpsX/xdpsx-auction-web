@@ -21,9 +21,11 @@ public class CategoryRequest {
 
     private boolean isPublished;
 
-    @ImgSizeConstraint(minWidth = CATEGORY_IMAGE_MIN_WIDTH)
-    @FileTypeConstraint(allowedTypes = {IMAGE_JPEG_VALUE, IMAGE_PNG_VALUE})
-    private MultipartFile file;
+    private Long imageId;
+
+//    @ImgSizeConstraint(minWidth = CATEGORY_IMAGE_MIN_WIDTH)
+//    @FileTypeConstraint(allowedTypes = {IMAGE_JPEG_VALUE, IMAGE_PNG_VALUE})
+//    private MultipartFile file;
 
     public void setSlug(String slug) {
         this.slug = slug.trim().replace(" ", "-");

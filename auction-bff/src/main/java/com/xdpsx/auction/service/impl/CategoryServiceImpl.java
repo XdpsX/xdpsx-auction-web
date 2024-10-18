@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static com.xdpsx.auction.constant.FileConstants.CATEGORY_IMAGE_FOLDER;
+import static com.xdpsx.auction.constant.FileConstants.CATEGORY_IMAGE_MIN_WIDTH;
 
 @Service
 @RequiredArgsConstructor
@@ -44,10 +45,10 @@ public class CategoryServiceImpl implements CategoryService {
                 .slug(request.getSlug())
                 .isPublished(request.isPublished())
                 .build();
-        if (request.getFile() != null){
-            Media image = mediaService.saveMedia(request.getFile(), CATEGORY_IMAGE_FOLDER);
-            category.setImage(image);
-        }
+//        if (request.getFile() != null){
+//            Media image = mediaService.saveMedia(request.getFile(), CATEGORY_IMAGE_FOLDER, CATEGORY_IMAGE_MIN_WIDTH);
+//            category.setImage(image);
+//        }
         Category savedCategory = categoryRepository.save(category);
         return CategoryResponse.fromModel(savedCategory);
     }
@@ -77,11 +78,11 @@ public class CategoryServiceImpl implements CategoryService {
         existingCat.setPublished(request.isPublished());
 
         // Update file
-        if (request.getFile() != null){
-            mediaService.deleteMedia(existingCat.getImage().getId());
-            Media image = mediaService.saveMedia(request.getFile(), CATEGORY_IMAGE_FOLDER);
-            existingCat.setImage(image);
-        }
+//        if (request.getFile() != null){
+//            mediaService.deleteMedia(existingCat.getImage().getId());
+//            Media image = mediaService.saveMedia(request.getFile(), CATEGORY_IMAGE_FOLDER, CATEGORY_IMAGE_MIN_WIDTH);
+//            existingCat.setImage(image);
+//        }
         Category savedCategory = categoryRepository.save(existingCat);
         return CategoryResponse.fromModel(savedCategory);
     }

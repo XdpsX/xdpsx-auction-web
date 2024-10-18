@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static com.xdpsx.auction.constant.FileConstants.AUCTION_IMAGE_FOLDER;
+import static com.xdpsx.auction.constant.FileConstants.AUCTION_IMAGE_MIN_WIDTH;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +35,7 @@ public class AuctionServiceImpl implements AuctionService {
         auction.setCategory(category);
 
         List<AuctionImage> images = request.getFiles().stream().map(file -> {
-            Media media = mediaService.saveMedia(file, AUCTION_IMAGE_FOLDER);
+            Media media = mediaService.saveMedia(file, AUCTION_IMAGE_FOLDER, AUCTION_IMAGE_MIN_WIDTH);
             return AuctionImage.builder()
                     .auction(auction)
                     .media(media).build();

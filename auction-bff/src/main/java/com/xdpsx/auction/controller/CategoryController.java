@@ -16,26 +16,26 @@ import java.util.List;
 public class CategoryController {
     private final CategoryService categoryService;
 
-    @GetMapping("/categories")
+    @GetMapping({"/storefront/categories", "/backoffice/categories"})
     ResponseEntity<List<CategoryResponse>> listPublishedCategories(){
         List<CategoryResponse> response = categoryService.listPublishedCategories();
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/categories")
-    ResponseEntity<CategoryResponse> createCategory(@Valid @ModelAttribute CategoryRequest request){
+    @PostMapping("/backoffice/categories")
+    ResponseEntity<CategoryResponse> createCategory(@Valid @RequestBody CategoryRequest request){
         CategoryResponse response = categoryService.createCategory(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PutMapping("/categories/{id}")
+    @PutMapping("/backoffice/categories/{id}")
     ResponseEntity<CategoryResponse> updateCategory(@PathVariable Integer id,
-                                                    @Valid @ModelAttribute CategoryRequest request){
+                                                    @Valid @RequestBody CategoryRequest request){
         CategoryResponse response = categoryService.updateCategory(id, request);
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/categories/{id}")
+    @DeleteMapping("/backoffice/categories/{id}")
     ResponseEntity<Void> deleteCategory(@PathVariable Integer id){
         categoryService.deleteCategory(id);
         return ResponseEntity.noContent().build();
