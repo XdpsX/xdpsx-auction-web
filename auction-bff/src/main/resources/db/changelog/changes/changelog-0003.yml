@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: 3
+      author: XdpsX
+      comment: 'Create users, roles tables'
+      changes:
+        - sqlFile:
+            path: db/changelog/sql/changelog-0003.sql

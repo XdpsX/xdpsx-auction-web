@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: 6
+      author: XdpsX
+      comment: 'Create auctions, auction_images tables'
+      changes:
+        - sqlFile:
+            path: db/changelog/sql/changelog-0006.sql

@@ -3,7 +3,7 @@ CREATE TABLE categories (
     name VARCHAR(255) NOT NULL UNIQUE,
     slug VARCHAR(255) NOT NULL UNIQUE ,
     is_published BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     image_id BIGINT,
     FOREIGN KEY (image_id) REFERENCES medias(id) ON DELETE SET NULL
