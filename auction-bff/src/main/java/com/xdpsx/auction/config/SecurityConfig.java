@@ -1,7 +1,7 @@
 package com.xdpsx.auction.config;
 
 import com.xdpsx.auction.filter.TokenFilter;
-import com.xdpsx.auction.model.enums.Role;
+import com.xdpsx.auction.model.Role;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -47,7 +47,7 @@ public class SecurityConfig {
                 .requestMatchers("/auth/**","/medias/**",
                         "/swagger-ui", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .requestMatchers("/storefront/**").permitAll()
-                .requestMatchers("/backoffice/**").hasRole(Role.ADMIN.name())
+                .requestMatchers("/backoffice/**").hasRole(Role.ADMIN)
                 .anyRequest().authenticated()
         );
         http

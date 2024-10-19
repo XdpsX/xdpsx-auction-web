@@ -1,17 +1,11 @@
 package com.xdpsx.auction.model;
 
 import com.xdpsx.auction.model.enums.AuthProvider;
-import com.xdpsx.auction.model.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
 import java.util.List;
-
-import static com.xdpsx.auction.constant.SecurityConstants.ROLE_PREFIX;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -20,7 +14,7 @@ import static com.xdpsx.auction.constant.SecurityConstants.ROLE_PREFIX;
 @Builder
 @Entity
 @Table(name = "users")
-public class User extends AbstractAuditEntity implements UserDetails {
+public class User extends AbstractAuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,42 +28,24 @@ public class User extends AbstractAuditEntity implements UserDetails {
     @OneToOne
     private Media avatar;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    private boolean enabled;
+
+    private boolean verified;
+
+    private boolean locked;
 
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
+    )
+    private Set<Role> roles;
+
     @OneToMany
     private List<Auction> auctions;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(ROLE_PREFIX + role.name()));
-    }
-
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 }

@@ -6,16 +6,17 @@ import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.xdpsx.auction.dto.auth.TokenResponse;
+import com.xdpsx.auction.model.Role;
 import com.xdpsx.auction.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -33,13 +34,18 @@ public class TokenProvider {
     private Long REFRESH_EXPIRATION_SECONDS;
 
     public TokenResponse generateToken(User user) {
+        CustomUserDetails userDetails = CustomUserDetails.fromUser(user);
+        return generateToken(userDetails);
+    }
+
+    public TokenResponse generateToken(CustomUserDetails userDetails) {
         return TokenResponse.builder()
-                .accessToken(generateToken(user, ACCESS_EXPIRATION_SECONDS, ACCESS_SECRET_KEY))
-                .refreshToken(generateToken(user, REFRESH_EXPIRATION_SECONDS, REFRESH_SECRET_KEY))
+                .accessToken(generateToken(userDetails, ACCESS_EXPIRATION_SECONDS, ACCESS_SECRET_KEY))
+                .refreshToken(generateToken(userDetails, REFRESH_EXPIRATION_SECONDS, REFRESH_SECRET_KEY))
                 .build();
     }
 
-    public String generateToken(User user, long expirationSeconds, String secretKey) {
+    public String generateToken(CustomUserDetails user, long expirationSeconds, String secretKey) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(user.getUsername())
@@ -48,7 +54,7 @@ public class TokenProvider {
                 .expirationTime(new Date(
                         Instant.now().plus(expirationSeconds, ChronoUnit.SECONDS).toEpochMilli()
                 ))
-                .claim("scope", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList().get(0))
+                .claim("scope", user.getRoles().stream().map(Role::getName).collect(Collectors.joining(" ")))
                 .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
         JWSObject jwsObject = new JWSObject(header, payload);
@@ -77,7 +83,8 @@ public class TokenProvider {
         return isTokenValid(token, userDetails, ACCESS_SECRET_KEY);
     }
 
-    public boolean isRefreshTokenValid(String token, UserDetails userDetails) {
+    public boolean isRefreshTokenValid(String token, User user) {
+        CustomUserDetails userDetails = CustomUserDetails.fromUser(user);
         return isTokenValid(token, userDetails, REFRESH_SECRET_KEY);
     }
 

@@ -1,5 +1,6 @@
-package com.xdpsx.auction.service.impl;
+package com.xdpsx.auction.security;
 
+import com.xdpsx.auction.model.User;
 import com.xdpsx.auction.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,7 +15,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByEmail(username)
+        User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException(String.format("User with email=%s not found", username)));
+        return CustomUserDetails.fromUser(user);
     }
 }

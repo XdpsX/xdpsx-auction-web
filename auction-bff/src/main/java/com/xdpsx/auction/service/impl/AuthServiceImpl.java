@@ -6,8 +6,8 @@ import com.xdpsx.auction.dto.auth.TokenResponse;
 import com.xdpsx.auction.exception.DuplicateException;
 import com.xdpsx.auction.model.User;
 import com.xdpsx.auction.model.enums.AuthProvider;
-import com.xdpsx.auction.model.enums.Role;
 import com.xdpsx.auction.repository.UserRepository;
+import com.xdpsx.auction.security.CustomUserDetails;
 import com.xdpsx.auction.security.TokenProvider;
 import com.xdpsx.auction.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,7 @@ public class AuthServiceImpl implements AuthService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .provider(AuthProvider.SYSTEM)
-                .role(Role.USER)
+//                .role(Role.USER)
                 .build();
         User savedUser = userRepository.save(user);
         return tokenProvider.generateToken(savedUser);
@@ -50,7 +50,7 @@ public class AuthServiceImpl implements AuthService {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
-        User user = (User) authentication.getPrincipal();
+        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
         return tokenProvider.generateToken(user);
     }
 
