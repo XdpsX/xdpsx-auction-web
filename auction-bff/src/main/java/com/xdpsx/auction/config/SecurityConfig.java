@@ -48,7 +48,7 @@ public class SecurityConfig {
                         "/swagger-ui", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .requestMatchers("/storefront/**").permitAll()
                 .requestMatchers("/backoffice/**").hasRole(Role.ADMIN)
-                .anyRequest().authenticated()
+                .anyRequest().permitAll()
         );
         http
                 .addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class)
