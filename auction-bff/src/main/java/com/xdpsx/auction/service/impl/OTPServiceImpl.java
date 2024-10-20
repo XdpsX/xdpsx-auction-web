@@ -1,9 +1,12 @@
 package com.xdpsx.auction.service.impl;
 
+import com.xdpsx.auction.constant.CacheKey;
 import com.xdpsx.auction.constant.ErrorCode;
 import com.xdpsx.auction.dto.otp.MailOTPRequest;
+import com.xdpsx.auction.dto.otp.OTPVerifyRequest;
 import com.xdpsx.auction.exception.BadRequestException;
 import com.xdpsx.auction.exception.NotFoundException;
+import com.xdpsx.auction.exception.OTPException;
 import com.xdpsx.auction.model.User;
 import com.xdpsx.auction.model.enums.EmailTemplateName;
 import com.xdpsx.auction.repository.UserRepository;
@@ -49,6 +52,16 @@ public class OTPServiceImpl implements OTPService {
         }
     }
 
+    @Override
+    public void verifyOTP(OTPVerifyRequest request) {
+        String key = CacheKey.getOTPKey(request.getEmail());
+        String otp = redisTemplate.opsForValue().get(key);
+        if (otp == null || !otp.equals(request.getOtp())) {
+            throw new OTPException(ErrorCode.OTP_INVALID);
+        }
+        redisTemplate.delete(key);
+    }
+
     private void validateEmail(String email){
         User user = userRepository.findByEmail(email).orElse(null);
         if (user == null){
@@ -61,7 +74,8 @@ public class OTPServiceImpl implements OTPService {
 
     private String genOTPAndSave(String email){
         String otp = generateCode();
-        redisTemplate.opsForValue().set(email, otp, OTP_VALID_MINUTES, TimeUnit.MINUTES);
+        String key = CacheKey.getOTPKey(email);
+        redisTemplate.opsForValue().set(key, otp, OTP_VALID_MINUTES, TimeUnit.MINUTES);
         return otp;
     }
 

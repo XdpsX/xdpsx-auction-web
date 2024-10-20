@@ -15,8 +15,14 @@ public class OTPController {
     private final OTPService otpService;
 
     @PostMapping("/otp-mail/send")
-    ResponseEntity<?> sendOTPMail(@Valid @RequestBody MailOTPRequest request){
+    ResponseEntity<Void> sendOTPMail(@Valid @RequestBody MailOTPRequest request){
         otpService.sendValidEmailOTP(request);
-        return null;
+        return ResponseEntity.ok().build();
     }
+
+//    @PostMapping("/verify-otp")
+//    ResponseEntity<Void> verifyOTP(@Valid @RequestBody OTPVerifyRequest request){
+//        otpService.verifyOTP(request);
+//        return ResponseEntity.ok().build();
+//    }
 }
