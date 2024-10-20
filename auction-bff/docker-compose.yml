@@ -29,6 +29,18 @@ services:
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
     command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}" ]
+  maildev:
+    image: maildev/maildev:2.1.0
+    container_name: maildev_container
+    ports:
+      - "1025:1025"
+      - "1080:1080"
+#    environment:
+#      - MAILDEV_SMTP_PORT=1025
+#      - MAILDEV_WEB_PORT=1080
+#      - MAILDEV_INCOMING_USER=xdpsx
+#      - MAILDEV_INCOMING_PASS=xdpsxpass
+    restart: always
 
 volumes:
   mysql:

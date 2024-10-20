@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Activation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 10px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .logo-container{
+            text-align: center;
+        }
+        .activation-code {
+            font-size: 36px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .valid-time {
+            color: grey;
+            font-size: 14px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Email Validation</h1>
+    <div class="logo-container">
+        <img th:src="@{cid:logo}" alt="logo"/>
+    </div>
+    <p>Thank you for signing up! Please use the following OTP to validate your email:</p>
+    <div class="activation-code"><span th:text="${otp}"></span></div>
+    <p class="valid-time" th:text="'Please use this OTP in under ' + ${validTime} + ' minutes'"></p>
+</div>
+</body>
+</html>
