@@ -1,7 +1,8 @@
 package com.xdpsx.auction.service.impl;
 
+import com.xdpsx.auction.constant.ErrorCode;
+import com.xdpsx.auction.dto.auth.EmailDTO;
 import com.xdpsx.auction.dto.auth.LoginRequest;
-import com.xdpsx.auction.dto.auth.RegisterRequest;
 import com.xdpsx.auction.dto.auth.TokenResponse;
 import com.xdpsx.auction.exception.DuplicateException;
 import com.xdpsx.auction.model.User;
@@ -30,19 +31,21 @@ public class AuthServiceImpl implements AuthService {
     private final RedisTemplate<String, String> redisTemplate;
 
     @Override
-    public TokenResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new DuplicateException("Email %s is already in use".formatted(request.getEmail()));
+    public EmailDTO register(EmailDTO request) {
+        User user = userRepository.findByEmail(request.getEmail()).orElse(null);
+        if (user != null) {
+            if (user.isEnabled()){
+                throw new DuplicateException(ErrorCode.EMAIL_DUPLICATED, request.getEmail());
+            }
+            return new EmailDTO(user.getEmail());
         }
-        User user = User.builder()
-                .name(request.getName())
+        User newUser = User.builder()
+                .name("New User")
                 .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
                 .provider(AuthProvider.SYSTEM)
-//                .role(Role.USER)
                 .build();
-        User savedUser = userRepository.save(user);
-        return tokenProvider.generateToken(savedUser);
+        User savedUser = userRepository.save(newUser);
+        return new EmailDTO(savedUser.getEmail());
     }
 
     @Override

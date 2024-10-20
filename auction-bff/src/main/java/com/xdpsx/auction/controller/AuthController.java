@@ -1,7 +1,7 @@
 package com.xdpsx.auction.controller;
 
+import com.xdpsx.auction.dto.auth.EmailDTO;
 import com.xdpsx.auction.dto.auth.LoginRequest;
-import com.xdpsx.auction.dto.auth.RegisterRequest;
 import com.xdpsx.auction.dto.auth.TokenResponse;
 import com.xdpsx.auction.service.AuthService;
 import jakarta.validation.Valid;
@@ -17,9 +17,9 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<TokenResponse> register(@Valid @RequestBody RegisterRequest request) {
-        TokenResponse response = authService.register(request);
-        return ResponseEntity.ok(response);
+    ResponseEntity<EmailDTO> register(@Valid @RequestBody EmailDTO request){
+        EmailDTO response = authService.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/login")
