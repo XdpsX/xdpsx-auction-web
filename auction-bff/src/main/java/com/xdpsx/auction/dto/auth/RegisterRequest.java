@@ -1,7 +1,8 @@
 package com.xdpsx.auction.dto.auth;
 
-import jakarta.validation.constraints.Email;
+import com.xdpsx.auction.dto.otp.OTPVerifyRequest;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,12 +14,10 @@ public class RegisterRequest {
     @Size(max=64)
     private String name;
 
-    @Email
-    @NotBlank
-    @Size(max=64)
-    private String email;
-
     @NotBlank
     @Size(min=8, max = 255)
     private String password;
+
+    @NotNull
+    private OTPVerifyRequest verify;
 }
