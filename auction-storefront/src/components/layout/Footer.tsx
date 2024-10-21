@@ -4,8 +4,8 @@ import { FaFacebookF, FaTwitter, FaLinkedin, FaGithub } from 'react-icons/fa'
 const Footer = () => {
   return (
     <footer className="bg-gray-100 py-6">
-      <div className="container mx-auto px-6 md:px-20">
-        <div className="flex flex-wrap gap-4 justify-between border-b-[1px] py-6">
+      <div className="container-lg mx-auto px-6 md:px-20">
+        <div className="flex flex-wrap gap-6 justify-between border-b-[1px] py-6">
           <div>
             <h2 className="font-bold text-lg mb-2">Buy</h2>
             <ul className="flex flex-col gap-2 text-slate-600 text-sm font-semibold">

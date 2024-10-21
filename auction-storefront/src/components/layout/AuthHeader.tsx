@@ -8,7 +8,7 @@ function AuthHeader() {
 
   return (
     <header>
-      <div className="container mx-auto px-6 md:px-0 lg:px-36">
+      <div className="container mx-auto px-6 xl:px-36">
         <nav className="flex items-center gap-2">
           <Link to="/">
             <img src={LOGO} alt="Logo" className="h-16" />

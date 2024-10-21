@@ -14,7 +14,7 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <button
       className={`rounded-md px-3 py-2 font-semibold leading-6 text-white shadow-sm ${className} ${
-        disabled && 'opacity-80'
+        disabled && 'opacity-80 cursor-not-allowed'
       }`}
       disabled={disabled}
       {...props}
