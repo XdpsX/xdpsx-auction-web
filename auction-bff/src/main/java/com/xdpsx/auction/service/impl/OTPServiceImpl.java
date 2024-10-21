@@ -7,6 +7,7 @@ import com.xdpsx.auction.dto.otp.OTPVerifyRequest;
 import com.xdpsx.auction.exception.BadRequestException;
 import com.xdpsx.auction.exception.NotFoundException;
 import com.xdpsx.auction.exception.OTPException;
+import com.xdpsx.auction.exception.TooManyRequestException;
 import com.xdpsx.auction.model.User;
 import com.xdpsx.auction.model.enums.EmailTemplateName;
 import com.xdpsx.auction.repository.UserRepository;
@@ -69,6 +70,15 @@ public class OTPServiceImpl implements OTPService {
         }
         if (user.isEnabled()){
             throw new BadRequestException(ErrorCode.EMAIL_VALIDATED, email);
+        }
+
+        String key = CacheKey.getOTPKey(email);
+        Long ttl = redisTemplate.getExpire(key);
+        if (ttl != null && ttl > 0) {
+            long elapsedTime = (OTP_VALID_MINUTES * 60) - ttl;
+            if (elapsedTime < (MINUTES_PER_OTP * 60)){
+                throw new TooManyRequestException(ErrorCode.TOO_MANY_REQUEST);
+            }
         }
     }
 

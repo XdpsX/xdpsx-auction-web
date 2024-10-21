@@ -11,6 +11,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class CustomExceptionHandler extends AbstractExceptionHandler {
 
+    @ExceptionHandler(TooManyRequestException.class)
+    public ResponseEntity<ErrorDto> handleTooManyRequestException(TooManyRequestException ex, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.TOO_MANY_REQUESTS;
+        String message = ex.getMessage();
+
+        return buildErrorResponse(status, message, ex, request);
+    }
+
     @ExceptionHandler(OTPException.class)
     public ResponseEntity<ErrorDto> handleOTPException(OTPException ex, HttpServletRequest request) {
         HttpStatus status = HttpStatus.FORBIDDEN;

@@ -13,4 +13,5 @@ public class ErrorCode {
     public static final String CATEGORY_IN_USE="CATEGORY_IN_USE";
     public static final String EMAIL_VALIDATED="EMAIL_VALIDATED";
     public static final String OTP_INVALID="OTP_INVALID";
+    public static final String TOO_MANY_REQUEST="TOO_MANY_REQUEST";
 }
