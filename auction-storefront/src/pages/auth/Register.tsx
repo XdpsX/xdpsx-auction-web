@@ -1,118 +1,32 @@
-import { Link } from 'react-router-dom'
-import * as yup from 'yup'
-import { useForm } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
-import SocialLogin from '../../components/auth/SocialLogin'
-import InputField from '../../components/ui/InputField'
-
-const schema = yup.object().shape({
-  name: yup
-    .string()
-    .required('Please enter your name')
-    .max(64, 'Name must not exceed 64 characters'),
-  email: yup
-    .string()
-    .required('Please enter your email address')
-    .email('Please enter a valid email address')
-    .max(64, 'Email must not exceed 64 characters'),
-  password: yup
-    .string()
-    .required('Please enter your password')
-    .min(8, 'Password must be at least 8 characters')
-    .max(255, 'Password must not exceed 255 characters'),
-  confirmPassword: yup
-    .string()
-    .oneOf([yup.ref('password'), undefined], 'Passwords must match')
-    .required('Please confirm your password'),
-})
+import { useState } from 'react'
+import RegisterForm from '../../components/auth/RegisterForm'
+import { CREATE_ACCOUNT_STEP, REGISTER_STEP } from '../../constants/steps'
+import CreateAccountForm from '../../components/auth/CreateAccountForm'
 
 function Register() {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(schema),
-  })
-
-  const onSubmit = (data) => {
-    console.log(data)
-    // Xử lý đăng ký ở đây
-  }
+  const [currentStep, setCurrentStep] = useState(REGISTER_STEP)
 
   return (
-    <div className="w-full md:w-[420px] flex flex-col justify-center px-6 py-8 lg:px-8 bg-white text-gray-800">
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <h2 className="text-center text-2xl font-bold leading-9 tracking-tight ">
-          Register new account
-        </h2>
+    <div
+      className={` relative overflow-hidden min-h-[530px] w-[380px] lg:w-[420px]`}
+    >
+      <div
+        className={`w-full absolute flex items-center justify-center h-full top-0 left-0 transition-transform duration-500 ${
+          currentStep !== CREATE_ACCOUNT_STEP
+            ? 'translate-x-0'
+            : '-translate-x-[150%]'
+        }`}
+      >
+        <RegisterForm setCurrentStep={setCurrentStep} />
       </div>
-
-      <div className="mt-4 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-          <InputField
-            control={control}
-            name="name"
-            label="Name"
-            type="text"
-            error={errors.name}
-          />
-          <InputField
-            control={control}
-            name="email"
-            label="Email address"
-            type="email"
-            error={errors.email}
-          />
-          <InputField
-            control={control}
-            name="password"
-            label="Password"
-            type="password"
-            error={errors.password}
-          />
-          <InputField
-            control={control}
-            name="confirmPassword"
-            label="Confirm Password"
-            type="password"
-            error={errors.confirmPassword}
-          />
-
-          <div className="text-sm text-end">
-            <a
-              href="#"
-              className="font-semibold text-blue-600 hover:text-blue-500"
-            >
-              Forgot password?
-            </a>
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-blue-500"
-            >
-              Register
-            </button>
-          </div>
-        </form>
-
-        <div className="mt-4 text-center">
-          <p>
-            <span>Already have account? </span>
-            <span>
-              <Link
-                to="/login"
-                className="text-yellow-600 font-semibold cursor-pointer hover:text-yellow-500"
-              >
-                Login now
-              </Link>
-            </span>
-          </p>
-        </div>
-
-        <SocialLogin />
+      <div
+        className={`w-full absolute flex items-center justify-center h-full top-0 left-0 transition-transform duration-500 ${
+          currentStep !== CREATE_ACCOUNT_STEP
+            ? 'translate-x-[150%]'
+            : 'translate-x-0'
+        }`}
+      >
+        <CreateAccountForm setCurrentStep={setCurrentStep} />
       </div>
     </div>
   )

@@ -1,8 +1,12 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import { AccountCreateRequest, RegisterRequest } from '../../models/auth.type'
-import api from '../../utils/api'
-import { fromAxiosErrorToAPIErrorDetails } from '../../utils/error.helper'
+import {
+  AccountCreateRequest,
+  LoginRequest,
+  RegisterRequest,
+} from '../../models/auth.type'
 import { Token } from '../../models/token.type'
+import { fromAxiosErrorToAPIErrorDetails } from '../../utils/error.helper'
+import api from '../../utils/api'
 
 export const registerAPI = createAsyncThunk(
   'auth/registerAPI',
@@ -33,6 +37,18 @@ export const createAccountAPI = createAsyncThunk(
   async (payload: AccountCreateRequest, thunkAPI) => {
     try {
       const response = await api.post<Token>('/auth/create-account', payload)
+      return response.data
+    } catch (error) {
+      return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))
+    }
+  }
+)
+
+export const loginAPI = createAsyncThunk(
+  'auth/loginAPI',
+  async (payload: LoginRequest, thunkAPI) => {
+    try {
+      const response = await api.post<Token>('/auth/login', payload)
       return response.data
     } catch (error) {
       return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))

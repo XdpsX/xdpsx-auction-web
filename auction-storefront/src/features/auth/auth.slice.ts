@@ -1,5 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { createAccountAPI, registerAPI, sendOTPAPI } from './auth.thunk'
+import {
+  createAccountAPI,
+  loginAPI,
+  registerAPI,
+  sendOTPAPI,
+} from './auth.thunk'
 import { APIErrorDetails } from '../../models/error.type'
 import { RootState } from '../../store/type'
 
@@ -69,6 +74,22 @@ export const authSlice = createSlice({
         localStorage.setItem('refreshToken', payload.refreshToken)
       })
       .addCase(createAccountAPI.rejected, (state, { payload }) => {
+        state.isLoading = false
+        state.error = payload as APIErrorDetails
+      })
+      //loginAPI
+      .addCase(loginAPI.pending, (state) => {
+        state.isLoading = true
+        state.error = null
+      })
+      .addCase(loginAPI.fulfilled, (state, { payload }) => {
+        state.isLoading = false
+        state.accessToken = payload.accessToken
+        state.refreshToken = payload.refreshToken
+        localStorage.setItem('accessToken', payload.accessToken)
+        localStorage.setItem('refreshToken', payload.refreshToken)
+      })
+      .addCase(loginAPI.rejected, (state, { payload }) => {
         state.isLoading = false
         state.error = payload as APIErrorDetails
       })
