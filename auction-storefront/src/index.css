@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  .divider-next {
+    @apply relative after:absolute  after:h-full after:w-[2px]  after:top-0 after:-right-[10px] after:bg-slate-300;
+  }
+}

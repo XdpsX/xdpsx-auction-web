@@ -42,8 +42,8 @@ export const authSlice = createSlice({
         state.error = null
       })
       .addCase(registerAPI.fulfilled, (state, action) => {
-        state.isLoading = false
         state.emailRegister = action.payload.email
+        state.isLoading = false
       })
       .addCase(registerAPI.rejected, (state, action) => {
         state.isLoading = false
