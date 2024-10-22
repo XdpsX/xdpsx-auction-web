@@ -22,7 +22,10 @@ export default {
             maxWidth: '1280px',
           },
           '@screen xl': {
-            maxWidth: '1580px',
+            maxWidth: '1380px',
+          },
+          '@screen 2xl': {
+            maxWidth: '1480px',
           },
         }
       })

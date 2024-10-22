@@ -7,17 +7,15 @@ function AuthHeader() {
   const isRegisterPage = location.pathname === '/register'
 
   return (
-    <header>
-      <div className="container mx-auto px-6 xl:px-36">
-        <nav className="flex items-center gap-2">
-          <Link to="/">
-            <img src={LOGO} alt="Logo" className="h-16" />
-          </Link>
-          <div className="text-lg lg:text-xl">
-            {isRegisterPage ? 'Register' : 'Login'}
-          </div>
-        </nav>
-      </div>
+    <header className="container mx-auto px-6 xl:px-36">
+      <nav className="flex items-center gap-2">
+        <Link to="/">
+          <img src={LOGO} alt="Logo" className="w-40" />
+        </Link>
+        <div className="text-lg lg:text-xl">
+          {isRegisterPage ? 'Register' : 'Login'}
+        </div>
+      </nav>
     </header>
   )
 }

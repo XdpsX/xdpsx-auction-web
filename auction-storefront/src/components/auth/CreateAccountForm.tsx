@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -37,6 +37,7 @@ function CreateAccountForm({
     handleSubmit,
     reset,
     setError,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(accountCreateSchema),
@@ -46,10 +47,14 @@ function CreateAccountForm({
       confirmPassword: '',
       verify: {
         otp: '',
-        email: emailRegister,
+        email: '',
       },
     },
   })
+
+  useEffect(() => {
+    setValue('verify.email', emailRegister)
+  }, [emailRegister, setValue])
 
   const sendOtp = () => {
     if (!emailRegister) return
@@ -97,6 +102,7 @@ function CreateAccountForm({
   }
 
   const onSubmit = (data: AccountCreateRequest) => {
+    console.log(data)
     dispatch(createAccountAPI(data))
       .unwrap()
       .then(() => {
@@ -114,6 +120,10 @@ function CreateAccountForm({
           })
         }
       })
+  }
+
+  if (!emailRegister) {
+    return null
   }
 
   return (

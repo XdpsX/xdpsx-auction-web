@@ -31,7 +31,7 @@ function RegisterForm({
     },
   })
 
-  const onSubmit = async (data: RegisterRequest) => {
+  const onSubmit = (data: RegisterRequest) => {
     dispatch(registerAPI(data))
       .unwrap()
       .then(() => {

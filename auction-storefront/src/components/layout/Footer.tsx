@@ -142,7 +142,7 @@ const Footer = () => {
           </div>
         </div>
         <div className="flex justify-center items-center text-slate-600 mx-auto pt-4 text-center">
-          <span>Copiright @{new Date().getFullYear()} All Rights Reserved</span>
+          <span>Copyright @{new Date().getFullYear()} All Rights Reserved</span>
         </div>
       </div>
     </footer>

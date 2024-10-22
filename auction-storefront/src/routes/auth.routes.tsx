@@ -1,5 +1,5 @@
 import AuthRoute from '../components/route/AuthRoute'
-import PageTitle from '../components/ui/PageTitle'
+import PageTitle from '../components/layout/PageTitle'
 import AuthLayout from '../layouts/AuthLayout'
 import Login from '../pages/auth/Login'
 import Register from '../pages/auth/Register'
