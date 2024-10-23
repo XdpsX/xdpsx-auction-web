@@ -55,3 +55,14 @@ export const loginAPI = createAsyncThunk(
     }
   }
 )
+
+export const logoutAPI = createAsyncThunk(
+  'auth/logoutAPI',
+  async (_, thunkAPI) => {
+    try {
+      await api.post('/auth/logout')
+    } catch (error) {
+      return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))
+    }
+  }
+)

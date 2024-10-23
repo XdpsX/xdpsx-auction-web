@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 import {
   createAccountAPI,
   loginAPI,
+  logoutAPI,
   registerAPI,
   sendOTPAPI,
 } from './auth.thunk'
@@ -92,6 +93,13 @@ export const authSlice = createSlice({
       .addCase(loginAPI.rejected, (state, { payload }) => {
         state.isLoading = false
         state.error = payload as APIErrorDetails
+      })
+      //logoutAPI
+      .addCase(logoutAPI.fulfilled, (state) => {
+        state.accessToken = null
+        state.refreshToken = null
+        localStorage.removeItem('accessToken')
+        localStorage.removeItem('refreshToken')
       })
   },
 })

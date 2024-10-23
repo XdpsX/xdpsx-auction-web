@@ -8,16 +8,33 @@ import {
   FaQuestionCircle,
   FaArrowRight,
   FaBars,
+  FaAngleDown,
 } from 'react-icons/fa'
-import { useAppSelector } from '../../store/hooks'
+import USER_ICON from '../../assets/default-user-icon.png'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { selectUser } from '../../features/user/user.slice'
+import Popover from '../ui/Popover'
+import { logoutAPI } from '../../features/auth/auth.thunk'
+import { toast } from 'react-toastify'
 
 function HeaderTop({
   setShowSidebar,
 }: {
   setShowSidebar: (value: boolean) => void
 }) {
+  const dispatch = useAppDispatch()
   const { userProfile } = useAppSelector(selectUser)
+
+  const handleLogout = () => {
+    dispatch(logoutAPI())
+      .unwrap()
+      .then(() => {
+        toast.success('Logout successfully')
+      })
+      .catch((e) => {
+        console.log(e)
+      })
+  }
 
   return (
     <div className="container-lg mx-auto px-10 md:pl-12 md:pr-24 py-2">
@@ -54,29 +71,29 @@ function HeaderTop({
           </div>
           <div className="flex gap-3">
             <Link to="#">
-              <FaFacebookF />
+              <FaFacebookF size={16} />
             </Link>
             <Link to="#">
-              <FaTwitter />
+              <FaTwitter size={16} />
             </Link>
             <Link to="#">
-              <FaLinkedin />
+              <FaLinkedin size={16} />
             </Link>
             <Link to="#">
-              <FaEnvelope />
+              <FaEnvelope size={16} />
             </Link>
           </div>
         </nav>
         <div className="ml-auto flex items-center gap-6">
           <div className="divider-next">
             <Link to="#" className="font-medium text-slate-700">
-              <FaQuestionCircle />
+              <FaQuestionCircle size={18} />
             </Link>
           </div>
-          <div className="divider-next">
-            <div className="font-medium text-slate-700">
-              <FaBell />
-            </div>
+          <div className="divider-next flex items-center">
+            <button className="font-medium text-slate-700">
+              <FaBell size={18} />
+            </button>
           </div>
           {!userProfile ? (
             <Link
@@ -87,11 +104,37 @@ function HeaderTop({
               <FaArrowRight size={12} className="mt-[2px]" />
             </Link>
           ) : (
-            <div>
-              <span className="text-slate-700 font-medium">
-                {userProfile.name}
-              </span>
-            </div>
+            <span className="text-slate-700 font-medium">
+              <Popover
+                className=" flex cursor-pointer items-center py-1 hover:text-slate-700/80"
+                renderPopover={
+                  <div className="relative rounded-sm border border-gray-200 bg-white shadow-md min-w-[150px]">
+                    <Link
+                      to={'/'}
+                      className="block w-full bg-white px-4 py-3 text-left hover:bg-slate-100 hover:text-yellow-500"
+                    >
+                      Profile
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full bg-white px-4 py-3 text-left hover:bg-slate-100 hover:text-yellow-500"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                }
+              >
+                <Link to="/" className="flex items-center gap-2 flex-shrink-0">
+                  <img
+                    src={userProfile.avatarUrl || USER_ICON}
+                    alt="avatar"
+                    className="h-6 w-6 rounded-full object-cover"
+                  />
+                  <p>{userProfile.name}</p>
+                  <FaAngleDown />
+                </Link>
+              </Popover>
+            </span>
           )}
         </div>
       </div>

@@ -7,6 +7,8 @@ import { useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from './store/hooks'
 import { selectAuth } from './features/auth/auth.slice'
 import { getUserProfile } from './features/user/user.thunk'
+import { selectUser, setUserProfile } from './features/user/user.slice'
+import LoadingOverlay from './components/ui/LoadingOverlay'
 
 const router = createBrowserRouter([
   {
@@ -30,11 +32,22 @@ const router = createBrowserRouter([
 function App() {
   const dispatch = useAppDispatch()
   const { accessToken } = useAppSelector(selectAuth)
+  const { isFetching } = useAppSelector(selectUser)
+
   useEffect(() => {
     if (accessToken) {
       dispatch(getUserProfile())
+    } else {
+      dispatch(setUserProfile(null))
     }
   }, [accessToken, dispatch])
+  if (isFetching) {
+    return (
+      <div className="relative h-screen">
+        <LoadingOverlay />
+      </div>
+    )
+  }
   return <RouterProvider router={router} />
 }
 export default App
