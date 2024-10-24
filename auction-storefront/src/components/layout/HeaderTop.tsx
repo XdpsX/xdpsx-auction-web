@@ -130,7 +130,7 @@ function HeaderTop({
                     alt="avatar"
                     className="h-6 w-6 rounded-full object-cover"
                   />
-                  <p>{userProfile.name}</p>
+                  <p className="max-w-[100px] truncate">{userProfile.name}</p>
                   <FaAngleDown />
                 </Link>
               </Popover>

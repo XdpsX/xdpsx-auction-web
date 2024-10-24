@@ -6,6 +6,7 @@ import store from './store'
 import App from './App.tsx'
 import './index.css'
 import 'react-toastify/dist/ReactToastify.css'
+import 'react-multi-carousel/lib/styles.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -5,10 +5,12 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { selectCategory } from '../../features/category/category.slice'
 import { useEffect } from 'react'
 import { getListCategories } from '../../features/category/category.thunk'
+import { selectUser } from '../../features/user/user.slice'
 
 function HeaderBottom() {
   const dispatch = useAppDispatch()
   const { categories } = useAppSelector(selectCategory)
+  const { userProfile } = useAppSelector(selectUser)
 
   useEffect(() => {
     dispatch(getListCategories())
@@ -45,20 +47,24 @@ function HeaderBottom() {
               Search
             </button>
           </div>
-          <div className="hidden sm:flex items-center gap-2 bg-gray-100 rounded-xl p-2 shadow-md">
-            <div className="flex items-center gap-2 w-[100px]">
-              <FaMoneyBillWave className="text-green-600" size={20} />
-              <span className="text-black text-sm font-semibold truncate">
-                10,000,000
-              </span>
+          {userProfile ? (
+            <div className="hidden sm:flex items-center gap-2 bg-gray-100 rounded-xl p-2 shadow-md">
+              <div className="flex items-center gap-2 w-[100px]">
+                <FaMoneyBillWave className="text-green-600" size={20} />
+                <span className="text-black text-sm font-semibold truncate">
+                  10,000,000
+                </span>
+              </div>
+              <Link to="#">
+                <FaPlusCircle
+                  className="text-blue-600 bg-transparent overflow-hidden"
+                  size={20}
+                />
+              </Link>
             </div>
-            <Link to="#">
-              <FaPlusCircle
-                className="text-blue-600 bg-transparent overflow-hidden"
-                size={20}
-              />
-            </Link>
-          </div>
+          ) : (
+            <div className="w-[100px]"></div>
+          )}
         </div>
       </div>
     </div>
