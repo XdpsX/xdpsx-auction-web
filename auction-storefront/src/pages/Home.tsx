@@ -4,7 +4,7 @@ import DropDown from '../components/ui/DropDown'
 import { Link } from 'react-router-dom'
 import Banner from '../components/home/Banner'
 import { auctions } from '../utils/data'
-import AuctionCard from '../components/auction/AuctionCard'
+import AuctionList from '../components/auction/AuctionList'
 
 function Home() {
   const { categories } = useAppSelector(selectCategory)
@@ -67,11 +67,7 @@ function Home() {
               </Link>
             </div>
           </div>
-          <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 3xl:grid-cols-5  gap-6 md:gap-8">
-            {auctions.map((auction) => (
-              <AuctionCard key={auction.id} auction={auction} />
-            ))}
-          </div>
+          <AuctionList auctions={auctions} />
         </section>
 
         <section>
@@ -86,11 +82,7 @@ function Home() {
               </Link>
             </div>
           </div>
-          <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 3xl:grid-cols-5  gap-6 md:gap-8">
-            {auctions.map((auction) => (
-              <AuctionCard key={auction.id} auction={auction} />
-            ))}
-          </div>
+          <AuctionList auctions={auctions} />
         </section>
       </div>
     </div>
