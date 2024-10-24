@@ -2,6 +2,9 @@ package com.xdpsx.auction.config;
 
 import com.xdpsx.auction.filter.TokenFilter;
 import com.xdpsx.auction.model.Role;
+import com.xdpsx.auction.security.oauth2.CustomOAuth2FailureHandler;
+import com.xdpsx.auction.security.oauth2.CustomOAuth2UserService;
+import com.xdpsx.auction.security.oauth2.CustomOauth2SuccessHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,7 +45,10 @@ public class SecurityConfig {
             TokenFilter tokenFilter,
             AuthenticationProvider authenticationProvider,
             AuthenticationEntryPoint authenticationEntryPoint,
-            LogoutHandler logoutHandler
+            LogoutHandler logoutHandler,
+            CustomOAuth2UserService customOAuth2UserService,
+            CustomOauth2SuccessHandler customOauth2SuccessHandler,
+            CustomOAuth2FailureHandler customOAuth2FailureHandler
     ) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -51,7 +57,7 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         );
         http.authorizeHttpRequests(request -> request
-                .requestMatchers("/auth/**","/medias/**",
+                .requestMatchers("/auth/**","/medias/**", "oauth2/**",
                         "/swagger-ui", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .requestMatchers("/storefront/**").permitAll()
                 .requestMatchers("/backoffice/**").hasRole(Role.ADMIN)
@@ -68,6 +74,11 @@ public class SecurityConfig {
                             (request, response, authentication) -> SecurityContextHolder.clearContext()
                     )
                 );
+        http.oauth2Login(oauth2 -> oauth2
+//                .loginPage("/auth/nopage")
+                .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
+                .successHandler(customOauth2SuccessHandler)
+                .failureHandler(customOAuth2FailureHandler));
         return http.build();
     }
 

@@ -9,6 +9,8 @@ import { selectAuth } from './features/auth/auth.slice'
 import { getUserProfile } from './features/user/user.thunk'
 import { selectUser, setUserProfile } from './features/user/user.slice'
 import LoadingOverlay from './components/ui/LoadingOverlay'
+import OAuth2RedirectHandler from './pages/redirect/OAuth2RedirectHandler'
+import AuthRoute from './components/route/AuthRoute'
 
 const router = createBrowserRouter([
   {
@@ -25,6 +27,14 @@ const router = createBrowserRouter([
         ),
       },
     ],
+  },
+  {
+    path: '/oauth2/redirect',
+    element: (
+      <AuthRoute>
+        <OAuth2RedirectHandler />
+      </AuthRoute>
+    ),
   },
   ...authRoutes,
 ])

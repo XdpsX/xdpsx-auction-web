@@ -3,6 +3,7 @@ package com.xdpsx.auction.model;
 import com.xdpsx.auction.model.enums.AuthProvider;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
 import java.util.Set;
@@ -25,7 +26,7 @@ public class User extends AbstractAuditEntity {
 
     private String password;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.PERSIST)
     private Media avatar;
 
     private boolean enabled;
@@ -47,5 +48,17 @@ public class User extends AbstractAuditEntity {
 
     @OneToMany
     private List<Auction> auctions;
+
+    public String getAvatarUrl(){
+        if (avatar == null){
+            return null;
+        }
+        if (provider.equals(AuthProvider.SYSTEM)){
+            return ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path(String.format("/medias/%1$s/file/%2$s", avatar.getId(), avatar.getFileName()))
+                    .build().toUriString();
+        }
+        return avatar.getFilePath();
+    }
 
 }

@@ -1,12 +1,16 @@
 package com.xdpsx.auction.service.impl;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.gson.GsonFactory;
 import com.xdpsx.auction.constant.ErrorCode;
-import com.xdpsx.auction.dto.auth.EmailDTO;
-import com.xdpsx.auction.dto.auth.LoginRequest;
-import com.xdpsx.auction.dto.auth.RegisterRequest;
-import com.xdpsx.auction.dto.auth.TokenResponse;
+import com.xdpsx.auction.dto.auth.*;
 import com.xdpsx.auction.exception.DuplicateException;
 import com.xdpsx.auction.exception.NotFoundException;
+import com.xdpsx.auction.model.Media;
 import com.xdpsx.auction.model.Role;
 import com.xdpsx.auction.model.User;
 import com.xdpsx.auction.model.enums.AuthProvider;
@@ -17,6 +21,7 @@ import com.xdpsx.auction.security.TokenProvider;
 import com.xdpsx.auction.service.AuthService;
 import com.xdpsx.auction.service.OTPService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,10 +29,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -105,6 +115,58 @@ public class AuthServiceImpl implements AuthService {
                 redisTemplate.opsForValue().set(refreshToken, "REFRESH",
                         tokenProvider.getTTL(refreshToken), TimeUnit.MILLISECONDS);
                 return tokenProvider.generateToken(user);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public TokenResponse handleGoogleIdToken(IDToken request) {
+        String GOOGLE_CLIENT_ID = System.getenv("GOOGLE_CLIENT_ID");
+        if (GOOGLE_CLIENT_ID != null){
+            try {
+                HttpTransport transport = GoogleNetHttpTransport.newTrustedTransport();
+                JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
+                GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
+                        .setAudience(Collections.singletonList(GOOGLE_CLIENT_ID))
+                        .build();
+
+                String idTokenString = request.getToken();
+                GoogleIdToken idToken = verifier.verify(idTokenString);
+                if (idToken != null) {
+                    GoogleIdToken.Payload payload = idToken.getPayload();
+                    String email = payload.getEmail();
+                    Optional<User> userOptional = userRepository.findByEmail(email);
+                    if (userOptional.isPresent()){
+                        return tokenProvider.generateToken(userOptional.get());
+                    }else {
+                        String name = (String) payload.get("name");
+                        String pictureUrl = (String) payload.get("picture");
+
+                        Media media = new Media();
+                        media.setFileName("");
+                        media.setMediaType("external");
+                        media.setFilePath(pictureUrl);
+
+                        Role role = roleRepository.findByName(Role.USER)
+                                .orElseThrow(() -> new NotFoundException(ErrorCode.ROLE_NOT_FOUND, Role.USER));
+                        Set<Role> roles = new HashSet<>();
+                        roles.add(role);
+
+                        User newUser = new User();
+                        newUser.setEmail(email);
+                        newUser.setName(name);
+                        newUser.setRoles(roles);
+                        newUser.setEnabled(true);
+                        newUser.setProvider(AuthProvider.GOOGLE);
+                        newUser.setAvatar(media);
+                        User savedUser = userRepository.save(newUser);
+                        return tokenProvider.generateToken(savedUser);
+                    }
+                }
+            }catch (GeneralSecurityException | IOException ex) {
+                log.error(ex.getMessage(), ex);
+                return null;
             }
         }
         return null;

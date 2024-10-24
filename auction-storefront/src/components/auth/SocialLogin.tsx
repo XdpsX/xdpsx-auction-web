@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import GOOGLE_ICON from '../../assets/google.svg'
 import FACEBOOK_ICON from '../../assets/facebook.svg'
 
@@ -17,20 +16,20 @@ function SocialLogin() {
       </div>
 
       <div className="mt-3 flex items-center gap-2">
-        <Link
-          to="#"
+        <a
+          href="http://localhost:8080/oauth2/authorization/google"
           className="flex w-full items-center justify-center gap-3 border border-slate-500 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-50"
         >
           <img src={GOOGLE_ICON} alt="" className="h-6" />
           <span className="text-sm font-semibold leading-6">Google</span>
-        </Link>
-        <Link
-          to="#"
+        </a>
+        <a
+          href="http://localhost:8080/oauth2/authorization/facebook"
           className="flex w-full items-center justify-center gap-3 border border-slate-500 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-50"
         >
           <img src={FACEBOOK_ICON} alt="" className="h-6" />
           <span className="text-sm font-semibold leading-6">Facebook</span>
-        </Link>
+        </a>
       </div>
     </div>
   )

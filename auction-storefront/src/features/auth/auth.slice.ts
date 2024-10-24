@@ -31,6 +31,12 @@ export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
+    setToken(state, action) {
+      state.accessToken = action.payload.accessToken
+      state.refreshToken = action.payload.refreshToken
+      localStorage.setItem('accessToken', action.payload.accessToken)
+      localStorage.setItem('refreshToken', action.payload.refreshToken)
+    },
     setError(state, action) {
       state.error = action.payload
     },
@@ -107,4 +113,4 @@ export const authSlice = createSlice({
 const authReducer = authSlice.reducer
 export default authReducer
 export const selectAuth = (state: RootState) => state.auth
-export const { setError } = authSlice.actions
+export const { setError, setToken } = authSlice.actions

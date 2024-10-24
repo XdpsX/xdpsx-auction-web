@@ -1,9 +1,6 @@
 package com.xdpsx.auction.controller;
 
-import com.xdpsx.auction.dto.auth.EmailDTO;
-import com.xdpsx.auction.dto.auth.LoginRequest;
-import com.xdpsx.auction.dto.auth.RegisterRequest;
-import com.xdpsx.auction.dto.auth.TokenResponse;
+import com.xdpsx.auction.dto.auth.*;
 import com.xdpsx.auction.dto.error.ErrorDetailsDto;
 import com.xdpsx.auction.dto.error.ErrorDto;
 import com.xdpsx.auction.service.AuthService;
@@ -79,5 +76,10 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/google/callback")
+    public ResponseEntity<TokenResponse> googleCallback(@RequestBody IDToken idToken){
+        return ResponseEntity.ok(authService.handleGoogleIdToken(idToken));
     }
 }

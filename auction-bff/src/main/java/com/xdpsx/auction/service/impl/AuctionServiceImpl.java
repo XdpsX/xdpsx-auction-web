@@ -42,8 +42,8 @@ public class AuctionServiceImpl implements AuctionService {
         }).toList();
         auction.setImages(images);
 
-        User seller = userContext.getLoggedUser();
-        auction.setSeller(seller);
+//        User seller = userContext.getLoggedUser();
+//        auction.setSeller(seller);
 
         Auction savedAuction = auctionRepository.save(auction);
         return auctionMapper.fromEntityToDto(savedAuction);

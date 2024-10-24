@@ -31,6 +31,7 @@
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <springdoc.version>2.6.0</springdoc.version>
         <thumbnailator.version>0.4.20</thumbnailator.version>
+        <google-api.version>2.6.0</google-api.version>
     </properties>
     <dependencies>
         <dependency>
@@ -99,6 +100,12 @@
             <groupId>net.coobird</groupId>
             <artifactId>thumbnailator</artifactId>
             <version>${thumbnailator.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+            <version>${google-api.version}</version>
         </dependency>
 
 

@@ -3,28 +3,32 @@ package com.xdpsx.auction.security;
 import com.xdpsx.auction.model.Role;
 import com.xdpsx.auction.model.User;
 import com.xdpsx.auction.model.enums.AuthProvider;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 @Setter
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class CustomUserDetails implements UserDetails {
+public class CustomUserDetails implements UserDetails, OAuth2User {
     private Long id;
     private String name;
     private String email;
     private String password;
+    private String avatarUrl;
     private boolean enabled;
     private boolean locked;
     private AuthProvider provider;
     private Set<Role> roles;
+    private Map<String, Object> attributes;
 
     public static CustomUserDetails fromUser(User user) {
         return CustomUserDetails.builder()
@@ -32,6 +36,7 @@ public class CustomUserDetails implements UserDetails {
                 .name(user.getName())
                 .email(user.getEmail())
                 .password(user.getPassword())
+                .avatarUrl(user.getAvatarUrl())
                 .enabled(user.isEnabled())
                 .locked(user.isLocked())
                 .provider(user.getProvider())
@@ -39,6 +44,11 @@ public class CustomUserDetails implements UserDetails {
                 .build();
     }
 
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
