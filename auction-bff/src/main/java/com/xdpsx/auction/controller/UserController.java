@@ -13,7 +13,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping({"/storefront/users/me", "/backoffice/users/me"})
-    public ResponseEntity<UserProfile> getCurrentUser() {
+    ResponseEntity<UserProfile> getCurrentUser() {
         UserProfile response = userService.getUserProfile();
         return ResponseEntity.ok(response);
     }

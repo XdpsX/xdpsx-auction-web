@@ -57,10 +57,11 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         );
         http.authorizeHttpRequests(request -> request
-                .requestMatchers("/auth/**","/medias/**", "oauth2/**",
+                .requestMatchers("/auth/**","/medias/**", "otp/**", "oauth2/**",
                         "/swagger-ui", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                .requestMatchers("/storefront/**").permitAll()
-                .requestMatchers("/backoffice/**").hasRole(Role.ADMIN)
+                .requestMatchers("/public/**").permitAll()
+                .requestMatchers("/storefront/**").hasRole(Role.USER)
+                .requestMatchers("/backoffice/**").hasAnyRole(Role.SELLER, Role.ADMIN)
                 .anyRequest().permitAll()
         );
         http

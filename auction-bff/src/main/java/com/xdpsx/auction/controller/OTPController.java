@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class OTPController {
     private final OTPService otpService;
 
-    @PostMapping("/otp-mail/send")
+    @PostMapping("/otp/mail")
     ResponseEntity<Void> sendOTPMail(@Valid @RequestBody MailOTPRequest request){
         otpService.sendValidEmailOTP(request);
         return ResponseEntity.ok().build();

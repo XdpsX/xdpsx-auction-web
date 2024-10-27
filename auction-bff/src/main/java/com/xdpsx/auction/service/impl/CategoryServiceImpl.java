@@ -18,6 +18,7 @@ import com.xdpsx.auction.service.MediaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,12 +39,14 @@ public class CategoryServiceImpl implements CategoryService {
                 .toList();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public CategoryDetailsDto getCategoryById(Integer id) {
         Category category = fetchCategory(id);
         return CategoryDetailsDto.fromModel(category);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public PageResponse<CategoryDetailsDto> getPageCategories(int pageNum, int pageSize,
                                                               String keyword, String sort, Boolean hasPublished) {
@@ -54,6 +57,7 @@ public class CategoryServiceImpl implements CategoryService {
         return pageMapper.toPageCategoryResponse(categoryPage);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public CategoryDetailsDto createCategory(CategoryRequest request) {
         checkNameExists(request.getName());
@@ -71,6 +75,7 @@ public class CategoryServiceImpl implements CategoryService {
         return CategoryDetailsDto.fromModel(savedCategory);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     @Override
     public CategoryDetailsDto updateCategory(Integer id, CategoryRequest request) {
@@ -96,6 +101,7 @@ public class CategoryServiceImpl implements CategoryService {
         return CategoryDetailsDto.fromModel(updatedCategory);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     @Override
     public void deleteCategory(Integer id) {

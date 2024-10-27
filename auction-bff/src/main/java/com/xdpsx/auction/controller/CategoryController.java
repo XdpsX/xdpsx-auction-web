@@ -37,7 +37,7 @@ public class CategoryController {
     private final CategoryService categoryService;
     private final MediaService mediaService;
 
-    @GetMapping({"/storefront/categories", "/backoffice/categories"})
+    @GetMapping("/public/categories")
     ResponseEntity<List<CategoryResponse>> listPublishedCategories(){
         List<CategoryResponse> response = categoryService.listPublishedCategories();
         return ResponseEntity.ok(response);
