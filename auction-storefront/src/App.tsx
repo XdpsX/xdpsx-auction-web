@@ -11,6 +11,9 @@ import { selectUser, setUserProfile } from './features/user/user.slice'
 import LoadingOverlay from './components/ui/LoadingOverlay'
 import OAuth2RedirectHandler from './pages/redirect/OAuth2RedirectHandler'
 import AuthRoute from './components/route/AuthRoute'
+import UserLayout from './layouts/UserLayout'
+import ProtectedRoute from './components/route/ProtectedRoute'
+import Profile from './pages/Profile'
 
 const router = createBrowserRouter([
   {
@@ -35,6 +38,25 @@ const router = createBrowserRouter([
         <OAuth2RedirectHandler />
       </AuthRoute>
     ),
+  },
+  {
+    path: '/user',
+    element: (
+      <ProtectedRoute>
+        <UserLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        path: 'profile',
+        element: (
+          <>
+            <PageTitle title="Profile" />
+            <Profile />
+          </>
+        ),
+      },
+    ],
   },
   ...authRoutes,
 ])

@@ -4,21 +4,22 @@ import { formatDate, formatPrice } from '../../utils/format'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function AuctionCard({ auction }: { auction: any }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const redenrDate = (auction: any) => {
+  const renderDate = (auction: any) => {
     const currentTime = new Date()
     const endingTime = new Date(auction.endingTime)
 
     const timeDifference = endingTime.getTime() - currentTime.getTime()
     const hoursLeft = Math.floor(timeDifference / (1000 * 60 * 60))
 
-    if (timeDifference < 24 * 60 * 60 * 1000) {
-      return <p className="font-bold text-red-600">{-hoursLeft} hours left</p>
+    if (timeDifference < 24 * 60 * 60 * 1000 && timeDifference > 0) {
+      return <p className="font-bold text-red-600">{hoursLeft} hours left</p>
     } else {
       return `${formatDate(auction.startingTime)} - ${formatDate(
         auction.endingTime
       )}`
     }
   }
+
   return (
     <Link
       to={'/auctions/details'}
@@ -53,7 +54,7 @@ function AuctionCard({ auction }: { auction: any }) {
           </span>
           <span className="">{auction.bids} bids</span>
         </div>
-        <div>{redenrDate(auction)}</div>
+        <div>{renderDate(auction)}</div>
       </div>
     </Link>
   )

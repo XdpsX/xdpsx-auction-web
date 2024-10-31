@@ -8,7 +8,7 @@ interface DropDownProps {
 }
 
 function DropDown({ children, renderDropDown, className }: DropDownProps) {
-  const [showDropDown, setShowDropDown] = useState(true)
+  const [showDropDown, setShowDropDown] = useState(false)
   const dropdownRef = useRef<HTMLDivElement | null>(null)
 
   return (

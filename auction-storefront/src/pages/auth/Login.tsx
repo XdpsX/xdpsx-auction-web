@@ -24,7 +24,7 @@ function Login() {
     resolver: yupResolver(loginSchema),
     defaultValues: {
       email: '',
-      password: '',
+      password: '12345678',
     },
   })
 

@@ -94,8 +94,8 @@ export const auctions = [
     mainImage:
       'https://image.invaluable.com/housePhotos/berners/61/780961/H1075-L386947193.jpg',
     auctionType: 'Sealed-bid',
-    startingTime: '2024-11-01',
-    endingTime: '2024-10-24',
+    startingTime: '2024-09-01',
+    endingTime: '2024-11-01T00:00:00',
     startingPrice: 1000,
     stepPrice: null,
     owner: 'John Doe',

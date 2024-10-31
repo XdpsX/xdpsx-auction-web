@@ -43,8 +43,8 @@ function CreateAccountForm({
     resolver: yupResolver(accountCreateSchema),
     defaultValues: {
       name: '',
-      password: '',
-      confirmPassword: '',
+      password: '12345678',
+      confirmPassword: '12345678',
       verify: {
         otp: '',
         email: '',

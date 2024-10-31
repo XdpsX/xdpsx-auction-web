@@ -16,6 +16,7 @@ import { selectUser } from '../../features/user/user.slice'
 import Popover from '../ui/Popover'
 import { logoutAPI } from '../../features/auth/auth.thunk'
 import { toast } from 'react-toastify'
+import { googleLogout } from '@react-oauth/google'
 
 function HeaderTop({
   setShowSidebar,
@@ -30,6 +31,7 @@ function HeaderTop({
       .unwrap()
       .then(() => {
         toast.success('Logout successfully')
+        googleLogout()
       })
       .catch((e) => {
         console.log(e)
@@ -110,7 +112,7 @@ function HeaderTop({
                 renderPopover={
                   <div className="relative rounded-sm border border-gray-200 bg-white shadow-md min-w-[150px]">
                     <Link
-                      to={'/'}
+                      to="/user/profile"
                       className="block w-full bg-white px-4 py-3 text-left hover:bg-slate-100 hover:text-yellow-500"
                     >
                       Profile
@@ -124,7 +126,10 @@ function HeaderTop({
                   </div>
                 }
               >
-                <Link to="/" className="flex items-center gap-2 flex-shrink-0">
+                <Link
+                  to="/user/profile"
+                  className="flex items-center gap-2 flex-shrink-0"
+                >
                   <img
                     src={userProfile.avatarUrl || USER_ICON}
                     alt="avatar"

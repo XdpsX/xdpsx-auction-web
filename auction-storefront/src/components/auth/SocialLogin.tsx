@@ -1,7 +1,38 @@
 import GOOGLE_ICON from '../../assets/google.svg'
 import FACEBOOK_ICON from '../../assets/facebook.svg'
+import { useGoogleOneTapLogin } from '@react-oauth/google'
+import { useNavigate } from 'react-router-dom'
+import api from '../../utils/api'
+import { setToken } from '../../features/auth/auth.slice'
+import { toast } from 'react-toastify'
+import { useAppDispatch } from '../../store/hooks'
 
 function SocialLogin() {
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+
+  useGoogleOneTapLogin({
+    onSuccess: (credentialResponse) => {
+      const idToken = credentialResponse.credential
+      api
+        .post('/auth/google/callback', { token: idToken })
+        .then((res) => {
+          dispatch(setToken(res.data))
+          toast.success('Login Successful')
+          navigate('/')
+        })
+        .catch((err) => {
+          console.log(err)
+          navigate('/login')
+        })
+    },
+    onError: () => {
+      navigate('/login')
+      console.log('Login Failed')
+    },
+    use_fedcm_for_prompt: false,
+  })
+
   return (
     <div className="mt-3">
       <div className="relative ">
