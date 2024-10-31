@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CategoryRepository extends JpaRepository<Category, Integer>, JpaSpecificationExecutor<Category> {
-    @Query("SELECT c FROM Category c WHERE c.isPublished = true")
+    @Query("SELECT c FROM Category c WHERE c.published = true")
     List<Category> findPublishedCategories();
 
     boolean existsByName(String name);
     boolean existsBySlug(String slug);
 
-    @Query("SELECT c FROM Category c WHERE c.isPublished = true AND c.id = :id")
+    @Query("SELECT c FROM Category c WHERE c.published = true AND c.id = :id")
     Optional<Category> findPublishedCategoryById(Integer id);
 
 //    @Query("SELECT COUNT(a) + COUNT(t) FROM Auction a JOIN a.category c ON c.id = :categoryId " +

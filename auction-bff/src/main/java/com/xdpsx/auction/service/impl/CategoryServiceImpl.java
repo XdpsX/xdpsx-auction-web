@@ -65,7 +65,7 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = Category.builder()
                 .name(request.getName())
                 .slug(request.getSlug())
-                .isPublished(request.isPublished())
+                .published(request.isPublished())
                 .build();
         if (request.getImageId() != null){
             Media image = mediaService.getMedia(request.getImageId());

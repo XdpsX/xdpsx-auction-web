@@ -22,7 +22,7 @@ public class Category extends AbstractAuditEntity {
 
     private String slug;
 
-    private boolean isPublished;
+    private boolean published;
 
     @OneToOne
     private Media image;

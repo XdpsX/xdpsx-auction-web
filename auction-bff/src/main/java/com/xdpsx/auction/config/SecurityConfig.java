@@ -60,7 +60,7 @@ public class SecurityConfig {
                 .requestMatchers("/auth/**","/medias/**", "otp/**", "oauth2/**",
                         "/swagger-ui", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .requestMatchers("/public/**").permitAll()
-                .requestMatchers("/storefront/**").hasRole(Role.USER)
+                .requestMatchers("/storefront/**").authenticated()
                 .requestMatchers("/backoffice/**").hasAnyRole(Role.SELLER, Role.ADMIN)
                 .anyRequest().permitAll()
         );

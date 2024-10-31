@@ -6,7 +6,7 @@ public record CategoryDetailsDto(
         Integer id,
         String name,
         String slug,
-        boolean isPublished,
+        boolean published,
         String imgUrl
 ) {
     public static CategoryDetailsDto fromModel(Category category) {
