@@ -3,15 +3,16 @@ package com.xdpsx.auction.dto.auction;
 import com.xdpsx.auction.model.enums.AuctionType;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 public record AuctionDto(
     Long id,
     String name,
     BigDecimal startingPrice,
-    LocalDate startingTime,
-    LocalDate endingTime,
+    ZonedDateTime startingTime,
+    ZonedDateTime endingTime,
     AuctionType auctionType,
+    boolean published,
     String mainImage,
     String category
 ) {

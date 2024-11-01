@@ -7,4 +7,5 @@ public class PageConstant {
 
     public static final String DATE_SORT_FIELD = "date";
     public static final String NAME_SORT_FIELD = "name";
+    public static final String PRICE_SORT_FIELD = "price";
 }

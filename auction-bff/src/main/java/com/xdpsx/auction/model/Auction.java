@@ -6,7 +6,7 @@ import lombok.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Getter
@@ -29,13 +29,22 @@ public class Auction extends AbstractAuditEntity{
 
     private BigDecimal stepPrice;
 
-    private LocalDate startingTime;
+    private ZonedDateTime startingTime;
 
-    private LocalDate endingTime;
+    private ZonedDateTime endingTime;
 
+    @Enumerated(EnumType.STRING)
     private AuctionType auctionType;
 
-    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER, mappedBy = "auction")
+    private boolean published;
+
+    private boolean trashed;
+
+    @OneToOne
+    @JoinColumn(name = "main_image_id")
+    private Media mainImage;
+
+    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "auction")
     private List<AuctionImage> images;
 
     @ManyToOne
@@ -45,12 +54,8 @@ public class Auction extends AbstractAuditEntity{
     private Category category;
 
     public String getMainImage(){
-        if (images.isEmpty()){
-            return null;
-        }
-        AuctionImage mainImage = images.get(0);
         return ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(String.format("/medias/%1$s/file/%2$s", mainImage.getMedia().getId(), mainImage.getMedia().getFileName()))
+                .path(String.format("/medias/%1$s/file/%2$s", mainImage.getId(), mainImage.getFileName()))
                 .build().toUriString();
     }
 }
