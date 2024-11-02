@@ -2,15 +2,13 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { loginAPI } from '~/services/auth.service'
 import { LoginPayload } from '~/types/auth'
 import { APIError } from '~/types/error'
-import { fromAxiosErrorToAPIError } from '~/utils/error'
 
 export const login = createAsyncThunk('auth/login', async (payload: LoginPayload, thunkAPI) => {
   try {
     const data = await loginAPI(payload)
     return data
   } catch (error) {
-    console.log(error)
-    return thunkAPI.rejectWithValue('error')
+    return thunkAPI.rejectWithValue(error)
   }
 })
 
