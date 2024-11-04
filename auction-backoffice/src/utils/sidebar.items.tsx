@@ -2,21 +2,14 @@ import { type SidebarItem, SidebarItemType } from '~/components/layout/Sidebar/t
 
 const sidebarItems: SidebarItem[] = [
   {
-    key: 'test',
-    href: '/',
-    icon: 'solar:chat-square-2-linear',
-    title: 'test',
-    className: 'hidden'
-  },
-  {
     key: 'dashboard',
-    href: '/',
+    path: '/',
     icon: 'solar:chat-square-2-linear',
     title: 'Dashboard'
   },
   {
     key: 'categories',
-    href: '/categories',
+    path: '/categories',
     icon: 'solar:widget-outline',
     title: 'Categories'
   },
@@ -29,19 +22,19 @@ const sidebarItems: SidebarItem[] = [
       {
         key: 'shareholders',
         icon: 'solar:users-group-rounded-linear',
-        href: '#',
+        path: '#',
         title: 'Shareholders'
       },
       {
         key: 'note_holders',
         icon: 'solar:notes-outline',
-        href: '#',
+        path: '#',
         title: 'Note Holders'
       },
       {
         key: 'transactions_log',
         icon: 'solar:clipboard-list-linear',
-        href: '#',
+        path: '#',
         title: 'Transactions Log'
       }
     ]

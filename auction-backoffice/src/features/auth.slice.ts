@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { loginAPI } from '~/services/auth.service'
+import { loginAPI, logoutAPI } from '~/services/auth.service'
 import { LoginPayload } from '~/types/auth'
 import { APIError } from '~/types/error'
 
@@ -7,6 +7,13 @@ export const login = createAsyncThunk('auth/login', async (payload: LoginPayload
   try {
     const data = await loginAPI(payload)
     return data
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error)
+  }
+})
+export const logout = createAsyncThunk('auth/logout', async (_, thunkAPI) => {
+  try {
+    await logoutAPI()
   } catch (error) {
     return thunkAPI.rejectWithValue(error)
   }
@@ -47,6 +54,13 @@ export const authSlice = createSlice({
       .addCase(login.rejected, (state, { payload }) => {
         state.isLoading = false
         state.error = payload as APIError
+      })
+      //logoutAPI
+      .addCase(logout.fulfilled, (state) => {
+        state.accessToken = null
+        state.refreshToken = null
+        localStorage.removeItem('accessToken')
+        localStorage.removeItem('refreshToken')
       })
   }
 })

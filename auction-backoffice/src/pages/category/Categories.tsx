@@ -1,4 +1,5 @@
 import React, { Key, useEffect, useMemo } from 'react'
+import { createSearchParams, useNavigate } from 'react-router-dom'
 import {
   Table,
   TableHeader,
@@ -22,21 +23,17 @@ import { useAppDispatch, useAppSelector } from '~/app/hooks'
 import { fetchAllCategories } from '~/features/category.slice'
 import { Category } from '~/types/category'
 import useQueryParams from '~/hooks/useQueryParams'
-import { createSearchParams, useNavigate } from 'react-router-dom'
+
+import { publishedOptions } from '~/utils/data'
+import { capitalize } from '~/utils/helper'
 
 const columns = [
   { name: 'ID', uid: 'id' },
   { name: 'IMAGE', uid: 'imgUrl' },
   { name: 'NAME', uid: 'name' },
   { name: 'SLUG', uid: 'slug' },
-  { name: 'Published', uid: 'published' },
+  { name: 'PUBLISHED', uid: 'published' },
   { name: 'ACTIONS', uid: 'actions' }
-]
-
-const publishedOptions = [
-  { name: 'All', uid: '' },
-  { name: 'Published', uid: 'true' },
-  { name: 'Unpublished', uid: 'false' }
 ]
 
 const sortOptions = [
@@ -45,10 +42,6 @@ const sortOptions = [
   { name: 'Oldest', uid: 'date' },
   { name: 'Newest', uid: '-date' }
 ]
-
-function capitalize(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1)
-}
 
 export default function Categories() {
   const dispatch = useAppDispatch()
@@ -250,7 +243,16 @@ export default function Categories() {
         </div>
       </div>
     )
-  }, [categoryPage?.totalPages, createUrlWithParams, navigate, onPageSizeChange, params.pageNum, params.pageSize])
+  }, [
+    categoryPage?.totalPages,
+    createUrlWithParams,
+    navigate,
+    onPageSizeChange,
+    pageNum,
+    pageSize,
+    params.pageNum,
+    params.pageSize
+  ])
 
   if (!categoryPage) return null
 

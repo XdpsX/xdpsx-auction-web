@@ -10,6 +10,7 @@ import { Listbox, Tooltip, ListboxItem, ListboxSection } from '@nextui-org/react
 import { Icon } from '@iconify/react'
 import { cn } from '@nextui-org/react'
 import { SidebarItem, SidebarItemType } from './type'
+import { NavLink } from 'react-router-dom'
 
 export type SidebarProps = Omit<ListboxProps<SidebarItem>, 'children'> & {
   items: SidebarItem[]
@@ -67,7 +68,7 @@ const Sidebar = React.forwardRef<HTMLElement, SidebarProps>(
 
         if (isNestType) {
           // Is a nest type item , so we need to remove the href
-          delete item.href
+          delete item.path
         }
 
         return (
@@ -133,7 +134,7 @@ const Sidebar = React.forwardRef<HTMLElement, SidebarProps>(
                         list: cn('border-l border-default-200 pl-4')
                       }}
                       items={item.items}
-                      variant='flat'
+                      variant='light'
                     >
                       {item.items.map(renderItem)}
                     </Listbox>
@@ -159,9 +160,10 @@ const Sidebar = React.forwardRef<HTMLElement, SidebarProps>(
 
         return (
           <ListboxItem
-            {...item}
             key={item.key}
-            endContent={isCompact || hideEndContent ? null : (item.endContent ?? null)}
+            classNames={{
+              base: cn(itemClasses?.base, { 'bg-yellow-500': false })
+            }}
             startContent={
               isCompact ? null : item.icon ? (
                 <Icon className={cn('text-default-100 ', iconClassName)} icon={item.icon} width={24} color='primary' />
@@ -169,24 +171,12 @@ const Sidebar = React.forwardRef<HTMLElement, SidebarProps>(
                 (item.startContent ?? null)
               )
             }
-            textValue={item.title}
-            title={isCompact ? null : item.title}
           >
-            {isCompact ? (
-              <Tooltip content={item.title} placement='right'>
-                <div className='flex w-full items-center justify-center'>
-                  {item.icon ? (
-                    <Icon className={cn('text-default-100 ', iconClassName)} icon={item.icon} width={24} />
-                  ) : (
-                    (item.startContent ?? null)
-                  )}
-                </div>
-              </Tooltip>
-            ) : null}
+            <NavLink to={item.path ?? '#'}>{item.title}</NavLink>
           </ListboxItem>
         )
       },
-      [isCompact, hideEndContent, iconClassName, itemClasses?.base]
+      [itemClasses?.base, isCompact, iconClassName, renderNestItem]
     )
 
     return (
@@ -210,7 +200,7 @@ const Sidebar = React.forwardRef<HTMLElement, SidebarProps>(
         items={items}
         selectedKeys={[selected] as unknown as Selection}
         selectionMode='single'
-        variant='flat'
+        variant='light'
         onSelectionChange={(keys) => {
           const key = Array.from(keys)[0]
 

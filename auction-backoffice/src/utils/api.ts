@@ -1,43 +1,73 @@
-import axios, { type AxiosInstance } from 'axios'
-import { convertAxiosErrorToAPIError } from './error'
+// import axios, { type AxiosInstance } from 'axios'
+import { convertAxiosErrorToAPIError } from './helper'
 
-class API {
-  instance: AxiosInstance
-  private accessToken: string
+// class API {
+//   instance: AxiosInstance
+//   private accessToken: string
 
-  constructor() {
-    this.accessToken = localStorage.getItem('accessToken') || ''
-    this.instance = axios.create({
-      baseURL: 'http://localhost:8080',
-      timeout: 10000,
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
+//   constructor() {
+//     this.accessToken = localStorage.getItem('accessToken') || ''
+//     this.instance = axios.create({
+//       baseURL: 'http://localhost:8080',
+//       timeout: 100000,
+//       headers: {
+//         'Content-Type': 'application/json'
+//       }
+//     })
 
-    this.instance.interceptors.request.use(
-      (config) => {
-        if (this.accessToken && config.headers) {
-          config.headers.Authorization = `Bearer ${this.accessToken}`
-          return config
-        }
-        return config
-      },
-      (error) => {
-        return Promise.reject(error)
-      }
-    )
+//     this.instance.interceptors.request.use(
+//       (config) => {
+//         if (this.accessToken && config.headers) {
+//           config.headers.Authorization = `Bearer ${this.accessToken}`
+//           return config
+//         }
+//         return config
+//       },
+//       (error) => {
+//         return Promise.reject(error)
+//       }
+//     )
 
-    this.instance.interceptors.response.use(
-      function (response) {
-        return response
-      },
-      function (error) {
-        console.log(error)
-        return Promise.reject(convertAxiosErrorToAPIError(error))
-      }
-    )
+//     this.instance.interceptors.response.use(
+//       function (response) {
+//         return response
+//       },
+//       function (error) {
+//         console.log(error)
+//         return Promise.reject(convertAxiosErrorToAPIError(error))
+//       }
+//     )
+//   }
+// }
+// const api = new API().instance
+// export default api
+
+import axios from 'axios'
+
+const api = axios.create({
+  baseURL: 'http://localhost:8080',
+  timeout: 10000
+})
+
+api.interceptors.request.use(
+  async (config) => {
+    const accessToken = localStorage.getItem('accessToken')
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`
+    }
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
   }
-}
-const api = new API().instance
+)
+api.interceptors.request.use(
+  function (response) {
+    return response
+  },
+  function (error) {
+    console.log(error)
+    return Promise.reject(convertAxiosErrorToAPIError(error))
+  }
+)
 export default api

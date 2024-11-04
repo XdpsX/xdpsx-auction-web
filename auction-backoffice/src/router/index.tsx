@@ -1,7 +1,9 @@
-import { createBrowserRouter } from 'react-router-dom'
-import authRoutes from './routes/auth.routes'
+import { useRoutes } from 'react-router-dom'
 import privateRoutes from './routes/private.routes'
+import authRoutes from './routes/auth.routes'
 
-const appRouter = createBrowserRouter([...authRoutes, ...privateRoutes])
-
-export default appRouter
+function AppRouter() {
+  const routes = useRoutes([...privateRoutes, ...authRoutes])
+  return routes
+}
+export default AppRouter

@@ -6,7 +6,7 @@ export type SidebarItem = {
   key: string
   title: string
   icon?: string
-  href?: string
+  path?: string
   type?: SidebarItemType.Nest
   startContent?: React.ReactNode
   endContent?: React.ReactNode

@@ -6,3 +6,7 @@ export const convertAxiosErrorToAPIError = (error: unknown): APIError => {
   const apiError = axiosError.response?.data as APIError
   return apiError || { status: 500, message: 'Internal Server Error' }
 }
+
+export function capitalize(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
