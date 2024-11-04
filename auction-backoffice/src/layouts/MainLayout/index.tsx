@@ -3,7 +3,7 @@ import { Button, ScrollShadow, Spacer } from '@nextui-org/react'
 import { cn } from '@nextui-org/react'
 import { Icon } from '@iconify/react'
 import Sidebar from '~/components/layout/Sidebar'
-import sidebarItems from '~/utils/sidabar.items'
+import sidebarItems from '~/utils/sidebar.items'
 import LOGO from '~/assets/logo.svg'
 import MainHeader from '~/components/layout/MainHeader'
 import { Outlet } from 'react-router-dom'
@@ -12,10 +12,10 @@ export default function MainLayout() {
   const [isHidden, setIsHidden] = React.useState(false)
 
   return (
-    <div className='flex h-dvh w-full'>
+    <div className='flex h-dvh overflow-hidden w-full'>
       <div
         className={cn(
-          'relative flex h-full w-72 max-w-[288px] flex-1 flex-col !border-r-small border-divider p-6 transition-[transform,opacity,margin] duration-250 ease-in-out',
+          'relative bg-black/90 flex h-full w-72 max-w-[288px] flex-1 flex-col !border-r-small border-divider p-6 transition-[transform,opacity,margin] duration-250 ease-in-out',
           {
             '-ml-72 -translate-x-72': isHidden
           }
@@ -48,10 +48,10 @@ export default function MainLayout() {
           </Button>
         </div>
       </div>
-      <div className='w-full flex-1 flex-col p-4'>
+      <div className='w-full flex-1 flex-col py-4 px-8 bg-slate-200/75'>
         <MainHeader isHidden={isHidden} setIsHidden={setIsHidden} />
-        <main className='mt-4 h-full w-full overflow-visible'>
-          <div className='flex h-[90%] w-full flex-col gap-4 rounded-medium border-small border-divider'>
+        <main className='mt-8 py-12 h-full w-full overflow-visible'>
+          <div className='flex h-[90%] w-full flex-col gap-4 rounded-medium'>
             <Outlet />
           </div>
         </main>

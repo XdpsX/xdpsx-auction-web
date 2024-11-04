@@ -4,7 +4,7 @@ import { ThemeSwitcher } from '~/components/shared/ThemeSwitcher'
 
 function MainHeader({ isHidden, setIsHidden }: { isHidden: boolean; setIsHidden: (isHidden: boolean) => void }) {
   return (
-    <header className='flex items-center justify-between gap-3 rounded-medium border-small border-divider p-4 sm:pr-12'>
+    <header className='bg-white flex items-center justify-between gap-3 rounded-medium border-small border-divider p-4 sm:pr-12'>
       <Button isIconOnly size='sm' variant='light' onPress={() => setIsHidden(!isHidden)}>
         <Icon className='text-default-500' height={24} icon='solar:sidebar-minimalistic-outline' width={24} />
       </Button>

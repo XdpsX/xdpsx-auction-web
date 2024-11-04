@@ -87,11 +87,7 @@ const Sidebar = React.forwardRef<HTMLElement, SidebarProps>(
             endContent={isCompact || isNestType || hideEndContent ? null : (item.endContent ?? null)}
             startContent={
               isCompact || isNestType ? null : item.icon ? (
-                <Icon
-                  className={cn('text-default-500 group-data-[selected=true]:text-foreground', iconClassName)}
-                  icon={item.icon}
-                  width={24}
-                />
+                <Icon className={cn('text-default-100 ', iconClassName)} icon={item.icon} width={24} />
               ) : (
                 (item.startContent ?? null)
               )
@@ -102,11 +98,7 @@ const Sidebar = React.forwardRef<HTMLElement, SidebarProps>(
               <Tooltip content={item.title} placement='right'>
                 <div className='flex w-full items-center justify-center'>
                   {item.icon ? (
-                    <Icon
-                      className={cn('text-default-500 group-data-[selected=true]:text-foreground', iconClassName)}
-                      icon={item.icon}
-                      width={24}
-                    />
+                    <Icon className={cn('text-default-100 ', iconClassName)} icon={item.icon} width={24} />
                   ) : (
                     (item.startContent ?? null)
                   )}
@@ -125,15 +117,9 @@ const Sidebar = React.forwardRef<HTMLElement, SidebarProps>(
                   }}
                   title={
                     item.icon ? (
-                      <div className={'flex h-11 items-center gap-2 px-2 py-1.5'}>
-                        <Icon
-                          className={cn('text-default-500 group-data-[selected=true]:text-foreground', iconClassName)}
-                          icon={item.icon}
-                          width={24}
-                        />
-                        <span className='text-small font-medium text-default-500 group-data-[selected=true]:text-foreground'>
-                          {item.title}
-                        </span>
+                      <div className={'flex h-11 items-center  gap-2 px-2 py-1.5'}>
+                        <Icon className={cn('text-default-100 ', iconClassName)} icon={item.icon} width={24} />
+                        <span className='text-small  font-medium text-default-100 '>{item.title}</span>
                       </div>
                     ) : (
                       (item.startContent ?? null)
@@ -178,11 +164,7 @@ const Sidebar = React.forwardRef<HTMLElement, SidebarProps>(
             endContent={isCompact || hideEndContent ? null : (item.endContent ?? null)}
             startContent={
               isCompact ? null : item.icon ? (
-                <Icon
-                  className={cn('text-default-500 group-data-[selected=true]:text-foreground', iconClassName)}
-                  icon={item.icon}
-                  width={24}
-                />
+                <Icon className={cn('text-default-100 ', iconClassName)} icon={item.icon} width={24} color='primary' />
               ) : (
                 (item.startContent ?? null)
               )
@@ -194,11 +176,7 @@ const Sidebar = React.forwardRef<HTMLElement, SidebarProps>(
               <Tooltip content={item.title} placement='right'>
                 <div className='flex w-full items-center justify-center'>
                   {item.icon ? (
-                    <Icon
-                      className={cn('text-default-500 group-data-[selected=true]:text-foreground', iconClassName)}
-                      icon={item.icon}
-                      width={24}
-                    />
+                    <Icon className={cn('text-default-100 ', iconClassName)} icon={item.icon} width={24} />
                   ) : (
                     (item.startContent ?? null)
                   )}
@@ -213,6 +191,7 @@ const Sidebar = React.forwardRef<HTMLElement, SidebarProps>(
 
     return (
       <Listbox
+        aria-label='Sidebar'
         key={isCompact ? 'compact' : 'default'}
         ref={ref}
         hideSelectedIcon
@@ -225,11 +204,8 @@ const Sidebar = React.forwardRef<HTMLElement, SidebarProps>(
         color='default'
         itemClasses={{
           ...itemClasses,
-          base: cn('px-3 min-h-11 rounded-large h-[44px] data-[selected=true]:bg-default-100', itemClasses?.base),
-          title: cn(
-            'text-small font-medium text-default-500 group-data-[selected=true]:text-foreground',
-            itemClasses?.title
-          )
+          base: cn('px-3 min-h-11 rounded-large h-[44px] ', itemClasses?.base),
+          title: cn('text-small font-medium text-default-100 ', itemClasses?.title)
         }}
         items={items}
         selectedKeys={[selected] as unknown as Selection}
