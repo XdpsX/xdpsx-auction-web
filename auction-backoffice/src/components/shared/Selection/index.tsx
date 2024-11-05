@@ -28,6 +28,7 @@ function Selection({ label, variant = 'solid', items, selectedKey, onChange, cla
 
   return (
     <Select
+      aria-label={label}
       label={label}
       variant='faded'
       size={size}

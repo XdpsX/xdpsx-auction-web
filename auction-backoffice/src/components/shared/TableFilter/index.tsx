@@ -3,7 +3,7 @@ import Selection from '~/components/shared/Selection'
 import { SelectItemType } from '~/components/shared/Selection/type'
 import { publishedOptions, sortOptions } from '~/utils/data'
 
-interface AuctionFilterProps {
+interface TableFilterProps {
   keyword: string
   filteredPublished?: SelectItemType
   filteredSort?: SelectItemType
@@ -13,7 +13,7 @@ interface AuctionFilterProps {
   onSortChange: (key: string) => void
 }
 
-function AuctionFilter({
+function TableFilter({
   keyword,
   filteredPublished,
   filteredSort,
@@ -21,7 +21,7 @@ function AuctionFilter({
   onSearchChange,
   onPublishedChange,
   onSortChange
-}: AuctionFilterProps) {
+}: TableFilterProps) {
   return (
     <div className='gap-4 bg-white rounded-xl p-4'>
       <div className='flex items-center gap-6 '>
@@ -47,4 +47,4 @@ function AuctionFilter({
   )
 }
 
-export default AuctionFilter
+export default TableFilter

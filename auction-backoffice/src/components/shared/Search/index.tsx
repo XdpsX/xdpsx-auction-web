@@ -11,6 +11,7 @@ interface SearchProps {
 function Search({ value, onClear, onSearch, className }: SearchProps) {
   return (
     <Input
+      aria-label='Search'
       isClearable
       className={cn('max-w-sm', className)}
       placeholder='Search by name...'

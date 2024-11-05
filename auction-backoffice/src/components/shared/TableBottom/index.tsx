@@ -42,12 +42,13 @@ function TableBottom({
         <div className='flex items-center gap-2'>
           <span className='text-sm'>Rows:</span>
           <Select
+            aria-label='Rows per page'
             size='sm'
             variant='underlined'
             selectedKeys={[`${pageSize}`]}
             onChange={(e) => onPageSizeChange(+e.target.value)}
             labelPlacement='outside-left'
-            className='flex items-center w-14'
+            className='flex items-center w-16'
           >
             <SelectItem key='3'>3</SelectItem>
             <SelectItem key='10'>10</SelectItem>

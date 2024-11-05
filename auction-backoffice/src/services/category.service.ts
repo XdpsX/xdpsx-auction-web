@@ -6,7 +6,7 @@ export const fetchAllCategoriesAPI = async (
   pageNum: number,
   pageSize: number,
   keyword: string | null,
-  sort: string | null,
+  sort: string,
   hasPublished?: boolean | null
 ): Promise<Page<Category>> => {
   console.log(pageNum, pageSize, keyword, sort, hasPublished)

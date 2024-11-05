@@ -20,9 +20,9 @@ import { Auction } from '~/types/auction'
 import { publishedOptions, sortOptions } from '~/utils/data'
 import { createUrlWithParams } from '~/utils/helper'
 import { formatDateTime, formatPrice } from '~/utils/format'
-import AuctionFilter from '~/components/auction/AuctionFilter'
 import TableBottom from '~/components/shared/TableBottom'
 import AddButton from '~/components/shared/AddButton'
+import TableFilter from '~/components/shared/TableFilter'
 
 const columns = [
   { name: 'ID', uid: 'id' },
@@ -54,7 +54,7 @@ function Auctions() {
         pageSize: Number(pageSize),
         keyword: keyword || null,
         hasPublished: hasPublished ? (hasPublished === 'true' ? true : false) : null,
-        sort: sort || null
+        sort: sort
       })
     )
   }, [dispatch, hasPublished, keyword, pageNum, pageSize, sort])
@@ -154,7 +154,7 @@ function Auctions() {
         <h1 className='page-heading'>Auctions</h1>
         <AddButton />
       </div>
-      <AuctionFilter
+      <TableFilter
         keyword={keyword ?? ''}
         filteredPublished={filteredPublished}
         filteredSort={filteredSort}

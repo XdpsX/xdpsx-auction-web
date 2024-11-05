@@ -13,7 +13,7 @@ export const fetchAllCategories = createAsyncThunk(
       keyword,
       sort,
       hasPublished
-    }: { pageNum: number; pageSize: number; keyword: string | null; sort: string | null; hasPublished: boolean | null },
+    }: { pageNum: number; pageSize: number; keyword: string | null; sort: string; hasPublished: boolean | null },
     thunkAPI
   ) => {
     try {
@@ -26,13 +26,19 @@ export const fetchAllCategories = createAsyncThunk(
 )
 
 export interface CategoryState {
-  categoryPage: Page<Category> | null
+  categoryPage: Page<Category>
   isLoading: boolean
   error: null | APIError
 }
 
 const initialState: CategoryState = {
-  categoryPage: null,
+  categoryPage: {
+    items: [],
+    pageNum: 0,
+    pageSize: 0,
+    totalItems: 0,
+    totalPages: 0
+  },
   isLoading: false,
   error: null
 }
@@ -44,8 +50,16 @@ export const categorySlice = createSlice({
   extraReducers: (builder) => {
     builder
       //fetchAllCategories
+      .addCase(fetchAllCategories.pending, (state) => {
+        state.isLoading = true
+      })
       .addCase(fetchAllCategories.fulfilled, (state, { payload }) => {
         state.categoryPage = payload
+        state.isLoading = false
+      })
+      .addCase(fetchAllCategories.rejected, (state, { payload }) => {
+        state.error = payload as APIError
+        state.isLoading = false
       })
   }
 })
