@@ -1,5 +1,5 @@
 import React, { Key, useEffect, useMemo } from 'react'
-import { createSearchParams, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {
   Table,
   TableHeader,
@@ -25,7 +25,7 @@ import { Category } from '~/types/category'
 import useQueryParams from '~/hooks/useQueryParams'
 
 import { publishedOptions } from '~/utils/data'
-import { capitalize } from '~/utils/helper'
+import { capitalize, createUrlWithParams } from '~/utils/helper'
 
 const columns = [
   { name: 'ID', uid: 'id' },
@@ -65,51 +65,51 @@ export default function Categories() {
     )
   }, [dispatch, hasPublished, keyword, pageNum, pageSize, sort])
 
-  const createUrlWithParams = React.useCallback(
-    (newParams: Partial<typeof params>) => {
-      const updatedParams = { ...params, ...newParams }
-      const searchParams = createSearchParams(
-        new URLSearchParams(
-          Object.entries(updatedParams)
-            .filter(([, value]) => value !== undefined && value !== null && value !== '')
-            .map(([key, value]) => [key, String(value)])
-        )
-      )
-      return `?${searchParams.toString()}`
-    },
-    [params]
-  )
+  // const createUrlWithParams = React.useCallback(
+  //   (newParams: Partial<typeof params>) => {
+  //     const updatedParams = { ...params, ...newParams }
+  //     const searchParams = createSearchParams(
+  //       new URLSearchParams(
+  //         Object.entries(updatedParams)
+  //           .filter(([, value]) => value !== undefined && value !== null && value !== '')
+  //           .map(([key, value]) => [key, String(value)])
+  //       )
+  //     )
+  //     return `?${searchParams.toString()}`
+  //   },
+  //   [params]
+  // )
 
   const onClear = React.useCallback(() => {
-    navigate(createUrlWithParams({ keyword: '', pageNum: 1 }))
-  }, [createUrlWithParams, navigate])
+    navigate(createUrlWithParams(params, { keyword: '', pageNum: 1 }))
+  }, [navigate, params])
 
   const onPageSizeChange = React.useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
-      navigate(createUrlWithParams({ pageSize: e.target.value }))
+      navigate(createUrlWithParams(params, { pageSize: e.target.value }))
     },
-    [createUrlWithParams, navigate]
+    [navigate, params]
   )
 
   const onPublishedChange = React.useCallback(
     (value: Key) => {
-      navigate(createUrlWithParams({ hasPublished: value === 'all' ? null : String(value) }))
+      navigate(createUrlWithParams(params, { hasPublished: value === 'all' ? null : String(value) }))
     },
-    [createUrlWithParams, navigate]
+    [navigate, params]
   )
 
   const onSortChange = React.useCallback(
     (value: Key) => {
-      navigate(createUrlWithParams({ sort: String(value) }))
+      navigate(createUrlWithParams(params, { sort: String(value) }))
     },
-    [createUrlWithParams, navigate]
+    [navigate, params]
   )
 
   const onSearchChange = React.useCallback(
     (value: string) => {
-      navigate(createUrlWithParams({ keyword: value, pageNum: 1 }))
+      navigate(createUrlWithParams(params, { keyword: value, pageNum: 1 }))
     },
-    [createUrlWithParams, navigate]
+    [navigate, params]
   )
 
   const renderCell = React.useCallback((category: Category, columnKey: Key) => {
@@ -238,21 +238,12 @@ export default function Categories() {
             color='primary'
             page={Number(params.pageNum)}
             total={categoryPage?.totalPages ?? 0}
-            onChange={(page) => navigate(createUrlWithParams({ pageNum: page }))}
+            onChange={(page) => navigate(createUrlWithParams(params, { pageNum: page }))}
           />
         </div>
       </div>
     )
-  }, [
-    categoryPage?.totalPages,
-    createUrlWithParams,
-    navigate,
-    onPageSizeChange,
-    pageNum,
-    pageSize,
-    params.pageNum,
-    params.pageSize
-  ])
+  }, [categoryPage?.totalPages, navigate, onPageSizeChange, pageNum, pageSize, params])
 
   if (!categoryPage) return null
 

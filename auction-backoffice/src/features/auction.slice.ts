@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { RootState } from '~/app/store'
-import { fetchAllAuctionsAPI } from '~/services/auction.service'
+import { fetchAllAuctionsAPI, fetchMyAuctionsAPI } from '~/services/auction.service'
 import { Auction } from '~/types/auction'
 import { APIError } from '~/types/error'
 import { Page } from '~/types/page'
@@ -19,10 +19,14 @@ export const fetchAllAuctions = createAsyncThunk(
   ) => {
     try {
       const state = thunkAPI.getState() as RootState
-      console.log(state)
-
-      const data = await fetchAllAuctionsAPI(pageNum, pageSize, keyword, sort, hasPublished)
-      return data
+      const isAdmin = state.user.roles?.includes('ADMIN')
+      if (isAdmin) {
+        const data = await fetchAllAuctionsAPI(pageNum, pageSize, keyword, sort, hasPublished)
+        return data
+      } else {
+        const data = await fetchMyAuctionsAPI(pageNum, pageSize, keyword, sort, hasPublished)
+        return data
+      }
     } catch (error) {
       return thunkAPI.rejectWithValue(error)
     }
@@ -53,10 +57,10 @@ export const auctionSlice = createSlice({
       })
       .addCase(fetchAllAuctions.fulfilled, (state, { payload }) => {
         state.auctionPage = payload
-        state.isLoading = false
+        // state.isLoading = false
       })
       .addCase(fetchAllAuctions.rejected, (state, { payload }) => {
-        state.isLoading = false
+        // state.isLoading = false
         state.error = payload as APIError
       })
   }

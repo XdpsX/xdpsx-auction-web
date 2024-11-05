@@ -14,26 +14,24 @@ const sidebarItems: SidebarItem[] = [
     title: 'Categories'
   },
   {
-    key: 'cap_table',
-    title: 'Cap Table',
-    icon: 'solar:pie-chart-2-outline',
+    key: 'auctions',
+    title: 'Auctions',
+    icon: 'solar:sledgehammer-outline',
     type: SidebarItemType.Nest,
     items: [
       {
         key: 'shareholders',
-        icon: 'solar:users-group-rounded-linear',
-        path: '#',
-        title: 'Shareholders'
+        path: '/auctions',
+        title: 'List'
       },
       {
         key: 'note_holders',
-        icon: 'solar:notes-outline',
+
         path: '#',
         title: 'Note Holders'
       },
       {
         key: 'transactions_log',
-        icon: 'solar:clipboard-list-linear',
         path: '#',
         title: 'Transactions Log'
       }

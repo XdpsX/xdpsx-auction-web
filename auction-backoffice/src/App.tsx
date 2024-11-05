@@ -5,7 +5,7 @@ import { ThemeProvider as NextThemesProvider } from 'next-themes'
 import AppRouter from './router'
 import { useAppDispatch, useAppSelector } from './app/hooks'
 import { useEffect } from 'react'
-import { fetchUserProfile, setProfile } from './features/user.slice'
+import { fetchUserProfile, setProfile, setRoles } from './features/user.slice'
 import LoadingOverlay from './components/shared/LoadingOverlay'
 
 export default function App() {
@@ -16,9 +16,12 @@ export default function App() {
 
   useEffect(() => {
     if (accessToken) {
+      console.log(accessToken)
       dispatch(fetchUserProfile())
+      dispatch(setRoles(accessToken))
     } else {
       dispatch(setProfile(null))
+      dispatch(setRoles(null))
     }
   }, [dispatch, accessToken])
 
