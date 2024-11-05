@@ -1,230 +1,97 @@
-import React from 'react'
-import {
-  Accordion,
-  AccordionItem,
-  type ListboxProps,
-  type ListboxSectionProps,
-  type Selection
-} from '@nextui-org/react'
-import { Listbox, Tooltip, ListboxItem, ListboxSection } from '@nextui-org/react'
+import { useCallback, useState } from 'react'
+import { NavLink, useLocation } from 'react-router-dom'
 import { Icon } from '@iconify/react'
-import { cn } from '@nextui-org/react'
-import { SidebarItem, SidebarItemType } from './type'
-import { NavLink } from 'react-router-dom'
+import SidebarLinkGroup from './SidebarLinkGroup'
+import { SidebarItem } from './type'
 
-export type SidebarProps = Omit<ListboxProps<SidebarItem>, 'children'> & {
-  items: SidebarItem[]
-  isCompact?: boolean
-  hideEndContent?: boolean
-  iconClassName?: string
-  sectionClasses?: ListboxSectionProps['classNames']
-  classNames?: ListboxProps['classNames']
-  defaultSelectedKey: string
-  onSelect?: (key: string) => void
-}
+function Sidebar({ sidebarItems }: { sidebarItems: SidebarItem[] }) {
+  const location = useLocation()
+  const { pathname } = location
 
-const Sidebar = React.forwardRef<HTMLElement, SidebarProps>(
-  (
-    {
-      items,
-      isCompact,
-      defaultSelectedKey,
-      onSelect,
-      hideEndContent,
-      sectionClasses: sectionClassesProp = {},
-      itemClasses: itemClassesProp = {},
-      iconClassName,
-      classNames,
-      className,
-      ...props
-    },
-    ref
-  ) => {
-    const [selected, setSelected] = React.useState<React.Key>(defaultSelectedKey)
+  const storedSidebarExpanded = localStorage.getItem('sidebar-expanded')
+  const [sidebarExpanded, setSidebarExpanded] = useState(
+    storedSidebarExpanded === null ? false : storedSidebarExpanded === 'true'
+  )
 
-    const sectionClasses = {
-      ...sectionClassesProp,
-      base: cn(sectionClassesProp?.base, 'w-full', {
-        'p-0 max-w-[44px]': isCompact
-      }),
-      group: cn(sectionClassesProp?.group, {
-        'flex flex-col gap-1': isCompact
-      }),
-      heading: cn(sectionClassesProp?.heading, {
-        hidden: isCompact
-      })
-    }
-
-    const itemClasses = {
-      ...itemClassesProp,
-      base: cn(itemClassesProp?.base, {
-        'w-11 h-11 gap-0 p-0': isCompact
-      })
-    }
-
-    const renderNestItem = React.useCallback(
-      (item: SidebarItem) => {
-        const isNestType = item.items && item.items?.length > 0 && item?.type === SidebarItemType.Nest
-
-        if (isNestType) {
-          // Is a nest type item , so we need to remove the href
-          delete item.path
-        }
-
-        return (
-          <ListboxItem
-            {...item}
-            key={item.key}
-            classNames={{
-              base: cn(
-                {
-                  'h-auto p-0': !isCompact && isNestType
-                },
-                {
-                  'inline-block w-11': isCompact && isNestType
-                }
-              )
-            }}
-            endContent={isCompact || isNestType || hideEndContent ? null : (item.endContent ?? null)}
-            startContent={
-              isCompact || isNestType ? null : item.icon ? (
-                <Icon className={cn('text-default-100 ', iconClassName)} icon={item.icon} width={24} />
-              ) : (
-                (item.startContent ?? null)
-              )
-            }
-            title={isCompact || isNestType ? null : item.title}
-          >
-            {isCompact ? (
-              <Tooltip content={item.title} placement='right'>
-                <div className='flex w-full items-center justify-center'>
-                  {item.icon ? (
-                    <Icon className={cn('text-default-100 ', iconClassName)} icon={item.icon} width={24} />
-                  ) : (
-                    (item.startContent ?? null)
-                  )}
-                </div>
-              </Tooltip>
-            ) : null}
-            {!isCompact && isNestType ? (
-              <Accordion className={'p-0'}>
-                <AccordionItem
-                  key={item.key}
-                  aria-label={item.title}
-                  classNames={{
-                    heading: 'pr-3',
-                    trigger: 'p-0',
-                    content: 'py-0 pl-4'
-                  }}
-                  title={
-                    item.icon ? (
-                      <div className={'flex h-11 items-center  gap-2 px-2 py-1.5'}>
-                        <Icon className={cn('text-default-100 ', iconClassName)} icon={item.icon} width={24} />
-                        <span className='text-small  font-medium text-default-100 '>{item.title}</span>
-                      </div>
-                    ) : (
-                      (item.startContent ?? null)
-                    )
+  const renderGroupItem = useCallback(
+    (item: SidebarItem) => {
+      return (
+        <SidebarLinkGroup key={item.title} activeCondition={pathname.includes(item.key)}>
+          {(handleClick, open) => (
+            <>
+              <NavLink
+                to='#'
+                className={`group nav-item justify-between ${
+                  (pathname === item.path || pathname.includes(item.key)) && 'bg-yellow-600 hover:text-white'
+                }`}
+                onClick={(e) => {
+                  e.preventDefault()
+                  if (sidebarExpanded) {
+                    handleClick()
+                  } else {
+                    setSidebarExpanded(true)
                   }
-                >
-                  {item.items && item.items?.length > 0 ? (
-                    <Listbox
-                      className={'mt-0.5'}
-                      classNames={{
-                        list: cn('border-l border-default-200 pl-4')
-                      }}
-                      items={item.items}
-                      variant='light'
-                    >
-                      {item.items.map(renderItem)}
-                    </Listbox>
-                  ) : (
-                    renderItem(item)
-                  )}
-                </AccordionItem>
-              </Accordion>
-            ) : null}
-          </ListboxItem>
-        )
-      },
-      [isCompact, hideEndContent, iconClassName]
-    )
+                }}
+              >
+                <div className='flex items-center '>
+                  <div className='w-8'>{item.icon && <Icon icon={item.icon} width={24} />}</div>
+                  {item.title}
+                </div>
+                {open ? <Icon icon='solar:alt-arrow-up-outline' /> : <Icon icon='solar:alt-arrow-down-outline' />}
+              </NavLink>
+              {/* <!-- Dropdown Menu Start --> */}
+              {item.children && (
+                <div className={`translate transform overflow-hidden ${!open && 'hidden'}`}>
+                  <ul className='mt-1.5 mb-5.5 ml-2 flex flex-col gap-1.5 pl-5 border-l-1 border-gray-400'>
+                    {item.children.map((child) => (
+                      <li key={child.key}>
+                        <NavLink
+                          to={child.index ? (item.path ?? '#') : (child.path ?? '#')}
+                          className={({ isActive }) =>
+                            'group    text-sm  rounded-md px-4 font-medium text-slate-300 duration-300 ease-in-out hover:text-white ' +
+                            (isActive && '!text-yellow-400 cursor-default')
+                          }
+                        >
+                          {child.title}
+                        </NavLink>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {/* <!-- Dropdown Menu End --> */}
+            </>
+          )}
+        </SidebarLinkGroup>
+      )
+    },
+    [pathname, sidebarExpanded]
+  )
 
-    const renderItem = React.useCallback(
-      (item: SidebarItem) => {
-        const isNestType = item.items && item.items?.length > 0 && item?.type === SidebarItemType.Nest
+  const renderItem = useCallback(
+    (item: SidebarItem) => {
+      return (
+        <NavLink
+          to={item.path ?? '#'}
+          className={`group nav-item ${(pathname === item.key || pathname.includes(item.key)) && 'bg-yellow-600 hover:text-white'}`}
+        >
+          <div className='flex items-center '>
+            <div className='w-8'>{item.icon && <Icon icon={item.icon} width={24} />}</div>
+            {item.title}
+          </div>
+        </NavLink>
+      )
+    },
+    [pathname]
+  )
 
-        if (isNestType) {
-          return renderNestItem(item)
-        }
-
-        return (
-          <ListboxItem
-            key={item.key}
-            classNames={{
-              base: cn(itemClasses?.base, { 'bg-yellow-500': false })
-            }}
-            startContent={
-              isCompact ? null : item.icon ? (
-                <Icon className={cn('text-default-100 ', iconClassName)} icon={item.icon} width={24} color='primary' />
-              ) : (
-                (item.startContent ?? null)
-              )
-            }
-          >
-            <NavLink to={item.path ?? '#'}>{item.title}</NavLink>
-          </ListboxItem>
-        )
-      },
-      [itemClasses?.base, isCompact, iconClassName, renderNestItem]
-    )
-
-    return (
-      <Listbox
-        aria-label='Sidebar'
-        key={isCompact ? 'compact' : 'default'}
-        ref={ref}
-        hideSelectedIcon
-        as='nav'
-        className={cn('list-none', className)}
-        classNames={{
-          ...classNames,
-          list: cn('items-center', classNames?.list)
-        }}
-        color='default'
-        itemClasses={{
-          ...itemClasses,
-          base: cn('px-3 min-h-11 rounded-large h-[44px] ', itemClasses?.base),
-          title: cn('text-small font-medium text-default-100 ', itemClasses?.title)
-        }}
-        items={items}
-        selectedKeys={[selected] as unknown as Selection}
-        selectionMode='single'
-        variant='light'
-        onSelectionChange={(keys) => {
-          const key = Array.from(keys)[0]
-
-          setSelected(key as React.Key)
-          onSelect?.(key as string)
-        }}
-        {...props}
-      >
-        {(item) => {
-          return item.items && item.items?.length > 0 && item?.type === SidebarItemType.Nest ? (
-            renderNestItem(item)
-          ) : item.items && item.items?.length > 0 ? (
-            <ListboxSection key={item.key} classNames={sectionClasses} showDivider={isCompact} title={item.title}>
-              {item.items.map(renderItem)}
-            </ListboxSection>
-          ) : (
-            renderItem(item)
-          )
-        }}
-      </Listbox>
-    )
-  }
-)
-
-Sidebar.displayName = 'Sidebar'
+  return (
+    <nav className='mt-5 py-4 px-4 text-white'>
+      <ul className='mb-6 flex flex-col gap-3'>
+        {sidebarItems.map((item) => (item.group ? renderGroupItem(item) : <li key={item.key}>{renderItem(item)}</li>))}
+      </ul>
+    </nav>
+  )
+}
 
 export default Sidebar

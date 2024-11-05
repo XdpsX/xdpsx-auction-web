@@ -1,42 +1,44 @@
-import { type SidebarItem, SidebarItemType } from '~/components/layout/Sidebar/type'
+import { SidebarItem } from '~/components/layout/Sidebar/type'
 
 const sidebarItems: SidebarItem[] = [
   {
     key: 'dashboard',
-    path: '/',
-    icon: 'solar:chat-square-2-linear',
-    title: 'Dashboard'
+    title: 'Dashboard',
+    path: '/dashboard',
+    icon: 'solar:chat-square-2-linear'
   },
   {
     key: 'categories',
-    path: '/categories',
+    title: 'Categories',
     icon: 'solar:widget-outline',
-    title: 'Categories'
+    path: '/categories',
+    group: true,
+    children: [
+      {
+        key: 'categories-list',
+        title: 'List',
+        index: true
+      }
+    ]
   },
   {
     key: 'auctions',
     title: 'Auctions',
     icon: 'solar:sledgehammer-outline',
-    type: SidebarItemType.Nest,
-    items: [
+    path: '/auctions',
+    group: true,
+    children: [
       {
-        key: 'shareholders',
-        path: '/auctions',
-        title: 'List'
+        key: 'auctions-list',
+        title: 'List',
+        index: true
       },
       {
-        key: 'note_holders',
-
-        path: '#',
-        title: 'Note Holders'
-      },
-      {
-        key: 'transactions_log',
-        path: '#',
-        title: 'Transactions Log'
+        key: 'auctions-add',
+        title: 'Add New Auction',
+        path: '/add'
       }
     ]
   }
 ]
-
 export default sidebarItems

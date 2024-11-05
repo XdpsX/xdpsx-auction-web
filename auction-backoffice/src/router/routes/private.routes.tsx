@@ -3,10 +3,14 @@ import PrivateRoute from '../guards/PrivateRoute'
 import Categories from '~/pages/category/Categories'
 import Dashboard from '~/pages/Dashboard'
 import Auctions from '~/pages/auction/Auctions'
+import { Navigate } from 'react-router-dom'
 
 const privateRoutes = [
   {
     path: '/',
+    element: <Navigate to='/dashboard' replace />
+  },
+  {
     element: (
       <PrivateRoute>
         <MainLayout />
@@ -14,7 +18,7 @@ const privateRoutes = [
     ),
     children: [
       {
-        index: true,
+        path: '/dashboard',
         element: <Dashboard />
       },
       {

@@ -1,11 +1,11 @@
 import React from 'react'
-import { ScrollShadow } from '@nextui-org/react'
-import { cn } from '@nextui-org/react'
-import Sidebar from '~/components/layout/Sidebar'
-import sidebarItems from '~/utils/sidebar.items'
-import LOGO from '~/assets/logo.svg'
-import MainHeader from '~/components/layout/MainHeader'
 import { Outlet } from 'react-router-dom'
+import { cn } from '@nextui-org/react'
+
+import MainHeader from '~/components/layout/MainHeader'
+import Sidebar from '~/components/layout/Sidebar'
+import LOGO from '~/assets/logo.svg'
+import sidebarItems from '~/utils/sidebar.items'
 
 export default function MainLayout() {
   const [isHidden, setIsHidden] = React.useState(false)
@@ -23,9 +23,7 @@ export default function MainLayout() {
         <div className='flex items-center gap-2 px-2'>
           <img src={LOGO} alt='logo' className='w-40' />
         </div>
-        <ScrollShadow className='-mr-6 h-full max-h-full py-6 pr-6'>
-          <Sidebar defaultSelectedKey='dashboard' items={sidebarItems} />
-        </ScrollShadow>
+        <Sidebar sidebarItems={sidebarItems} />
       </div>
       <div className='w-full flex-1 flex-col py-4 px-8 bg-slate-200/75 overflow-y-scroll'>
         <MainHeader isHidden={isHidden} setIsHidden={setIsHidden} />
