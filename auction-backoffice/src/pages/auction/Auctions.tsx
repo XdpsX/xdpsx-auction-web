@@ -2,14 +2,7 @@ import React, { Key } from 'react'
 import { useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  Button,
-  Chip,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-  Input,
-  Pagination,
+  Spinner,
   Switch,
   Table,
   TableBody,
@@ -24,9 +17,12 @@ import { useAppDispatch, useAppSelector } from '~/app/hooks'
 import { fetchAllAuctions } from '~/features/auction.slice'
 import useQueryParams from '~/hooks/useQueryParams'
 import { Auction } from '~/types/auction'
-import { publishedOptions } from '~/utils/data'
-import { capitalize, createUrlWithParams } from '~/utils/helper'
+import { publishedOptions, sortOptions } from '~/utils/data'
+import { createUrlWithParams } from '~/utils/helper'
 import { formatDateTime, formatPrice } from '~/utils/format'
+import AuctionFilter from '~/components/auction/AuctionFilter'
+import TableBottom from '~/components/shared/TableBottom'
+import AddButton from '~/components/shared/AddButton'
 
 const columns = [
   { name: 'ID', uid: 'id' },
@@ -41,22 +37,15 @@ const columns = [
   { name: 'ACTIONS', uid: 'actions' }
 ]
 
-const sortOptions = [
-  { name: 'Name A-Z', uid: 'name' },
-  { name: 'Name Z-A', uid: '-name' },
-  { name: 'Oldest', uid: 'date' },
-  { name: 'Newest', uid: '-date' }
-]
-
 function Auctions() {
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const params = useQueryParams()
   const { pageNum, pageSize, keyword, sort, hasPublished } = useMemo(() => params, [params])
-  const { auctionPage } = useAppSelector((state) => state.auction)
+  const { auctionPage, isLoading } = useAppSelector((state) => state.auction)
 
-  const filteredPublished = publishedOptions.find((option) => option.uid === hasPublished)
-  const filteredSort = sortOptions.find((option) => option.uid === sort)
+  const filteredPublished = publishedOptions.find((option) => option.key === hasPublished)
+  const filteredSort = sortOptions.find((option) => option.key === sort)
 
   useEffect(() => {
     dispatch(
@@ -74,15 +63,22 @@ function Auctions() {
     navigate(createUrlWithParams(params, { keyword: '', pageNum: 1 }))
   }, [navigate, params])
 
+  const onPageChange = React.useCallback(
+    (newPageNum: number) => {
+      navigate(createUrlWithParams(params, { pageNum: newPageNum }))
+    },
+    [navigate, params]
+  )
+
   const onPageSizeChange = React.useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      navigate(createUrlWithParams(params, { pageSize: e.target.value }))
+    (newPageSize: number) => {
+      navigate(createUrlWithParams(params, { pageSize: newPageSize }))
     },
     [navigate, params]
   )
 
   const onPublishedChange = React.useCallback(
-    (value: Key) => {
+    (value: string) => {
       navigate(createUrlWithParams(params, { hasPublished: value === 'all' ? null : String(value) }))
     },
     [navigate, params]
@@ -152,119 +148,23 @@ function Auctions() {
     }
   }, [])
 
-  const topContent = React.useMemo(() => {
-    return (
-      <div className='flex flex-col gap-4 bg-white rounded-xl p-4'>
-        <div className='flex justify-between gap-3 items-end  '>
-          <div className='flex items-center gap-6'>
-            <Input
-              isClearable
-              className='flex-1'
-              placeholder='Search by name...'
-              startContent={<Icon icon='material-symbols:search' />}
-              value={keyword ?? ''}
-              onClear={() => onClear()}
-              onValueChange={onSearchChange}
-              variant='bordered'
-            />
-
-            <Dropdown>
-              <DropdownTrigger className='hidden sm:flex'>
-                <Button variant='flat' endContent={<Icon icon='solar:alt-arrow-down-outline' />}>
-                  {filteredPublished?.name || 'All'}
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu aria-label='Status' onAction={(key) => onPublishedChange(key)}>
-                {publishedOptions.map((status) => (
-                  <DropdownItem key={status.uid} className='capitalize'>
-                    {capitalize(status.name)}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown>
-
-            <Dropdown>
-              <DropdownTrigger className='hidden sm:flex'>
-                <Button variant='flat' endContent={<Icon icon='solar:alt-arrow-down-outline' />}>
-                  {filteredSort?.name || 'Sort'}
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu aria-label='Sort' onAction={onSortChange}>
-                {sortOptions.map((status) => (
-                  <DropdownItem key={status.uid} className='capitalize'>
-                    {capitalize(status.name)}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown>
-          </div>
-          <div className='flex gap-3'>
-            <Button className='bg-green-500 text-white' endContent={<Icon icon='ic:baseline-plus' />}>
-              Add New
-            </Button>
-          </div>
-        </div>
-      </div>
-    )
-  }, [keyword, onSearchChange, filteredPublished?.name, filteredSort?.name, onSortChange, onClear, onPublishedChange])
-
-  const bottomContent = React.useMemo(() => {
-    if ((auctionPage?.items?.length ?? 0) > 0) {
-      return (
-        <div className='py-2 px-2 mx-auto'>
-          <div className='flex flex-col items-center gap-4'>
-            <div className='flex items-center gap-6'>
-              <span className='text-small'>
-                {(+pageNum - 1) * +pageSize + 1} to {(+pageNum - 1) * +pageSize + +pageSize}
-              </span>
-              <label className='flex items-center text-small '>
-                Rows:
-                <select
-                  className='ml-1 outline-none border-1 border-black rounded-md text-small px-2 py-1'
-                  value={params.pageSize}
-                  onChange={onPageSizeChange}
-                >
-                  <option value='5'>5</option>
-                  <option value='10'>10</option>
-                  <option value='15'>15</option>
-                </select>
-              </label>
-            </div>
-            {auctionPage?.totalPages && auctionPage.totalPages > 1 && (
-              <Pagination
-                isCompact
-                showControls
-                showShadow
-                color='primary'
-                page={Number(params.pageNum)}
-                total={auctionPage?.totalPages ?? 0}
-                onChange={(page) => navigate(createUrlWithParams(params, { pageNum: page }))}
-              />
-            )}
-          </div>
-        </div>
-      )
-    }
-    return null
-  }, [auctionPage?.items?.length, auctionPage?.totalPages, navigate, onPageSizeChange, pageNum, pageSize, params])
-
-  if (!auctionPage) return
-
   return (
-    <section>
-      <div className='flex items-center gap-2 mb-6'>
-        <h1 className='text-2xl font-[700] leading-[32px]'>Auctions</h1>
-        <Chip color='secondary' className='hidden items-center sm:flex' size='sm' variant='solid'>
-          {auctionPage?.totalItems} items
-        </Chip>
+    <section className='flex flex-col gap-4'>
+      <div className='flex items-center justify-between gap-2'>
+        <h1 className='page-heading'>Auctions</h1>
+        <AddButton />
       </div>
-      <Table
-        aria-label='Auctions Table'
-        topContent={topContent}
-        topContentPlacement='outside'
-        bottomContent={bottomContent}
-        bottomContentPlacement='outside'
-      >
+      <AuctionFilter
+        keyword={keyword ?? ''}
+        filteredPublished={filteredPublished}
+        filteredSort={filteredSort}
+        onClear={onClear}
+        onSearchChange={onSearchChange}
+        onPublishedChange={onPublishedChange}
+        onSortChange={onSortChange}
+      />
+
+      <Table aria-label='Auctions Table'>
         <TableHeader columns={columns}>
           {(column) => (
             <TableColumn key={column.uid} align={column.uid === 'actions' ? 'center' : 'start'}>
@@ -273,18 +173,28 @@ function Auctions() {
           )}
         </TableHeader>
         <TableBody
-          items={auctionPage?.items}
-          emptyContent={
-            <div>
-              <p>No item found</p>
-            </div>
-          }
+          items={auctionPage.items}
+          emptyContent={<p>No item found</p>}
+          isLoading={isLoading}
+          loadingContent={<Spinner />}
         >
           {(item) => (
             <TableRow key={item.id}>{(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}</TableRow>
           )}
         </TableBody>
       </Table>
+
+      {auctionPage.items.length > 0 && (
+        <TableBottom
+          pageNum={+pageNum}
+          pageSize={+pageSize}
+          totalItems={auctionPage.totalItems}
+          totalPages={auctionPage.totalPages}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+          className='mt-4'
+        />
+      )}
     </section>
   )
 }

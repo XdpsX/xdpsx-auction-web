@@ -12,7 +12,7 @@ export default function MainLayout() {
 
   return (
     <div className='flex h-dvh w-full'>
-      <div
+      <aside
         className={cn(
           'relative bg-black/90 flex h-full w-72 max-w-[288px] flex-1 flex-col !border-r-small border-divider p-6 transition-[transform,opacity,margin] duration-250 ease-in-out',
           {
@@ -24,7 +24,7 @@ export default function MainLayout() {
           <img src={LOGO} alt='logo' className='w-40' />
         </div>
         <Sidebar sidebarItems={sidebarItems} />
-      </div>
+      </aside>
       <div className='w-full flex-1 flex-col py-4 px-8 bg-slate-200/75 overflow-y-scroll'>
         <MainHeader isHidden={isHidden} setIsHidden={setIsHidden} />
         <main className='mt-8 3xl:py-12 h-full w-full overflow-visible'>

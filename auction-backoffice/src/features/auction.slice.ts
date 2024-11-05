@@ -34,13 +34,19 @@ export const fetchAllAuctions = createAsyncThunk(
 )
 
 export interface AuctionState {
-  auctionPage: Page<Auction> | null
+  auctionPage: Page<Auction>
   isLoading: boolean
   error: null | APIError
 }
 
 const initialState: AuctionState = {
-  auctionPage: null,
+  auctionPage: {
+    items: [],
+    pageNum: 0,
+    pageSize: 0,
+    totalItems: 0,
+    totalPages: 0
+  },
   isLoading: false,
   error: null
 }
@@ -57,10 +63,10 @@ export const auctionSlice = createSlice({
       })
       .addCase(fetchAllAuctions.fulfilled, (state, { payload }) => {
         state.auctionPage = payload
-        // state.isLoading = false
+        state.isLoading = false
       })
       .addCase(fetchAllAuctions.rejected, (state, { payload }) => {
-        // state.isLoading = false
+        state.isLoading = false
         state.error = payload as APIError
       })
   }

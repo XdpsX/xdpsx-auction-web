@@ -9,6 +9,6 @@ export default function useQueryParams() {
     pageSize: params.pageSize || 10,
     keyword: params.keyword || null,
     hasPublished: params.hasPublished || null,
-    sort: params.sort || null
+    sort: params.sort || '-date'
   }
 }
