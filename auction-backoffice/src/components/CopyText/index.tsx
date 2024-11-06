@@ -36,7 +36,7 @@ export const CopyText = memo(
     const content = useMemo(() => (copied ? 'Copied' : copyText), [copied, copyText])
 
     return (
-      <div ref={forwardedRef} className={cn('flex items-center gap-3 text-default-500', className)}>
+      <div ref={forwardedRef} className={cn('flex items-center gap-1 text-default-500', className)}>
         <span className={textClassName}>{children}</span>
         <Tooltip className='text-foreground' content={content}>
           <Button

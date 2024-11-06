@@ -79,7 +79,7 @@ function Dashboard() {
   return (
     <div>
       <section className='flex py-2 justify-between gap-8'>
-        <div className='flex-1 p-4 flex items-center gap-6 bg-white shadow-sm'>
+        <div className='flex-1 p-4 flex items-center gap-6 bg-default-50 shadow-md'>
           <div className='h-14 w-14 bg-blue-50 rounded-full flex items-center justify-center'>
             <Icon icon='solar:sledgehammer-outline' className='h-8 w-8 text-blue-500' />
           </div>
@@ -88,7 +88,7 @@ function Dashboard() {
             <h4 className='text-foreground tracking-tight'>Auctions</h4>
           </div>
         </div>
-        <div className='flex-1 p-4 flex items-center gap-6 bg-white shadow-sm'>
+        <div className='flex-1 p-4 flex items-center gap-6 bg-default-50 shadow-md'>
           <div className='h-14 w-14 bg-orange-50 rounded-full flex items-center justify-center'>
             <Icon icon='solar:sledgehammer-outline' className='h-8 w-8 text-orange-500' />
           </div>
@@ -97,7 +97,7 @@ function Dashboard() {
             <h4 className='text-foreground tracking-tight'>Auctions</h4>
           </div>
         </div>
-        <div className='flex-1 p-4 flex items-center gap-6 bg-white shadow-sm'>
+        <div className='flex-1 p-4 flex items-center gap-6 bg-default-50 shadow-md'>
           <div className='h-14 w-14 bg-yellow-50 rounded-full flex items-center justify-center'>
             <Icon icon='solar:sledgehammer-outline' className='h-8 w-8 text-yellow-500' />
           </div>
@@ -106,7 +106,7 @@ function Dashboard() {
             <h4 className='text-foreground tracking-tight'>Auctions</h4>
           </div>
         </div>
-        <div className='flex-1 p-4 flex items-center gap-6 bg-white shadow-sm'>
+        <div className='flex-1 p-4 flex items-center gap-6 bg-default-50 shadow-md'>
           <div className='h-14 w-14 bg-purple-50 rounded-full flex items-center justify-center'>
             <Icon icon='solar:sledgehammer-outline' className='h-8 w-8 text-purple-500' />
           </div>

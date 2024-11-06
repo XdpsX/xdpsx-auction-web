@@ -41,11 +41,11 @@ const SidebarLinkGroup = memo(({ activeCondition, item }: { activeCondition: boo
         {open ? <Icon icon='solar:alt-arrow-up-outline' /> : <Icon icon='solar:alt-arrow-down-outline' />}
       </NavLink>
       {/* <!-- Dropdown Menu Start --> */}
-      {item.children && open && (
+      {item.children && (
         <div
           ref={groupRef}
-          className={`translate transform overflow-hidden transition-all duration-300 ease-in-out`}
-          style={{ height: open ? `${groupRef.current?.scrollHeight}px` : '0px' }}
+          className={`overflow-hidden transition-all duration-3000 ease-in-out`}
+          style={{ height: open ? `${groupRef.current && groupRef.current.scrollHeight}px` : '0px' }}
         >
           <ul className='mt-1.5 mb-5.5 ml-2 flex flex-col gap-1.5 pl-5 border-l-1 border-gray-400'>
             {item.children.map((child) => (

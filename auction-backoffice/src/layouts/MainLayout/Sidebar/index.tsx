@@ -10,7 +10,7 @@ const Sidebar = ({ sidebarItems }: { sidebarItems: SidebarItem[] }) => {
 
   const renderGroupItem = useMemo(
     () => (item: SidebarItem) => {
-      return <SidebarLinkGroup activeCondition={pathname === item.key} item={item} />
+      return <SidebarLinkGroup key={item.key} activeCondition={pathname === item.key} item={item} />
     },
     [pathname]
   )

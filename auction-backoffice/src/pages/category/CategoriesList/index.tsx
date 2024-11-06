@@ -27,6 +27,7 @@ import FilterResult from '~/components/FilterResult'
 
 import { publishedOptions, sortOptions } from '~/utils/data'
 import { DEFAULT_PAGE_NUM, DEFAULT_PAGE_SIZE, DEFAULT_PUBLISHED, DEFAULT_SORT } from '~/constants'
+import { CopyText } from '~/components/CopyText'
 
 const columns = [
   { name: 'ID', uid: 'id' },
@@ -105,7 +106,7 @@ function CategoriesList() {
   const renderCell = useCallback((category: Category, columnKey: Key) => {
     switch (columnKey) {
       case 'id':
-        return <p className='text-sm'>{category.id}</p>
+        return <CopyText>{`${category.id}`}</CopyText>
       case 'imgUrl':
         return (
           <img

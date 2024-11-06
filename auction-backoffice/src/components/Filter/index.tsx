@@ -56,6 +56,7 @@ function Filter({ items, onFilterChange }: FilterProps) {
         <div className='flex w-full flex-col gap-6 px-2 py-4 mb-4'>
           {items.map((item) => (
             <RadioGroup
+              size='sm'
               key={item.key}
               label={item.label}
               value={selectedValues[item.key]}
@@ -69,9 +70,11 @@ function Filter({ items, onFilterChange }: FilterProps) {
             </RadioGroup>
           ))}
         </div>
-        <Button color='danger' onPress={handleFilter}>
-          Apply
-        </Button>
+        <div className='pb-2'>
+          <Button color='secondary' radius='sm' onPress={handleFilter}>
+            Apply
+          </Button>
+        </div>
       </PopoverContent>
     </Popover>
   )
