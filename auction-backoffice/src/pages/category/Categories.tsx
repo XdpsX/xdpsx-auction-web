@@ -1,5 +1,4 @@
 import React, { Key, useEffect, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
 import {
   Table,
   TableHeader,
@@ -18,13 +17,14 @@ import { Category } from '~/types/category'
 import useQueryParams from '~/hooks/useQueryParams'
 
 import { publishedOptions, sortOptions } from '~/utils/data'
-import { createUrlWithParams } from '~/utils/helper'
 import AddButton from '~/components/shared/AddButton'
 import TableBottom from '~/components/shared/TableBottom'
 
 import Search from '~/components/shared/Search'
 import Sort from '~/components/shared/Sort'
 import Filter from '~/components/shared/Filter'
+import FilterResult from '~/components/shared/FilterResult'
+import { DEFAULT_PAGE_NUM, DEFAULT_PAGE_SIZE, DEFAULT_PUBLISHED, DEFAULT_SORT } from '~/constants'
 
 const columns = [
   { name: 'ID', uid: 'id' },
@@ -37,13 +37,18 @@ const columns = [
 
 export default function Categories() {
   const dispatch = useAppDispatch()
-  const navigate = useNavigate()
-  const params = useQueryParams()
-  const { pageNum, pageSize, keyword, sort, hasPublished } = useMemo(() => params, [params])
+
+  const { params, setParams, deleteAllParams } = useQueryParams()
+  const pageNum = params.pageNum || DEFAULT_PAGE_NUM
+  const pageSize = params.pageSize || DEFAULT_PAGE_SIZE
+  const keyword = params.keyword || null
+  const published = params.published || DEFAULT_PUBLISHED.key
+  const sort = params.sort || DEFAULT_SORT.key
+
   const { categoryPage, isLoading } = useAppSelector((state) => state.category)
 
-  const filteredPublished = publishedOptions.find((option) => option.key === hasPublished)
-  const filteredSort = sortOptions.find((option) => option.key === sort)
+  const filteredPublished = useMemo(() => publishedOptions.find((option) => option.key === published), [published])
+  const filteredSort = useMemo(() => sortOptions.find((option) => option.key === sort), [sort])
 
   useEffect(() => {
     dispatch(
@@ -51,50 +56,48 @@ export default function Categories() {
         pageNum: Number(pageNum),
         pageSize: Number(pageSize),
         keyword: keyword || null,
-        hasPublished: hasPublished ? (hasPublished === 'true' ? true : false) : null,
+        published: published === 'all' ? null : published === 'true' ? true : false,
         sort: sort
       })
     )
-  }, [dispatch, hasPublished, keyword, pageNum, pageSize, sort])
+  }, [dispatch, published, keyword, pageNum, pageSize, sort])
 
   const onClear = React.useCallback(() => {
-    navigate(createUrlWithParams(params, { keyword: '', pageNum: 1 }))
-  }, [navigate, params])
+    setParams({ keyword: '', pageNum: 1 })
+  }, [setParams])
 
   const onPageChange = React.useCallback(
     (newPageNum: number) => {
-      navigate(createUrlWithParams(params, { pageNum: newPageNum }))
+      setParams({ pageNum: newPageNum })
     },
-    [navigate, params]
+    [setParams]
   )
 
   const onPageSizeChange = React.useCallback(
     (newPageSize: number) => {
-      navigate(createUrlWithParams(params, { pageSize: newPageSize }))
+      setParams({ pageSize: newPageSize })
     },
-    [navigate, params]
+    [setParams]
   )
 
   const onFilterChange = (selectedValues: Record<string, string>) => {
-    navigate(
-      createUrlWithParams(params, {
-        hasPublished: selectedValues['hasPublished'] === 'all' ? '' : String(selectedValues['hasPublished'])
-      })
-    )
+    setParams({
+      published: selectedValues['published'] === 'all' ? '' : String(selectedValues['published'])
+    })
   }
 
   const onSortChange = React.useCallback(
     (value: Key) => {
-      navigate(createUrlWithParams(params, { sort: String(value) }))
+      setParams({ sort: String(value) })
     },
-    [navigate, params]
+    [setParams]
   )
 
   const onSearchChange = React.useCallback(
     (value: string) => {
-      navigate(createUrlWithParams(params, { keyword: value, pageNum: 1 }))
+      setParams({ keyword: value, pageNum: 1 })
     },
-    [navigate, params]
+    [setParams]
   )
 
   const renderCell = React.useCallback((category: Category, columnKey: Key) => {
@@ -140,25 +143,25 @@ export default function Categories() {
   }, [])
 
   return (
-    <section className='flex flex-col gap-4'>
+    <section className='flex flex-col gap-6'>
       <div className='flex items-center justify-between gap-2'>
         <h1 className='page-heading'>Categories</h1>
         <AddButton />
       </div>
 
-      <div className='gap-4  rounded-xl p-4'>
+      <div className='flex flex-col gap-4'>
         <div className='flex items-center gap-6 '>
           <div>
-            <Search value={keyword ?? ''} onClear={onClear} onSearch={onSearchChange} />
+            <Search value={keyword || ''} onClear={onClear} onSearch={onSearchChange} />
           </div>
           <div>
             <Filter
               items={[
                 {
-                  key: 'hasPublished',
-                  label: 'Has published ?',
+                  key: 'published',
+                  label: 'Published/Unpublished',
                   allOptions: publishedOptions,
-                  value: hasPublished
+                  value: published
                 }
               ]}
               onFilterChange={onFilterChange}
@@ -168,6 +171,29 @@ export default function Categories() {
             <Sort sortOptions={sortOptions} onSortChange={onSortChange} />
           </div>
         </div>
+        <FilterResult
+          items={[
+            {
+              key: filteredPublished?.key || DEFAULT_PUBLISHED.key,
+              title: filteredPublished?.title || DEFAULT_PUBLISHED.title,
+              exceptKey: DEFAULT_PUBLISHED.key,
+              onClear: () => setParams({ published: DEFAULT_PUBLISHED.key })
+            },
+            {
+              key: filteredSort?.key || DEFAULT_SORT.key,
+              title: filteredSort?.title || DEFAULT_SORT.title,
+              exceptKey: DEFAULT_SORT.key,
+              onClear: () => setParams({ sort: DEFAULT_SORT.key })
+            },
+            {
+              key: keyword || '',
+              title: keyword ? `Search: ${keyword}` : '',
+              exceptKey: '',
+              onClear: () => setParams({ keyword: '' })
+            }
+          ]}
+          onClearAll={deleteAllParams}
+        />
       </div>
 
       <Table aria-label='Categories Table'>

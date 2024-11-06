@@ -12,12 +12,12 @@ export const fetchAllCategories = createAsyncThunk(
       pageSize,
       keyword,
       sort,
-      hasPublished
-    }: { pageNum: number; pageSize: number; keyword: string | null; sort: string; hasPublished: boolean | null },
+      published
+    }: { pageNum: number; pageSize: number; keyword: string | null; sort: string; published: boolean | null },
     thunkAPI
   ) => {
     try {
-      const data = await fetchAllCategoriesAPI(pageNum, pageSize, keyword, sort, hasPublished)
+      const data = await fetchAllCategoriesAPI(pageNum, pageSize, keyword, sort, published)
       return data
     } catch (error) {
       return thunkAPI.rejectWithValue(error)

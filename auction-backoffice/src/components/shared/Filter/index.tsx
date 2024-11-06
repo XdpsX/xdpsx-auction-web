@@ -1,7 +1,7 @@
 import { Icon } from '@iconify/react'
 import { Button, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup } from '@nextui-org/react'
 import { FilterItemKeyValue, FilterItemType } from './type'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 interface FilterProps {
   items: FilterItemType[]
@@ -15,7 +15,10 @@ function Filter({ items, onFilterChange }: FilterProps) {
   }, {} as FilterItemKeyValue)
 
   const [selectedValues, setSelectedValues] = useState(initialValues)
-  // const [appliedValues, setAppliedValues] = useState(initialValues)
+
+  useEffect(() => {
+    setSelectedValues(initialValues)
+  }, [items])
 
   const handleValueChange = (key: string, value: string) => {
     setSelectedValues((prevValues) => ({
@@ -31,9 +34,6 @@ function Filter({ items, onFilterChange }: FilterProps) {
   }
 
   const handleFilter = () => {
-    // setAppliedValues(selectedValues)
-    console.log(selectedValues)
-    // Add any additional logic to handle the applied filter values
     onFilterChange(selectedValues)
   }
 
@@ -48,7 +48,7 @@ function Filter({ items, onFilterChange }: FilterProps) {
         </Button>
       </PopoverTrigger>
       <PopoverContent className='w-80'>
-        <div className='flex w-full flex-col gap-6 px-2 py-4'>
+        <div className='flex w-full flex-col gap-6 px-2 py-4 mb-4'>
           {items.map((item) => (
             <RadioGroup
               key={item.key}
@@ -64,7 +64,9 @@ function Filter({ items, onFilterChange }: FilterProps) {
             </RadioGroup>
           ))}
         </div>
-        <Button onPress={handleFilter}>Filter</Button>
+        <Button color='danger' onPress={handleFilter}>
+          Apply
+        </Button>
       </PopoverContent>
     </Popover>
   )
