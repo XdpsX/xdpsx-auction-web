@@ -1,4 +1,4 @@
-import React, { Key, useEffect, useMemo } from 'react'
+import React, { Key, useEffect, useMemo, useCallback } from 'react'
 import {
   Table,
   TableHeader,
@@ -35,18 +35,15 @@ const columns = [
   { name: 'ACTIONS', uid: 'actions' }
 ]
 
-export default function Categories() {
+function Categories() {
   const dispatch = useAppDispatch()
-
   const { params, setParams, deleteAllParams } = useQueryParams()
   const pageNum = params.pageNum || DEFAULT_PAGE_NUM
   const pageSize = params.pageSize || DEFAULT_PAGE_SIZE
   const keyword = params.keyword || null
   const published = params.published || DEFAULT_PUBLISHED.key
   const sort = params.sort || DEFAULT_SORT.key
-
   const { categoryPage, isLoading } = useAppSelector((state) => state.category)
-
   const filteredPublished = useMemo(() => publishedOptions.find((option) => option.key === published), [published])
   const filteredSort = useMemo(() => sortOptions.find((option) => option.key === sort), [sort])
 
@@ -62,45 +59,48 @@ export default function Categories() {
     )
   }, [dispatch, published, keyword, pageNum, pageSize, sort])
 
-  const onClear = React.useCallback(() => {
+  const onClear = useCallback(() => {
     setParams({ keyword: '', pageNum: 1 })
   }, [setParams])
 
-  const onPageChange = React.useCallback(
+  const onPageChange = useCallback(
     (newPageNum: number) => {
       setParams({ pageNum: newPageNum })
     },
     [setParams]
   )
 
-  const onPageSizeChange = React.useCallback(
+  const onPageSizeChange = useCallback(
     (newPageSize: number) => {
       setParams({ pageSize: newPageSize })
     },
     [setParams]
   )
 
-  const onFilterChange = (selectedValues: Record<string, string>) => {
-    setParams({
-      published: selectedValues['published'] === 'all' ? '' : String(selectedValues['published'])
-    })
-  }
+  const onFilterChange = useCallback(
+    (selectedValues: Record<string, string>) => {
+      setParams({
+        published: selectedValues['published'] === 'all' ? '' : String(selectedValues['published'])
+      })
+    },
+    [setParams]
+  )
 
-  const onSortChange = React.useCallback(
+  const onSortChange = useCallback(
     (value: Key) => {
       setParams({ sort: String(value) })
     },
     [setParams]
   )
 
-  const onSearchChange = React.useCallback(
+  const onSearchChange = useCallback(
     (value: string) => {
       setParams({ keyword: value, pageNum: 1 })
     },
     [setParams]
   )
 
-  const renderCell = React.useCallback((category: Category, columnKey: Key) => {
+  const renderCell = useCallback((category: Category, columnKey: Key) => {
     switch (columnKey) {
       case 'id':
         return <p className='text-sm'>{category.id}</p>
@@ -148,7 +148,6 @@ export default function Categories() {
         <h1 className='page-heading'>Categories</h1>
         <AddButton />
       </div>
-
       <div className='flex flex-col gap-4'>
         <div className='flex items-center gap-6 '>
           <div>
@@ -195,7 +194,6 @@ export default function Categories() {
           onClearAll={deleteAllParams}
         />
       </div>
-
       <Table aria-label='Categories Table'>
         <TableHeader columns={columns}>
           {(column) => (
@@ -215,7 +213,6 @@ export default function Categories() {
           )}
         </TableBody>
       </Table>
-
       {categoryPage.items.length > 0 && (
         <TableBottom
           pageNum={+pageNum}
@@ -230,3 +227,5 @@ export default function Categories() {
     </section>
   )
 }
+
+export default React.memo(Categories)

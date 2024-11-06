@@ -1,7 +1,7 @@
 import { Icon } from '@iconify/react'
 import { Button, Popover, PopoverContent, PopoverTrigger, Radio, RadioGroup } from '@nextui-org/react'
 import { FilterItemKeyValue, FilterItemType } from './type'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 
 interface FilterProps {
   items: FilterItemType[]
@@ -9,33 +9,38 @@ interface FilterProps {
 }
 
 function Filter({ items, onFilterChange }: FilterProps) {
-  const initialValues = items.reduce((acc, item) => {
-    acc[item.key] = item.value
-    return acc
-  }, {} as FilterItemKeyValue)
+  const initialValues = useMemo(() => {
+    return items.reduce((acc, item) => {
+      acc[item.key] = item.value
+      return acc
+    }, {} as FilterItemKeyValue)
+  }, [items])
 
   const [selectedValues, setSelectedValues] = useState(initialValues)
 
   useEffect(() => {
     setSelectedValues(initialValues)
-  }, [items])
+  }, [initialValues])
 
-  const handleValueChange = (key: string, value: string) => {
+  const handleValueChange = useCallback((key: string, value: string) => {
     setSelectedValues((prevValues) => ({
       ...prevValues,
       [key]: value
     }))
-  }
+  }, [])
 
-  const handlePopoverOpenChange = (isOpen: boolean) => {
-    if (!isOpen) {
-      setSelectedValues(initialValues)
-    }
-  }
+  const handlePopoverOpenChange = useCallback(
+    (isOpen: boolean) => {
+      if (!isOpen) {
+        setSelectedValues(initialValues)
+      }
+    },
+    [initialValues]
+  )
 
-  const handleFilter = () => {
+  const handleFilter = useCallback(() => {
     onFilterChange(selectedValues)
-  }
+  }, [onFilterChange, selectedValues])
 
   return (
     <Popover placement='bottom' onOpenChange={handlePopoverOpenChange}>

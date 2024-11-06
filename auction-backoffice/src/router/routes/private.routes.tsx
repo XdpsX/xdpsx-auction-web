@@ -1,9 +1,12 @@
+import { lazy, Suspense } from 'react'
 import MainLayout from '~/layouts/MainLayout'
 import PrivateRoute from '../guards/PrivateRoute'
-import Categories from '~/pages/category/Categories'
-import Dashboard from '~/pages/Dashboard'
-import Auctions from '~/pages/auction/Auctions'
 import { Navigate } from 'react-router-dom'
+import LoadingOverlay from '~/components/shared/LoadingOverlay'
+
+const Categories = lazy(() => import('~/pages/category/Categories'))
+const Dashboard = lazy(() => import('~/pages/Dashboard'))
+const Auctions = lazy(() => import('~/pages/auction/Auctions'))
 
 const privateRoutes = [
   {
@@ -19,15 +22,27 @@ const privateRoutes = [
     children: [
       {
         path: '/dashboard',
-        element: <Dashboard />
+        element: (
+          <Suspense fallback={<LoadingOverlay />}>
+            <Dashboard />
+          </Suspense>
+        )
       },
       {
         path: '/categories',
-        element: <Categories />
+        element: (
+          <Suspense fallback={<LoadingOverlay />}>
+            <Categories />
+          </Suspense>
+        )
       },
       {
         path: '/auctions',
-        element: <Auctions />
+        element: (
+          <Suspense fallback={<LoadingOverlay />}>
+            <Auctions />
+          </Suspense>
+        )
       }
     ]
   }

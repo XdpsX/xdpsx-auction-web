@@ -1,9 +1,14 @@
-import { Chip } from '@nextui-org/react'
+import React, { useMemo } from 'react'
+import { Chip, Button } from '@nextui-org/react'
 import { FilterResultItem } from './type'
-import { Button } from '@nextui-org/react'
 
-function FilterResult({ items, onClearAll }: { items: FilterResultItem[]; onClearAll: () => void }) {
-  const filteredItems = items.filter((item) => item.key !== item.exceptKey)
+interface FilterResultProps {
+  items: FilterResultItem[]
+  onClearAll: () => void
+}
+
+const FilterResult: React.FC<FilterResultProps> = React.memo(({ items, onClearAll }) => {
+  const filteredItems = useMemo(() => items.filter((item) => item.key !== item.exceptKey), [items])
 
   return (
     <div className='flex items-center gap-4'>
@@ -19,6 +24,6 @@ function FilterResult({ items, onClearAll }: { items: FilterResultItem[]; onClea
       )}
     </div>
   )
-}
+})
 
 export default FilterResult

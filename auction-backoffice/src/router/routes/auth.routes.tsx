@@ -1,7 +1,10 @@
-import Login from '~/pages/auth/Login'
-import Register from '~/pages/auth/Register'
+import { lazy, Suspense } from 'react'
 import PublicRoute from '../guards/PublicRoute'
 import AuthLayout from '~/layouts/AuthLayout'
+import LoadingOverlay from '~/components/shared/LoadingOverlay'
+
+const Login = lazy(() => import('~/pages/auth/Login'))
+const Register = lazy(() => import('~/pages/auth/Register'))
 
 const authRoutes = [
   {
@@ -13,11 +16,19 @@ const authRoutes = [
     children: [
       {
         path: '/login',
-        element: <Login />
+        element: (
+          <Suspense fallback={<LoadingOverlay />}>
+            <Login />
+          </Suspense>
+        )
       },
       {
         path: '/register',
-        element: <Register />
+        element: (
+          <Suspense fallback={<LoadingOverlay />}>
+            <Register />
+          </Suspense>
+        )
       }
     ]
   }

@@ -28,7 +28,17 @@ export default function useQueryParams() {
   }
 
   const deleteAllParams = () => {
-    setSearchParams(new URLSearchParams())
+    const { pageNum, pageSize } = params
+    const updatedParams: Record<string, string | number | boolean | null> = {}
+    if (pageNum !== undefined) updatedParams.pageNum = pageNum
+    if (pageSize !== undefined) updatedParams.pageSize = pageSize
+    setSearchParams(
+      new URLSearchParams(
+        Object.entries(updatedParams)
+          .filter(([, value]) => value !== undefined && value !== null && value !== '')
+          .map(([key, value]) => [key, String(value)])
+      )
+    )
   }
 
   return { params, setParams, deleteParam, deleteAllParams }
