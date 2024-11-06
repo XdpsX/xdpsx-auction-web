@@ -13,18 +13,18 @@ export const fetchAllAuctions = createAsyncThunk(
       pageSize,
       keyword,
       sort,
-      hasPublished
-    }: { pageNum: number; pageSize: number; keyword: string | null; sort: string | null; hasPublished: boolean | null },
+      published
+    }: { pageNum: number; pageSize: number; keyword: string | null; sort: string | null; published: boolean | null },
     thunkAPI
   ) => {
     try {
       const state = thunkAPI.getState() as RootState
       const isAdmin = state.user.roles?.includes('ADMIN')
       if (isAdmin) {
-        const data = await fetchAllAuctionsAPI(pageNum, pageSize, keyword, sort, hasPublished)
+        const data = await fetchAllAuctionsAPI(pageNum, pageSize, keyword, sort, published)
         return data
       } else {
-        const data = await fetchMyAuctionsAPI(pageNum, pageSize, keyword, sort, hasPublished)
+        const data = await fetchMyAuctionsAPI(pageNum, pageSize, keyword, sort, published)
         return data
       }
     } catch (error) {

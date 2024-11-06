@@ -7,7 +7,7 @@ export const fetchAllAuctionsAPI = async (
   pageSize: number,
   keyword: string | null,
   sort: string | null,
-  hasPublished?: boolean | null
+  published?: boolean | null
 ): Promise<Page<Auction>> => {
   const response = await api.get<Page<Auction>>('/backoffice/auctions/all', {
     params: {
@@ -15,7 +15,7 @@ export const fetchAllAuctionsAPI = async (
       pageSize,
       keyword,
       sort,
-      hasPublished
+      published
     }
   })
   return response.data
@@ -26,7 +26,7 @@ export const fetchMyAuctionsAPI = async (
   pageSize: number,
   keyword: string | null,
   sort: string | null,
-  hasPublished?: boolean | null
+  published?: boolean | null
 ): Promise<Page<Auction>> => {
   const response = await api.get<Page<Auction>>('/backoffice/auctions/me', {
     params: {
@@ -34,7 +34,7 @@ export const fetchMyAuctionsAPI = async (
       pageSize,
       keyword,
       sort,
-      hasPublished
+      published
     }
   })
   return response.data

@@ -7,12 +7,12 @@ function AddButton({ to = 'add', className }: { to?: string; className?: string 
     <Link
       to={to}
       className={cn(
-        'flex items-center gap-3 px-4 py-2 rounded-md text-white bg-green-500 hover:bg-green-600 transition-colors',
+        'flex items-center gap-3 px-4 py-2 rounded-md text-white bg-primary-500 hover:bg-primary-600 transition-colors',
         className
       )}
     >
       Add New
-      <Icon icon='ic:baseline-plus' />
+      <Icon icon='solar:add-circle-bold' width={20} />
     </Link>
   )
 }

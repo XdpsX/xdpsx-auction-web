@@ -1,7 +1,7 @@
-import React, { Key } from 'react'
+import React, { Key, useCallback } from 'react'
 import { useEffect, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
 import {
+  Chip,
   Spinner,
   Switch,
   Table,
@@ -13,39 +13,61 @@ import {
   Tooltip
 } from '@nextui-org/react'
 import { Icon } from '@iconify/react'
-import { useAppDispatch, useAppSelector } from '~/app/hooks'
-import { fetchAllAuctions } from '~/features/auction/auction.slice'
+
 import useQueryParams from '~/app/hooks/useQueryParams'
 import { Auction } from '~/app/features/auction/type'
 import { publishedOptions, sortOptions } from '~/utils/data'
-import { createUrlWithParams } from '~/utils/helper'
 import { formatDateTime, formatPrice } from '~/utils/format'
 import TableBottom from '~/components/TableBottom'
 import AddButton from '~/components/AddButton'
-import TableFilter from '~/components/TableFilter'
+import useAppDispatch from '~/app/hooks/useAppDispatch'
+import useAppSelector from '~/app/hooks/useAppSelector'
+import { fetchAllAuctions } from '~/app/features/auction'
+import Search from '~/components/Search'
+import Filter from '~/components/Filter'
+import Sort from '~/components/Sort'
+import FilterResult from '~/components/FilterResult'
+import { DEFAULT_PUBLISHED, DEFAULT_SORT } from '~/constants'
+import { Status } from '~/components/Status'
+import { capitalize } from '~/utils/helper'
+import { CopyText } from '~/components/CopyText'
 
 const columns = [
   { name: 'ID', uid: 'id' },
   { name: 'IMAGE', uid: 'image' },
   { name: 'NAME', uid: 'name' },
-  { name: 'PRICE', uid: 'price' },
-  { name: 'STARTING', uid: 'starting' },
-  { name: 'ENDING', uid: 'ending' },
+  {
+    name: 'PRICE',
+    uid: 'price',
+    info: (
+      <div className='text-sm'>
+        <p>
+          <span className='font-semibold'>English:</span> starting bid amount
+        </p>
+        <p>
+          <span className='font-semibold'>Sealead bid:</span> buy now amount
+        </p>
+      </div>
+    )
+  },
+  { name: 'STATUS', uid: 'status' },
   { name: 'TYPE', uid: 'type' },
-  { name: 'PUBLISHED', uid: 'published' },
   { name: 'CATEGORY', uid: 'category' },
+  { name: 'PUBLISHED', uid: 'published' },
   { name: 'ACTIONS', uid: 'actions' }
 ]
 
-function Auctions() {
-  const navigate = useNavigate()
+function AuctionsList() {
   const dispatch = useAppDispatch()
-  const params = useQueryParams()
-  const { pageNum, pageSize, keyword, sort, hasPublished } = useMemo(() => params, [params])
+  const {
+    params: { pageNum, pageSize, keyword, published, sort },
+    setParams,
+    deleteAllParams
+  } = useQueryParams()
   const { auctionPage, isLoading } = useAppSelector((state) => state.auction)
 
-  const filteredPublished = publishedOptions.find((option) => option.key === hasPublished)
-  const filteredSort = sortOptions.find((option) => option.key === sort)
+  const filteredPublished = useMemo(() => publishedOptions.find((option) => option.key === published), [published])
+  const filteredSort = useMemo(() => sortOptions.find((option) => option.key === sort), [sort])
 
   useEffect(() => {
     dispatch(
@@ -53,55 +75,57 @@ function Auctions() {
         pageNum: Number(pageNum),
         pageSize: Number(pageSize),
         keyword: keyword || null,
-        hasPublished: hasPublished ? (hasPublished === 'true' ? true : false) : null,
+        published: published === 'all' ? null : published === 'true' ? true : false,
         sort: sort
       })
     )
-  }, [dispatch, hasPublished, keyword, pageNum, pageSize, sort])
+  }, [dispatch, published, keyword, pageNum, pageSize, sort])
 
-  const onClear = React.useCallback(() => {
-    navigate(createUrlWithParams(params, { keyword: '', pageNum: 1 }))
-  }, [navigate, params])
+  const onClear = useCallback(() => {
+    setParams({ keyword: '', pageNum: 1 })
+  }, [setParams])
 
-  const onPageChange = React.useCallback(
+  const onPageChange = useCallback(
     (newPageNum: number) => {
-      navigate(createUrlWithParams(params, { pageNum: newPageNum }))
+      setParams({ pageNum: newPageNum })
     },
-    [navigate, params]
+    [setParams]
   )
 
-  const onPageSizeChange = React.useCallback(
+  const onPageSizeChange = useCallback(
     (newPageSize: number) => {
-      navigate(createUrlWithParams(params, { pageSize: newPageSize }))
+      setParams({ pageSize: newPageSize })
     },
-    [navigate, params]
+    [setParams]
   )
 
-  const onPublishedChange = React.useCallback(
-    (value: string) => {
-      navigate(createUrlWithParams(params, { hasPublished: value === 'all' ? null : String(value) }))
+  const onFilterChange = useCallback(
+    (selectedValues: Record<string, string>) => {
+      setParams({
+        published: selectedValues['published'] === 'all' ? '' : String(selectedValues['published'])
+      })
     },
-    [navigate, params]
+    [setParams]
   )
 
-  const onSortChange = React.useCallback(
+  const onSortChange = useCallback(
     (value: Key) => {
-      navigate(createUrlWithParams(params, { sort: String(value) }))
+      setParams({ sort: String(value) })
     },
-    [navigate, params]
+    [setParams]
   )
 
-  const onSearchChange = React.useCallback(
+  const onSearchChange = useCallback(
     (value: string) => {
-      navigate(createUrlWithParams(params, { keyword: value, pageNum: 1 }))
+      setParams({ keyword: value, pageNum: 1 })
     },
-    [navigate, params]
+    [setParams]
   )
 
   const renderCell = React.useCallback((auction: Auction, columnKey: Key) => {
     switch (columnKey) {
       case 'id':
-        return <p className='text-sm'>{auction.id}</p>
+        return <CopyText>{`${auction.id}`}</CopyText>
       case 'image':
         return (
           <img
@@ -110,17 +134,39 @@ function Auctions() {
           />
         )
       case 'name':
-        return <p className='text-bold text-sm capitalize'>{auction.name}</p>
+        return <p className='text-bold text-sm capitalize max-w-[140px] truncate'>{auction.name}</p>
       case 'price':
         return <p className='text-sm'>{formatPrice(auction.startingPrice)}</p>
       case 'published':
         return <Switch isSelected={auction.published} />
-      case 'starting':
-        return <p className='text-sm'>{formatDateTime(auction.startingTime)}</p>
-      case 'ending':
-        return <p className='text-sm'>{formatDateTime(auction.endingTime)}</p>
+      case 'status': {
+        const now = new Date()
+        const content = (
+          <div>
+            <p>
+              <span className='font-semibold'>Starting time:</span> {formatDateTime(auction.startingTime)}
+            </p>
+            <p>
+              <span className='font-semibold'>Ending time:</span> {formatDateTime(auction.endingTime)}
+            </p>
+          </div>
+        )
+        if (now < new Date(auction.startingTime)) {
+          return <Status status='Upcoming' content={content} />
+        } else if (now < new Date(auction.endingTime)) {
+          return <Status status='Live' content={content} />
+        } else {
+          return <Status status='Ended' content={content} />
+        }
+      }
       case 'type':
-        return <p className='text-sm'>{auction.auctionType}</p>
+        return auction.auctionType === 'ENGLISH' ? (
+          <Chip className='bg-green-500/90'>{capitalize(auction.auctionType)}</Chip>
+        ) : (
+          <Chip color='warning' className='dark:text-white'>
+            {capitalize(auction.auctionType)}
+          </Chip>
+        )
       case 'category':
         return <p className='text-sm'>{auction.category}</p>
       case 'actions':
@@ -154,21 +200,71 @@ function Auctions() {
         <h1 className='page-heading'>Auctions</h1>
         <AddButton />
       </div>
-      <TableFilter
-        keyword={keyword ?? ''}
-        filteredPublished={filteredPublished}
-        filteredSort={filteredSort}
-        onClear={onClear}
-        onSearchChange={onSearchChange}
-        onPublishedChange={onPublishedChange}
-        onSortChange={onSortChange}
-      />
+
+      <div className='flex flex-col gap-4'>
+        <div className='flex items-center gap-6 '>
+          <div>
+            <Search value={keyword || ''} onClear={onClear} onSearch={onSearchChange} />
+          </div>
+          <div>
+            <Filter
+              items={[
+                {
+                  key: 'published',
+                  label: 'Published/Unpublished',
+                  allOptions: publishedOptions,
+                  value: published
+                }
+              ]}
+              onFilterChange={onFilterChange}
+            />
+          </div>
+          <div>
+            <Sort sortOptions={sortOptions} onSortChange={onSortChange} />
+          </div>
+        </div>
+        <FilterResult
+          items={[
+            {
+              key: keyword || '',
+              title: keyword ? `Search: ${keyword}` : '',
+              exceptKey: '',
+              onClear: () => setParams({ keyword: '' })
+            },
+            {
+              key: filteredPublished?.key || DEFAULT_PUBLISHED.key,
+              title: filteredPublished?.title || DEFAULT_PUBLISHED.title,
+              exceptKey: DEFAULT_PUBLISHED.key,
+              onClear: () => setParams({ published: DEFAULT_PUBLISHED.key })
+            },
+            {
+              key: filteredSort?.key || DEFAULT_SORT.key,
+              title: filteredSort?.title || DEFAULT_SORT.title,
+              exceptKey: DEFAULT_SORT.key,
+              onClear: () => setParams({ sort: DEFAULT_SORT.key })
+            }
+          ]}
+          onClearAll={deleteAllParams}
+        />
+      </div>
 
       <Table aria-label='Auctions Table'>
         <TableHeader columns={columns}>
           {(column) => (
-            <TableColumn key={column.uid} align={column.uid === 'actions' ? 'center' : 'start'}>
-              {column.name}
+            <TableColumn
+              key={column.uid}
+              align={column.uid === 'actions' || column.uid === 'published' ? 'center' : 'start'}
+            >
+              {column.info ? (
+                <div className='flex min-w-[108px] items-center gap-2'>
+                  {column.name}
+                  <Tooltip className='max-w-[40]' content={column.info}>
+                    <Icon className='text-default-400' height={16} icon='solar:info-circle-linear' width={16} />
+                  </Tooltip>
+                </div>
+              ) : (
+                column.name
+              )}
             </TableColumn>
           )}
         </TableHeader>
@@ -198,4 +294,4 @@ function Auctions() {
     </section>
   )
 }
-export default Auctions
+export default React.memo(AuctionsList)

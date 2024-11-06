@@ -26,7 +26,7 @@ import Filter from '~/components/Filter'
 import FilterResult from '~/components/FilterResult'
 
 import { publishedOptions, sortOptions } from '~/utils/data'
-import { DEFAULT_PAGE_NUM, DEFAULT_PAGE_SIZE, DEFAULT_PUBLISHED, DEFAULT_SORT } from '~/constants'
+import { DEFAULT_PUBLISHED, DEFAULT_SORT } from '~/constants'
 import { CopyText } from '~/components/CopyText'
 
 const columns = [
@@ -40,12 +40,11 @@ const columns = [
 
 function CategoriesList() {
   const dispatch = useAppDispatch()
-  const { params, setParams, deleteAllParams } = useQueryParams()
-  const pageNum = params.pageNum || DEFAULT_PAGE_NUM
-  const pageSize = params.pageSize || DEFAULT_PAGE_SIZE
-  const keyword = params.keyword || null
-  const published = params.published || DEFAULT_PUBLISHED.key
-  const sort = params.sort || DEFAULT_SORT.key
+  const {
+    params: { pageNum, pageSize, keyword, published, sort },
+    setParams,
+    deleteAllParams
+  } = useQueryParams()
   const { categoryPage, isLoading } = useAppSelector((state) => state.category)
   const filteredPublished = useMemo(() => publishedOptions.find((option) => option.key === published), [published])
   const filteredSort = useMemo(() => sortOptions.find((option) => option.key === sort), [sort])
@@ -176,6 +175,12 @@ function CategoriesList() {
         <FilterResult
           items={[
             {
+              key: keyword || '',
+              title: keyword ? `Search: ${keyword}` : '',
+              exceptKey: '',
+              onClear: () => setParams({ keyword: '' })
+            },
+            {
               key: filteredPublished?.key || DEFAULT_PUBLISHED.key,
               title: filteredPublished?.title || DEFAULT_PUBLISHED.title,
               exceptKey: DEFAULT_PUBLISHED.key,
@@ -186,12 +191,6 @@ function CategoriesList() {
               title: filteredSort?.title || DEFAULT_SORT.title,
               exceptKey: DEFAULT_SORT.key,
               onClear: () => setParams({ sort: DEFAULT_SORT.key })
-            },
-            {
-              key: keyword || '',
-              title: keyword ? `Search: ${keyword}` : '',
-              exceptKey: '',
-              onClear: () => setParams({ keyword: '' })
             }
           ]}
           onClearAll={deleteAllParams}
@@ -200,7 +199,10 @@ function CategoriesList() {
       <Table aria-label='Categories Table'>
         <TableHeader columns={columns}>
           {(column) => (
-            <TableColumn key={column.uid} align={column.uid === 'actions' ? 'center' : 'start'}>
+            <TableColumn
+              key={column.uid}
+              align={column.uid === 'actions' || column.uid === 'published' ? 'center' : 'start'}
+            >
               {column.name}
             </TableColumn>
           )}
