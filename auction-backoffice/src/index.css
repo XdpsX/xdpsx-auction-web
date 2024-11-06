@@ -7,6 +7,6 @@
     @apply rounded-sm font-medium duration-300 ease-in-out hover:text-yellow-600 flex items-center p-1.5;
   }
   .page-heading {
-    @apply text-2xl font-[700] leading-[32px] text-slate-800;
+    @apply text-2xl font-[700] leading-[32px] text-default-800;
   }
 }

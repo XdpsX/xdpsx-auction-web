@@ -8,7 +8,7 @@ export default function useQueryParams() {
     pageNum: params.pageNum || 1,
     pageSize: params.pageSize || 10,
     keyword: params.keyword || null,
-    hasPublished: params.hasPublished || null,
+    hasPublished: params.hasPublished || '',
     sort: params.sort || '-date'
   }
 }

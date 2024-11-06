@@ -23,7 +23,7 @@ function TableFilter({
   onSortChange
 }: TableFilterProps) {
   return (
-    <div className='gap-4 bg-white rounded-xl p-4'>
+    <div className='gap-4  rounded-xl p-4'>
       <div className='flex items-center gap-6 '>
         <Search value={keyword} onClear={onClear} onSearch={onSearchChange} />
 

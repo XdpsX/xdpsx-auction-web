@@ -9,7 +9,6 @@ export const fetchAllCategoriesAPI = async (
   sort: string,
   hasPublished?: boolean | null
 ): Promise<Page<Category>> => {
-  console.log(pageNum, pageSize, keyword, sort, hasPublished)
   const response = await api.get<Page<Category>>('/backoffice/categories/paging', {
     params: {
       pageNum,

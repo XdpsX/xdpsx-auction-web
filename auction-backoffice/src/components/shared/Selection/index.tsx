@@ -30,14 +30,15 @@ function Selection({ label, variant = 'solid', items, selectedKey, onChange, cla
     <Select
       aria-label={label}
       label={label}
-      variant='faded'
+      // variant='faded'
+      variant='flat'
       size={size}
-      className={cn('max-w-32', className)}
-      classNames={{
-        trigger: styles[variant].trigger,
-        label: styles[variant].label,
-        value: styles[variant].value
-      }}
+      className={cn('max-w-32 ', className)}
+      // classNames={{
+      //   trigger: styles[variant].trigger,
+      //   label: styles[variant].label,
+      //   value: styles[variant].value
+      // }}
       selectedKeys={selectedKey}
       onChange={(e) => onChange(e.target.value)}
     >

@@ -16,7 +16,6 @@ export default function App() {
 
   useEffect(() => {
     if (accessToken) {
-      console.log(accessToken)
       dispatch(fetchUserProfile())
       dispatch(setRoles(accessToken))
     } else {

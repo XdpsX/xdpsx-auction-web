@@ -21,7 +21,10 @@ import { publishedOptions, sortOptions } from '~/utils/data'
 import { createUrlWithParams } from '~/utils/helper'
 import AddButton from '~/components/shared/AddButton'
 import TableBottom from '~/components/shared/TableBottom'
-import TableFilter from '~/components/shared/TableFilter'
+
+import Search from '~/components/shared/Search'
+import Sort from '~/components/shared/Sort'
+import Filter from '~/components/shared/Filter'
 
 const columns = [
   { name: 'ID', uid: 'id' },
@@ -72,12 +75,13 @@ export default function Categories() {
     [navigate, params]
   )
 
-  const onPublishedChange = React.useCallback(
-    (value: string) => {
-      navigate(createUrlWithParams(params, { hasPublished: value === 'all' ? null : String(value) }))
-    },
-    [navigate, params]
-  )
+  const onFilterChange = (selectedValues: Record<string, string>) => {
+    navigate(
+      createUrlWithParams(params, {
+        hasPublished: selectedValues['hasPublished'] === 'all' ? '' : String(selectedValues['hasPublished'])
+      })
+    )
+  }
 
   const onSortChange = React.useCallback(
     (value: Key) => {
@@ -142,15 +146,29 @@ export default function Categories() {
         <AddButton />
       </div>
 
-      <TableFilter
-        keyword={keyword ?? ''}
-        filteredPublished={filteredPublished}
-        filteredSort={filteredSort}
-        onClear={onClear}
-        onSearchChange={onSearchChange}
-        onPublishedChange={onPublishedChange}
-        onSortChange={onSortChange}
-      />
+      <div className='gap-4  rounded-xl p-4'>
+        <div className='flex items-center gap-6 '>
+          <div>
+            <Search value={keyword ?? ''} onClear={onClear} onSearch={onSearchChange} />
+          </div>
+          <div>
+            <Filter
+              items={[
+                {
+                  key: 'hasPublished',
+                  label: 'Has published ?',
+                  allOptions: publishedOptions,
+                  value: hasPublished
+                }
+              ]}
+              onFilterChange={onFilterChange}
+            />
+          </div>
+          <div>
+            <Sort sortOptions={sortOptions} onSortChange={onSortChange} />
+          </div>
+        </div>
+      </div>
 
       <Table aria-label='Categories Table'>
         <TableHeader columns={columns}>

@@ -25,7 +25,7 @@ export default function MainLayout() {
         </div>
         <Sidebar sidebarItems={sidebarItems} />
       </aside>
-      <div className='w-full flex-1 flex-col py-4 px-8 bg-slate-200/75 overflow-y-scroll'>
+      <div className='w-full flex-1 flex-col py-4 px-8 bg-background overflow-y-scroll'>
         <MainHeader isHidden={isHidden} setIsHidden={setIsHidden} />
         <main className='mt-8 3xl:py-12 h-full w-full overflow-visible'>
           <div className='flex h-[90%] w-full flex-col gap-4 rounded-medium'>
