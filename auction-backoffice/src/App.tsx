@@ -1,12 +1,13 @@
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { NextUIProvider } from '@nextui-org/react'
 import { ThemeProvider as NextThemesProvider } from 'next-themes'
 
 import AppRouter from './router'
-import { useAppDispatch, useAppSelector } from './app/hooks'
-import { useEffect } from 'react'
-import { fetchUserProfile, setProfile, setRoles } from './features/user.slice'
-import LoadingOverlay from './components/shared/LoadingOverlay'
+import useAppDispatch from './app/hooks/useAppDispatch'
+import useAppSelector from './app/hooks/useAppSelector'
+import { fetchUserProfile, setProfile, setRoles } from './app/features/user'
+import LoadingOverlay from './components/LoadingOverlay'
 
 export default function App() {
   const navigate = useNavigate()

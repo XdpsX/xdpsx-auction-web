@@ -1,7 +1,7 @@
 import { AxiosError } from 'axios'
 import { createSearchParams } from 'react-router-dom'
-import useQueryParams from '~/hooks/useQueryParams'
-import { APIError } from '~/types/error'
+import useQueryParams from '~/app/hooks/useQueryParams'
+import { APIError } from '~/app/features/error/type'
 
 export const convertAxiosErrorToAPIError = (error: unknown): APIError => {
   const axiosError = error as AxiosError

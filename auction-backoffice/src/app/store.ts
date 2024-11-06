@@ -1,8 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit'
-import auctionReducer from '~/features/auction.slice'
-import authReducer from '~/features/auth.slice'
-import categoryReducer from '~/features/category.slice'
-import userReducer from '~/features/user.slice'
+import auctionReducer from './features/auction'
+import authReducer from './features/auth'
+import categoryReducer from './features/category'
+import userReducer from './features/user'
 
 export const store = configureStore({
   reducer: {

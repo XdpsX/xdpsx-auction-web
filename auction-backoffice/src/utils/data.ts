@@ -1,4 +1,4 @@
-import { SelectItemType } from '~/components/shared/Selection/type'
+import { SelectItemType } from '~/components/Selection/type'
 
 export const publishedOptions: SelectItemType[] = [
   { key: 'all', title: 'All' },

@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom'
-import { useAppSelector } from '~/app/hooks'
+import useAppSelector from '~/app/hooks/useAppSelector'
 
 function PublicRoute({ children }: { children: React.ReactNode }) {
   const { accessToken } = useAppSelector((state) => state.auth)

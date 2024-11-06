@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom'
-import AuthHeader from '~/components/layout/AuthHeader'
-import Footer from '~/components/layout/Footer'
+import AuthHeader from '~/layouts/AuthLayout/AuthHeader'
+import Footer from '~/components/Footer'
 
 function AuthLayout() {
   return (

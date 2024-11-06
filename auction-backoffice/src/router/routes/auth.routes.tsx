@@ -1,7 +1,7 @@
 import { lazy, Suspense } from 'react'
 import PublicRoute from '../guards/PublicRoute'
 import AuthLayout from '~/layouts/AuthLayout'
-import LoadingOverlay from '~/components/shared/LoadingOverlay'
+import LoadingOverlay from '~/components/LoadingOverlay'
 
 const Login = lazy(() => import('~/pages/auth/Login'))
 const Register = lazy(() => import('~/pages/auth/Register'))

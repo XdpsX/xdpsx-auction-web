@@ -2,10 +2,10 @@ import React from 'react'
 import { Outlet } from 'react-router-dom'
 import { cn } from '@nextui-org/react'
 
-import MainHeader from '~/components/layout/MainHeader'
-import Sidebar from '~/components/layout/Sidebar'
+import MainHeader from '~/layouts/MainLayout/MainHeader'
+import Sidebar from '~/layouts/MainLayout/Sidebar'
 import LOGO from '~/assets/logo.svg'
-import sidebarItems from '~/utils/sidebar.items'
+import sidebarItems from '~/layouts/MainLayout/Sidebar/sidebar-items'
 
 export default function MainLayout() {
   const [isHidden, setIsHidden] = React.useState(false)
