@@ -7,7 +7,7 @@ export const getListCategories = createAsyncThunk(
   'category/getListCategories',
   async (_, thunkAPI) => {
     try {
-      const response = await api.get<Category[]>('/storefront/categories')
+      const response = await api.get<Category[]>('/public/categories')
       return response.data
     } catch (error) {
       return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))

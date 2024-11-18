@@ -26,6 +26,10 @@ public class User extends AbstractAuditEntity {
 
     private String password;
 
+    private String mobileNumber;
+
+    private String address;
+
     @OneToOne(cascade = CascadeType.PERSIST)
     private Media avatar;
 

@@ -23,6 +23,8 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
     private String name;
     private String email;
     private String password;
+    private String mobileNumber;
+    private String address;
     private String avatarUrl;
     private boolean enabled;
     private boolean locked;
@@ -36,6 +38,8 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
                 .name(user.getName())
                 .email(user.getEmail())
                 .password(user.getPassword())
+                .address(user.getAddress())
+                .mobileNumber(user.getMobileNumber())
                 .avatarUrl(user.getAvatarUrl())
                 .enabled(user.isEnabled())
                 .locked(user.isLocked())

@@ -1,16 +1,18 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { RootState } from '../../store/type'
 import { User } from '../../models/user.type'
-import { getUserProfile } from './user.thunk'
+import { getUserProfile, updateUserProfile } from './user.thunk'
 
 export interface UserState {
   userProfile: User | null
   isFetching: boolean
+  isLoading: boolean
 }
 
 const initialState: UserState = {
   userProfile: null,
   isFetching: false,
+  isLoading: false,
 }
 
 export const userSlice = createSlice({
@@ -23,6 +25,7 @@ export const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      //getUserProfile
       .addCase(getUserProfile.pending, (state) => {
         state.isFetching = true
       })
@@ -32,6 +35,17 @@ export const userSlice = createSlice({
       })
       .addCase(getUserProfile.rejected, (state) => {
         state.isFetching = false
+      })
+      //updateUserProfile
+      .addCase(updateUserProfile.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(updateUserProfile.fulfilled, (state, action) => {
+        state.userProfile = action.payload
+        state.isLoading = false
+      })
+      .addCase(updateUserProfile.rejected, (state) => {
+        state.isLoading = false
       })
   },
 })
