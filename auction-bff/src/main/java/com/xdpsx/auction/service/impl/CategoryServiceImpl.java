@@ -49,9 +49,9 @@ public class CategoryServiceImpl implements CategoryService {
     @PreAuthorize("hasRole('ADMIN')")
     @Override
     public PageResponse<CategoryDetailsDto> getPageCategories(int pageNum, int pageSize,
-                                                              String keyword, String sort, Boolean hasPublished) {
+                                                              String keyword, String sort, Boolean published) {
         Page<Category> categoryPage = categoryRepository.findAll(
-                specification.getSimpleSpec(keyword, sort, hasPublished),
+                specification.getSimpleSpec(keyword, sort, published),
                 PageRequest.of(pageNum - 1, pageSize)
         );
         return pageMapper.toPageCategoryResponse(categoryPage);

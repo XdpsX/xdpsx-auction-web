@@ -10,7 +10,7 @@ import java.util.List;
 public interface CategoryService {
     List<CategoryResponse> listPublishedCategories();
     CategoryDetailsDto getCategoryById(Integer id);
-    PageResponse<CategoryDetailsDto> getPageCategories(int pageNum, int pageSize, String keyword, String sort, Boolean hasPublished);
+    PageResponse<CategoryDetailsDto> getPageCategories(int pageNum, int pageSize, String keyword, String sort, Boolean published);
     CategoryDetailsDto createCategory(CategoryRequest request);
     CategoryDetailsDto updateCategory(Integer id, CategoryRequest request);
     void deleteCategory(Integer id);

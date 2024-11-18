@@ -8,9 +8,9 @@ import static com.xdpsx.auction.constant.PageConstant.*;
 @Component
 public class SimpleSpecification<T> extends AbstractSpecification<T> {
 
-    public Specification<T> getSimpleSpec(String name, String sort, Boolean hasPublished) {
+    public Specification<T> getSimpleSpec(String name, String sort, Boolean published) {
         return Specification.where(hasName(name))
-                .and(hasPublished(hasPublished))
+                .and(hasPublished(published))
                 .and(getSortSpec(sort));
     }
 

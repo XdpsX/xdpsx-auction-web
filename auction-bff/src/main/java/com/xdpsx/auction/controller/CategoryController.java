@@ -61,9 +61,9 @@ public class CategoryController {
             @RequestParam(defaultValue = PAGE_SIZE, required = false) @Max(MAX_PAGE_SIZE) int pageSize,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String sort,
-            @RequestParam(required = false) Boolean hasPublished
+            @RequestParam(required = false) Boolean published
     ){
-        PageResponse<CategoryDetailsDto> response = categoryService.getPageCategories(pageNum, pageSize, keyword, sort, hasPublished);
+        PageResponse<CategoryDetailsDto> response = categoryService.getPageCategories(pageNum, pageSize, keyword, sort, published);
         return ResponseEntity.ok(response);
     }
 

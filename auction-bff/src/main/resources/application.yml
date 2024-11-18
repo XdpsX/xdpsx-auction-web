@@ -68,7 +68,7 @@ app:
     access:
       secret: AxdbTQmW/abSjS3TpqhS2rHHUTtK8ESb0xq9uueSj34=
       expiration:
-        seconds: 3600
+        seconds: 36000
     refresh:
         secret: fv0Q2PIP4I9oUhg1rYKqK2jHv4RFMDei
         expiration:

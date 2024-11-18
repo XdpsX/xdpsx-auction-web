@@ -65,7 +65,7 @@ public class AuctionServiceImpl implements AuctionService {
         Media mainImage = mediaService.getMedia(request.getMainImageId());
         auction.setMainImage(mainImage);
 
-        if (!request.getImageIds().isEmpty()) {
+        if (request.getImageIds() != null && !request.getImageIds().isEmpty()) {
             List<AuctionImage> images = request.getImageIds().stream().map(imageId -> {
                 Media image = mediaService.getMedia(imageId);
                 return AuctionImage.builder()
