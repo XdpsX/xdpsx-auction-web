@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { fetchAllCategoriesAPI } from './service'
+import { fetchAllCategoriesAPI, fetchPublishedCategoriesAPI } from './service'
 import { Category } from '~/app/features/category/type'
 import { APIError } from '~/app/features/error/type'
 import { Page } from '~/app/features/page/type'
@@ -25,8 +25,18 @@ export const fetchAllCategories = createAsyncThunk(
   }
 )
 
+export const fetchPublishedCategories = createAsyncThunk('category/fetchPublishedCategories', async (_, thunkAPI) => {
+  try {
+    const data = await fetchPublishedCategoriesAPI()
+    return data
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error)
+  }
+})
+
 export interface CategoryState {
   categoryPage: Page<Category>
+  categories: Category[]
   isLoading: boolean
   error: null | APIError
 }
@@ -39,6 +49,7 @@ const initialState: CategoryState = {
     totalItems: 0,
     totalPages: 0
   },
+  categories: [],
   isLoading: false,
   error: null
 }
@@ -58,6 +69,18 @@ export const categorySlice = createSlice({
         state.isLoading = false
       })
       .addCase(fetchAllCategories.rejected, (state, { payload }) => {
+        state.error = payload as APIError
+        state.isLoading = false
+      })
+      //fetchPublishedCategories
+      .addCase(fetchPublishedCategories.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(fetchPublishedCategories.fulfilled, (state, { payload }) => {
+        state.categories = payload
+        state.isLoading = false
+      })
+      .addCase(fetchPublishedCategories.rejected, (state, { payload }) => {
         state.error = payload as APIError
         state.isLoading = false
       })

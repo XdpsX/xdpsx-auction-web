@@ -8,6 +8,7 @@ import { Helmet } from 'react-helmet'
 const CategoriesList = lazy(() => import('~/pages/category/CategoriesList'))
 const Dashboard = lazy(() => import('~/pages/Dashboard'))
 const AuctionsList = lazy(() => import('~/pages/auction/AuctionsList'))
+const AuctionAdd = lazy(() => import('~/pages/auction/AuctionAdd'))
 
 const privateRoutes = [
   {
@@ -53,6 +54,17 @@ const privateRoutes = [
               <title>Manage Auctions | Auction Backoffice</title>
             </Helmet>
             <AuctionsList />
+          </>
+        )
+      },
+      {
+        path: '/auctions/add',
+        element: (
+          <>
+            <Helmet>
+              <title>Create New Auction | Auction Backoffice</title>
+            </Helmet>
+            <AuctionAdd />
           </>
         )
       }

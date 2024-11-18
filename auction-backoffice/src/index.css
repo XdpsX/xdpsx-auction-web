@@ -9,4 +9,18 @@
   .page-heading {
     @apply text-2xl font-[700] leading-[32px] text-default-800;
   }
+  .input-box {
+    @apply flex flex-col gap-2;
+  }
+}
+
+.ql-toolbar {
+  border-top-right-radius: 6px;
+  border-top-left-radius: 6px;
+}
+
+.ql-container {
+  min-height: 300px;
+  border-bottom-right-radius: 6px;
+  border-bottom-left-radius: 6px;
 }

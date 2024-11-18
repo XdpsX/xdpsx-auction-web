@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { RootState } from '~/app/store'
-import { fetchAllAuctionsAPI, fetchMyAuctionsAPI } from './service'
-import { Auction } from '~/app/features/auction/type'
+import { createAuctionAPI, fetchAllAuctionsAPI, fetchMyAuctionsAPI } from './service'
+import { Auction, AuctionPayload } from '~/app/features/auction/type'
 import { APIError } from '~/app/features/error/type'
 import { Page } from '~/app/features/page/type'
 
@@ -32,6 +32,16 @@ export const fetchAllAuctions = createAsyncThunk(
     }
   }
 )
+
+export const createAuction = createAsyncThunk('auction/createAuction', async (payload: AuctionPayload, thunkAPI) => {
+  try {
+    const data = await createAuctionAPI(payload)
+    return data
+  } catch (error) {
+    console.log(error)
+    return thunkAPI.rejectWithValue(error)
+  }
+})
 
 export interface AuctionState {
   auctionPage: Page<Auction>
@@ -66,6 +76,17 @@ export const auctionSlice = createSlice({
         state.isLoading = false
       })
       .addCase(fetchAllAuctions.rejected, (state, { payload }) => {
+        state.isLoading = false
+        state.error = payload as APIError
+      })
+      //createAuction
+      .addCase(createAuction.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(createAuction.fulfilled, (state) => {
+        state.isLoading = false
+      })
+      .addCase(createAuction.rejected, (state, { payload }) => {
         state.isLoading = false
         state.error = payload as APIError
       })

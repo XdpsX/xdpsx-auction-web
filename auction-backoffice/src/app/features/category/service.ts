@@ -20,3 +20,8 @@ export const fetchAllCategoriesAPI = async (
   })
   return response.data
 }
+
+export const fetchPublishedCategoriesAPI = async (): Promise<Category[]> => {
+  const response = await api.get<Category[]>('/public/categories')
+  return response.data
+}
