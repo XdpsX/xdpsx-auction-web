@@ -24,7 +24,7 @@ export default function Login() {
   } = useForm({
     resolver: yupResolver(loginSchema),
     defaultValues: {
-      email: '',
+      email: 'admina@xdpsx.com',
       password: '12345678'
     }
   })

@@ -130,7 +130,7 @@ function AuctionsList() {
         return (
           <img
             className='w-10 h-10 object-cover'
-            src={auction.image || 'https://i.pravatar.cc/150?u=a042581f4e29026024d'}
+            src={auction.mainImage || 'https://i.pravatar.cc/150?u=a042581f4e29026024d'}
           />
         )
       case 'name':

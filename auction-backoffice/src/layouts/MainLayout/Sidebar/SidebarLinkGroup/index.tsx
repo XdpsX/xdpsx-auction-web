@@ -52,9 +52,10 @@ const SidebarLinkGroup = memo(({ activeCondition, item }: { activeCondition: boo
               <li key={child.key}>
                 <NavLink
                   to={child.index ? (item.path ?? '#') : (child.path ?? '#')}
-                  className={({ isActive }) =>
-                    'group    text-sm  rounded-md px-4 font-medium text-slate-300 duration-300 ease-in-out hover:text-white ' +
-                    (isActive && '!text-yellow-400 cursor-default')
+                  className={() =>
+                    'group  text-sm  rounded-md px-4 font-medium text-slate-300 duration-300 ease-in-out hover:text-white ' +
+                    ((child.index ? pathname === item.path : pathname === child.path) &&
+                      '!text-yellow-400 cursor-default')
                   }
                 >
                   {child.title}

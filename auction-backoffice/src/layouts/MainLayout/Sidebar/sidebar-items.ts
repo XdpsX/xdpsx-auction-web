@@ -31,12 +31,13 @@ const sidebarItems: SidebarItem[] = [
       {
         key: 'auctions-list',
         title: 'List',
+        path: '/',
         index: true
       },
       {
         key: 'auctions-add',
         title: 'Add New Auction',
-        path: '/add'
+        path: '/auctions/add'
       }
     ]
   }
