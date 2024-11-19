@@ -20,4 +20,11 @@ public class AuctionImage {
 
     @ManyToOne
     private Media media;
+
+    public String getUrl(){
+        if (media == null){
+            return null;
+        }
+        return media.getUrl();
+    }
 }

@@ -1,6 +1,7 @@
 package com.xdpsx.auction.security.oauth2;
 
 import com.xdpsx.auction.constant.ErrorCode;
+import com.xdpsx.auction.constant.FileConstants;
 import com.xdpsx.auction.exception.NotFoundException;
 import com.xdpsx.auction.model.Media;
 import com.xdpsx.auction.model.Role;
@@ -54,7 +55,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             // Media
             Media media = new Media();
             media.setFileName("");
-            media.setMediaType("external");
+            media.setMediaType(FileConstants.EXTERNAL_FILE_TYPE);
             media.setFilePath(customUserDetails.getAvatarUrl());
 
             // Role

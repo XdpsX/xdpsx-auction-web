@@ -7,6 +7,7 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
 import com.xdpsx.auction.constant.ErrorCode;
+import com.xdpsx.auction.constant.FileConstants;
 import com.xdpsx.auction.dto.auth.*;
 import com.xdpsx.auction.exception.DuplicateException;
 import com.xdpsx.auction.exception.NotFoundException;
@@ -152,7 +153,7 @@ public class AuthServiceImpl implements AuthService {
 
                         Media media = new Media();
                         media.setFileName("");
-                        media.setMediaType("external");
+                        media.setMediaType(FileConstants.EXTERNAL_FILE_TYPE);
                         media.setFilePath(pictureUrl);
 
                         Role role = roleRepository.findByName(Role.USER)

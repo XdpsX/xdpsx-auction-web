@@ -60,12 +60,7 @@ public class User extends AbstractAuditEntity {
         if (avatar == null){
             return null;
         }
-        if (provider.equals(AuthProvider.SYSTEM)){
-            return ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path(String.format("/medias/%1$s/file/%2$s", avatar.getId(), avatar.getFileName()))
-                    .build().toUriString();
-        }
-        return avatar.getFilePath();
+        return avatar.getUrl();
     }
 
 }

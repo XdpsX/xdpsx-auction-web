@@ -7,6 +7,7 @@ public class ErrorCode {
     public static final String ROLE_NOT_FOUND="ROLE_NOT_FOUND";
     public static final String WALLET_NOT_FOUND="WALLET_NOT_FOUND";
     public static final String TRANSACTION_NOT_FOUND="TRANSACTION_NOT_FOUND";
+    public static final String AUCTION_NOT_FOUND="AUCTION_NOT_FOUND";
 
     public static final String NAME_DUPLICATED="NAME_DUPLICATED";
     public static final String SLUG_DUPLICATED="SLUG_DUPLICATED";

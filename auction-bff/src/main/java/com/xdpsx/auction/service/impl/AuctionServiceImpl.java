@@ -1,6 +1,8 @@
 package com.xdpsx.auction.service.impl;
 
+import com.xdpsx.auction.constant.ErrorCode;
 import com.xdpsx.auction.dto.PageResponse;
+import com.xdpsx.auction.dto.auction.AuctionDetails;
 import com.xdpsx.auction.dto.auction.AuctionRequest;
 import com.xdpsx.auction.dto.auction.AuctionDto;
 import com.xdpsx.auction.dto.auction.AuctionResponse;
@@ -93,6 +95,13 @@ public class AuctionServiceImpl implements AuctionService {
                 PageRequest.of(pageNum - 1, pageSize)
         );
         return pageMapper.toPageAuctionResponse(auctionPage, auctionMapper::fromEntityToResponse);
+    }
+
+    @Override
+    public AuctionDetails getPublishedAuction(Long id) {
+        Auction auction = auctionRepository.findActiveAuctionById(id)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.AUCTION_NOT_FOUND, id));
+        return auctionMapper.toAuctionDetails(auction);
     }
 
     private Category findPublishedCategory(Integer categoryId){

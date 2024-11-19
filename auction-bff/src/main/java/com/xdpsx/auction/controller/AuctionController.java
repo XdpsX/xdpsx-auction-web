@@ -1,6 +1,7 @@
 package com.xdpsx.auction.controller;
 
 import com.xdpsx.auction.dto.PageResponse;
+import com.xdpsx.auction.dto.auction.AuctionDetails;
 import com.xdpsx.auction.dto.auction.AuctionRequest;
 import com.xdpsx.auction.dto.auction.AuctionDto;
 import com.xdpsx.auction.dto.auction.AuctionResponse;
@@ -90,4 +91,13 @@ public class AuctionController {
         PageResponse<AuctionResponse> response = auctionService.getCategoryAuctions(categoryId, pageNum, pageSize);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/public/auctions/{id}")
+    ResponseEntity<AuctionDetails> getPublishedAuction(
+            @PathVariable Long id
+    ) {
+        AuctionDetails response = auctionService.getPublishedAuction(id);
+        return ResponseEntity.ok(response);
+    }
+
 }

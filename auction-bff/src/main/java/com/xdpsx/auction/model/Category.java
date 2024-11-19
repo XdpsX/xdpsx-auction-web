@@ -34,8 +34,6 @@ public class Category extends AbstractAuditEntity {
         if (image == null){
             return null;
         }
-        return ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(String.format("/medias/%1$s/file/%2$s", image.getId(), image.getFileName()))
-                .build().toUriString();
+        return image.getUrl();
     }
 }
