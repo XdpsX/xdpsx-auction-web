@@ -10,7 +10,7 @@ function UserSidebar() {
     <div>
       <div className="flex items-center border-b border-b-gray-200 py-4">
         <Link
-          to="#"
+          to="/user/profile"
           className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full border border-black/10"
         >
           <img
@@ -27,7 +27,7 @@ function UserSidebar() {
       </div>
       <div className="mt-4 space-y-2">
         <NavLink
-          to="#"
+          to="/user/profile"
           className="flex items-center capitalize transition-color text-gray-600"
         >
           My Account
@@ -39,7 +39,7 @@ function UserSidebar() {
           Change Password
         </NavLink>
         <NavLink
-          to="#"
+          to="/wallet/deposit"
           className="flex items-center capitalize transition-color text-gray-600"
         >
           Deposite

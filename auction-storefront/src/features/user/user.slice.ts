@@ -1,10 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { RootState } from '../../store/type'
-import { User } from '../../models/user.type'
+import { UserProfile } from '../../models/user.type'
 import { getUserProfile, updateUserProfile } from './user.thunk'
 
 export interface UserState {
-  userProfile: User | null
+  userProfile: UserProfile | null
   isFetching: boolean
   isLoading: boolean
 }
@@ -21,6 +21,11 @@ export const userSlice = createSlice({
   reducers: {
     setUserProfile(state, action) {
       state.userProfile = action.payload
+    },
+    addBalance(state, action) {
+      if (state.userProfile) {
+        state.userProfile.balance += action.payload
+      }
     },
   },
   extraReducers: (builder) => {
@@ -53,4 +58,4 @@ export const userSlice = createSlice({
 const userReducer = userSlice.reducer
 export default userReducer
 export const selectUser = (state: RootState) => state.user
-export const { setUserProfile } = userSlice.actions
+export const { setUserProfile, addBalance } = userSlice.actions

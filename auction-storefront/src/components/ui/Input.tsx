@@ -8,7 +8,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   control: Control<any>
   name: string
   error?: FieldError
-  type?: 'text' | 'password' | 'email'
+  type?: 'text' | 'password' | 'email' | 'number'
   classNameInput?: string
 }
 

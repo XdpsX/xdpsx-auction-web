@@ -14,3 +14,11 @@ export const fromAxiosErrorToAPIErrorDetails = (
   const apiError = axiosError.response?.data as APIErrorDetails
   return apiError || { status: 500, message: 'Internal Server Error' }
 }
+
+export const getErrorMessage = (error: unknown): string => {
+  if (error instanceof AxiosError && error.response && error.response.data) {
+    return error.response.data.message
+  } else {
+    return 'An unexpected error occurred'
+  }
+}

@@ -1,12 +1,13 @@
 import * as yup from 'yup'
 
-export type User = {
+export type UserProfile = {
   id: number
   name: string
   email: string
   avatarUrl: string | null
   mobileNumber: string | null
   address: string | null
+  balance: number
 }
 
 export const profileSchema = yup.object().shape({

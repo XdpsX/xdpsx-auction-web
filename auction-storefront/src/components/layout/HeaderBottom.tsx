@@ -6,6 +6,7 @@ import { selectCategory } from '../../features/category/category.slice'
 import { useEffect } from 'react'
 import { getListCategories } from '../../features/category/category.thunk'
 import { selectUser } from '../../features/user/user.slice'
+import { formatPrice } from '../../utils/format'
 
 function HeaderBottom() {
   const dispatch = useAppDispatch()
@@ -52,7 +53,7 @@ function HeaderBottom() {
               <div className="flex items-center gap-2 w-[100px]">
                 <FaMoneyBillWave className="text-green-600" size={20} />
                 <span className="text-black text-sm font-semibold truncate">
-                  10,000,000
+                  {formatPrice(userProfile.balance)}
                 </span>
               </div>
               <Link to="#">

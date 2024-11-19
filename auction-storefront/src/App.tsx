@@ -14,6 +14,9 @@ import AuthRoute from './components/route/AuthRoute'
 import UserLayout from './layouts/UserLayout'
 import ProtectedRoute from './components/route/ProtectedRoute'
 import Profile from './pages/Profile'
+import Deposit from './pages/Deposit'
+import PaymentRedirect from './pages/redirect/PaymentRedirect'
+import PaymentHandler from './pages/handler/PaymentSuccess'
 
 const router = createBrowserRouter([
   {
@@ -40,7 +43,22 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: '/user',
+    path: '/transactions/:transactionId/payment/redirect',
+    element: (
+      <ProtectedRoute>
+        <PaymentRedirect />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/payment/handler',
+    element: (
+      <ProtectedRoute>
+        <PaymentHandler />
+      </ProtectedRoute>
+    ),
+  },
+  {
     element: (
       <ProtectedRoute>
         <UserLayout />
@@ -48,11 +66,20 @@ const router = createBrowserRouter([
     ),
     children: [
       {
-        path: 'profile',
+        path: '/user/profile',
         element: (
           <>
             <PageTitle title="Profile" />
             <Profile />
+          </>
+        ),
+      },
+      {
+        path: '/wallet/deposit',
+        element: (
+          <>
+            <PageTitle title="Wallet | Deposite" />
+            <Deposit />
           </>
         ),
       },
