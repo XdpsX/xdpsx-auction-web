@@ -1,22 +1,39 @@
 import { Link } from 'react-router-dom'
-import { formatDate, formatPrice } from '../../utils/format'
+import { formatDateTime, formatPrice } from '../../utils/format'
+import { Auction } from '../../models/auction.type'
+import DEFAULT_AVATAR from '../../assets/default-user-icon.png'
+import { Status } from '../ui/Status'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function AuctionCard({ auction }: { auction: any }) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const renderDate = (auction: any) => {
-    const currentTime = new Date()
+function AuctionCard({ auction }: { auction: Auction }) {
+  const renderDate = (auction: Auction) => {
+    const now = new Date()
     const endingTime = new Date(auction.endingTime)
 
-    const timeDifference = endingTime.getTime() - currentTime.getTime()
-    const hoursLeft = Math.floor(timeDifference / (1000 * 60 * 60))
-
-    if (timeDifference < 24 * 60 * 60 * 1000 && timeDifference > 0) {
-      return <p className="font-bold text-red-600">{hoursLeft} hours left</p>
+    if (now < new Date(auction.startingTime)) {
+      const content = (
+        <div className="bg-gray-100 shadow-sm px-2 py-2">
+          <p>Starting time: {formatDateTime(auction.startingTime)}</p>
+        </div>
+      )
+      return <Status status="Upcoming" content={content} />
+    } else if (endingTime.getTime() - now.getTime() < 24 * 60 * 60 * 1000) {
+      const timeDifference = endingTime.getTime() - now.getTime()
+      const hoursLeft = Math.floor(timeDifference / (1000 * 60 * 60))
+      const content = (
+        <div className="bg-gray-100 shadow-sm px-2 py-2">
+          <p className="font-semibold text-red-500">{hoursLeft} hours left</p>
+          <p>Ending time: {formatDateTime(auction.endingTime)}</p>
+        </div>
+      )
+      return <Status status="Ending soon" content={content} />
     } else {
-      return `${formatDate(auction.startingTime)} - ${formatDate(
-        auction.endingTime
-      )}`
+      const content = (
+        <div className="bg-gray-100 shadow-sm px-2 py-2">
+          <p>Starting time: {formatDateTime(auction.startingTime)}</p>
+          <p>Ending time: {formatDateTime(auction.endingTime)}</p>
+        </div>
+      )
+      return <Status status="Live" content={content} />
     }
   }
 
@@ -43,18 +60,28 @@ function AuctionCard({ auction }: { auction: any }) {
       </div>
 
       <div className="px-4 space-y-4">
-        <div className="space-y-2 font-semibold">
-          <h3 className="text-gray-800 text-lg line-clamp-2">{auction.name}</h3>
-          <p className="text-gray-600">by {auction.owner}</p>
+        <h3 className="text-gray-800 text-lg font-semibold line-clamp-2">
+          {auction.name}
+        </h3>
+        <div className="flex items-center justify-between gap-4">
+          <p className="font-semibold">{formatPrice(auction.startingPrice)}</p>
+          <span className="text-sm">1 bids</span>
         </div>
-        <div className="flex justify-between gap-4">
-          <span className="font-semibold">
-            {formatPrice(auction.startingPrice)}
-            {auction.stepPrice && ` / ${formatPrice(auction.stepPrice)}`}
-          </span>
-          <span className="">{auction.bids} bids</span>
+        <div className="flex items-center justify-between">
+          <p className="text-gray-600 flex items-center gap-2">
+            <img
+              src={
+                auction.seller.avatarUrl
+                  ? auction.seller.avatarUrl
+                  : DEFAULT_AVATAR
+              }
+              alt="Seller avatar"
+              className="w-8 h-8 rounded-full"
+            />
+            <span>{auction.seller.name}</span>
+          </p>
+          {renderDate(auction)}
         </div>
-        <div>{renderDate(auction)}</div>
       </div>
     </Link>
   )

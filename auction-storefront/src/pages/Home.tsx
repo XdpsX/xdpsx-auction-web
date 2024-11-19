@@ -3,11 +3,30 @@ import { selectCategory } from '../features/category/category.slice'
 import DropDown from '../components/ui/DropDown'
 import { Link } from 'react-router-dom'
 import Banner from '../components/home/Banner'
-import { auctions } from '../utils/data'
 import AuctionList from '../components/auction/AuctionList'
-
+import { useEffect, useMemo, useState } from 'react'
+import { Auction } from '../models/auction.type'
+import { Page } from '../models/page.type'
+import { fetchCategoryAuctionsAPI } from '../features/auction/auction.service'
+const NUMBER_CATEGORIES = 3
 function Home() {
   const { categories } = useAppSelector(selectCategory)
+  const [auctionPages, setAuctionPages] = useState<Page<Auction>[]>([])
+  const categoryIds = useMemo(() => {
+    return categories?.slice(0, NUMBER_CATEGORIES).map((cat) => cat.id)
+  }, [categories])
+
+  useEffect(() => {
+    categoryIds?.forEach(async (categoryId) => {
+      try {
+        const auctionPage = await fetchCategoryAuctionsAPI(categoryId, 1, 8)
+        setAuctionPages((prev) => [...prev, auctionPage])
+      } catch (error) {
+        console.log('Failed to fetch auctions: ', error)
+      }
+    })
+  }, [categoryIds])
+
   return (
     <div>
       <div className="container-lg mx-auto">
@@ -56,33 +75,25 @@ function Home() {
 
       <div className="container mx-auto py-20 px-8 lg:px-20 space-y-10">
         <section>
-          <div className="flex items-center gap-4 mb-10">
-            <h2 className="text-2xl font-semibold">Jewelry & Watches</h2>
-            <div>
-              <Link
-                to="/"
-                className="text-blue-700 hover:text-blue-500 underline"
-              >
-                View more
-              </Link>
-            </div>
-          </div>
-          <AuctionList auctions={auctions} />
-        </section>
-
-        <section>
-          <div className="flex items-center gap-4 mb-10">
-            <h2 className="text-2xl font-semibold">Jewelry & Watches</h2>
-            <div>
-              <Link
-                to="/"
-                className="text-blue-700 hover:text-blue-500 underline"
-              >
-                View more
-              </Link>
-            </div>
-          </div>
-          <AuctionList auctions={auctions} />
+          {auctionPages.map((page, index) => {
+            if (page.items.length === 0 || !categories?.[index]) return null
+            return (
+              <div key={index} className="mb-10">
+                <div className="flex items-center gap-4 mb-10">
+                  <h2 className="text-2xl font-semibold">
+                    {categories?.[index].name}
+                  </h2>
+                  <Link
+                    to={`/categories/${categories?.[index].slug}`}
+                    className="text-blue-700 hover:text-blue-500 underline text-sm"
+                  >
+                    View more
+                  </Link>
+                </div>
+                <AuctionList auctions={page.items} />
+              </div>
+            )
+          })}
         </section>
       </div>
     </div>

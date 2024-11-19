@@ -1,104 +1,14 @@
-export const auctions = [
-  {
-    id: 1,
-    name: 'Seiko V175-ocz8 Prospex Solar Flight Chronographaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-    mainImage:
-      'https://image.invaluable.com/housePhotos/berners/61/780961/H1075-L386947193.jpg',
-    auctionType: 'English',
-    startingTime: '2024-11-01',
-    endingTime: '2024-12-01',
-    startingPrice: 1000,
-    stepPrice: 20,
-    owner: 'John Doe',
-    bids: 3,
-  },
-  {
-    id: 2,
-    name: 'Seiko V175-ocz8 Prospex Solar Flight Chronograph',
-    mainImage: 'http://localhost:3000/banners/banner-1.png',
-    auctionType: 'English',
-    startingTime: '2024-11-01',
-    endingTime: '2024-12-01',
-    startingPrice: 1000,
-    stepPrice: 20,
-    owner: 'John Doe',
-    bids: 3,
-  },
-  {
-    id: 3,
-    name: 'Seiko V175-ocz8 Prospex Solar Flight Chronograph',
-    mainImage:
-      'https://image.invaluable.com/housePhotos/berners/61/780961/H1075-L386947193.jpg',
-    auctionType: 'Sealed-bid',
-    startingTime: '2024-11-01',
-    endingTime: '2024-12-01',
-    startingPrice: 1000,
-    stepPrice: null,
-    owner: 'John Doe',
-    bids: 3,
-  },
-  {
-    id: 4,
-    name: 'Seiko V175-ocz8 Prospex Solar Flight Chronograph',
-    mainImage:
-      'https://image.invaluable.com/housePhotos/berners/61/780961/H1075-L386947193.jpg',
-    auctionType: 'English',
-    startingTime: '2024-11-01',
-    endingTime: '2024-12-01',
-    startingPrice: 1000,
-    stepPrice: 20,
-    owner: 'John Doe',
-    bids: 3,
-  },
-  {
-    id: 5,
-    name: 'Seiko V175-ocz8 Prospex Solar Flight Chronographaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-    mainImage:
-      'https://image.invaluable.com/housePhotos/berners/61/780961/H1075-L386947193.jpg',
-    auctionType: 'English',
-    startingTime: '2024-11-01',
-    endingTime: '2024-12-01',
-    startingPrice: 1000,
-    stepPrice: 20,
-    owner: 'John Doe',
-    bids: 3,
-  },
-  {
-    id: 6,
-    name: 'Seiko V175-ocz8 Prospex Solar Flight Chronograph',
-    mainImage: 'http://localhost:3000/banners/banner-1.png',
-    auctionType: 'English',
-    startingTime: '2024-11-01',
-    endingTime: '2024-12-01',
-    startingPrice: 1000,
-    stepPrice: 20,
-    owner: 'John Doe',
-    bids: 3,
-  },
-  {
-    id: 7,
-    name: 'Seiko V175-ocz8 Prospex Solar Flight Chronograph',
-    mainImage:
-      'https://image.invaluable.com/housePhotos/berners/61/780961/H1075-L386947193.jpg',
-    auctionType: 'Sealed-bid',
-    startingTime: '2024-11-01',
-    endingTime: '2024-12-01',
-    startingPrice: 1000,
-    stepPrice: null,
-    owner: 'John Doe',
-    bids: 3,
-  },
-  {
-    id: 8,
-    name: 'Seiko V175-ocz8 Prospex Solar Flight Chronograph',
-    mainImage:
-      'https://image.invaluable.com/housePhotos/berners/61/780961/H1075-L386947193.jpg',
-    auctionType: 'Sealed-bid',
-    startingTime: '2024-09-01',
-    endingTime: '2024-11-01T00:00:00',
-    startingPrice: 1000,
-    stepPrice: null,
-    owner: 'John Doe',
-    bids: 3,
-  },
-]
+export const statusOptions = [
+  { name: 'Upcoming', uid: 'upcoming' },
+  { name: 'Live', uid: 'live' },
+  { name: 'Ending soon', uid: 'endingSoon' },
+] as const
+
+export type StatusOptions = (typeof statusOptions)[number]['name']
+
+export const statusColorMap: Record<StatusOptions, string> = {
+  Upcoming: 'currentColor',
+  Live: '#17C964',
+  'Ending soon': '#F31260',
+  // Vacation: '#F5A524'
+}
