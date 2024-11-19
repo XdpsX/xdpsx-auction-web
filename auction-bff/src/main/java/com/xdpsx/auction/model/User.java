@@ -53,6 +53,9 @@ public class User extends AbstractAuditEntity {
     @OneToMany
     private List<Auction> auctions;
 
+    @OneToOne(mappedBy = "owner", cascade = CascadeType.PERSIST)
+    private Wallet wallet;
+
     public String getAvatarUrl(){
         if (avatar == null){
             return null;

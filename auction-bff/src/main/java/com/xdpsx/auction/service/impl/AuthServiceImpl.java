@@ -13,6 +13,7 @@ import com.xdpsx.auction.exception.NotFoundException;
 import com.xdpsx.auction.model.Media;
 import com.xdpsx.auction.model.Role;
 import com.xdpsx.auction.model.User;
+import com.xdpsx.auction.model.Wallet;
 import com.xdpsx.auction.model.enums.AuthProvider;
 import com.xdpsx.auction.repository.RoleRepository;
 import com.xdpsx.auction.repository.UserRepository;
@@ -30,6 +31,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.HashSet;
@@ -83,6 +85,11 @@ public class AuthServiceImpl implements AuthService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setEnabled(true);
         user.setRoles(roles);
+
+        Wallet wallet = new Wallet();
+        wallet.setOwner(user);
+        wallet.setBalance(BigDecimal.valueOf(0));
+        user.setWallet(wallet);
 
         User savedUser = userRepository.save(user);
         return tokenProvider.generateToken(savedUser);
@@ -160,6 +167,12 @@ public class AuthServiceImpl implements AuthService {
                         newUser.setEnabled(true);
                         newUser.setProvider(AuthProvider.GOOGLE);
                         newUser.setAvatar(media);
+
+                        Wallet wallet = new Wallet();
+                        wallet.setOwner(newUser);
+                        wallet.setBalance(BigDecimal.valueOf(0));
+                        newUser.setWallet(wallet);
+
                         User savedUser = userRepository.save(newUser);
                         return tokenProvider.generateToken(savedUser);
                     }

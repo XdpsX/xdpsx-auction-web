@@ -5,6 +5,7 @@ import com.xdpsx.auction.exception.NotFoundException;
 import com.xdpsx.auction.model.Media;
 import com.xdpsx.auction.model.Role;
 import com.xdpsx.auction.model.User;
+import com.xdpsx.auction.model.Wallet;
 import com.xdpsx.auction.repository.RoleRepository;
 import com.xdpsx.auction.repository.UserRepository;
 import com.xdpsx.auction.security.CustomUserDetails;
@@ -15,6 +16,7 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -68,6 +70,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             user.setProvider(customUserDetails.getProvider());
             user.setRoles(roles);
             user.setEnabled(customUserDetails.isEnabled());
+
+            // Wallet
+            Wallet wallet = new Wallet();
+            wallet.setOwner(user);
+            wallet.setBalance(BigDecimal.valueOf(0));
+            user.setWallet(wallet);
+
             return userRepository.save(user);
         } else {
             return userOptional.get();

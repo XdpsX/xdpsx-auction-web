@@ -2,6 +2,7 @@ package com.xdpsx.auction.security;
 
 import com.xdpsx.auction.model.Role;
 import com.xdpsx.auction.model.User;
+import com.xdpsx.auction.model.Wallet;
 import com.xdpsx.auction.model.enums.AuthProvider;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -31,6 +32,7 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
     private AuthProvider provider;
     private Set<Role> roles;
     private Map<String, Object> attributes;
+    private Wallet wallet;
 
     public static CustomUserDetails fromUser(User user) {
         return CustomUserDetails.builder()
@@ -45,6 +47,7 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
                 .locked(user.isLocked())
                 .provider(user.getProvider())
                 .roles(user.getRoles())
+                .wallet(user.getWallet())
                 .build();
     }
 

@@ -78,3 +78,11 @@ app:
   oauth2:
     success-uri: http://localhost:3000/oauth2/redirect
     error-uri: http://localhost:3000/login
+
+payment:
+  vnpay:
+    tmn-code: ${VNPAY_TMN_CODE}
+    secret-key: ${VNPAY_SECRET_KEY}
+    init-payment-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+    return-url: http://localhost:3000/%s/payment/redirect
+    timeout: 15 # in minutes
