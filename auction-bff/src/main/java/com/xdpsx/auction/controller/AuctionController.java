@@ -3,6 +3,7 @@ package com.xdpsx.auction.controller;
 import com.xdpsx.auction.dto.PageResponse;
 import com.xdpsx.auction.dto.auction.AuctionRequest;
 import com.xdpsx.auction.dto.auction.AuctionDto;
+import com.xdpsx.auction.dto.auction.AuctionResponse;
 import com.xdpsx.auction.dto.error.ErrorDetailsDto;
 import com.xdpsx.auction.model.Media;
 import com.xdpsx.auction.service.AuctionService;
@@ -78,5 +79,15 @@ public class AuctionController {
             MultipartFile file){
         Media image = mediaService.saveMedia(file, AUCTION_IMAGE_FOLDER, AUCTION_IMAGE_MIN_WIDTH);
         return new ResponseEntity<>(image, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/public/categories/{categoryId}/auctions")
+    ResponseEntity<PageResponse<AuctionResponse>> getCategoryAuctions(
+            @PathVariable Integer categoryId,
+            @RequestParam(defaultValue = PAGE_NUM, required = false) int pageNum,
+            @RequestParam(defaultValue = PAGE_SIZE, required = false) @Max(MAX_PAGE_SIZE) int pageSize
+    ) {
+        PageResponse<AuctionResponse> response = auctionService.getCategoryAuctions(categoryId, pageNum, pageSize);
+        return ResponseEntity.ok(response);
     }
 }

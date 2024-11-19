@@ -3,6 +3,7 @@ package com.xdpsx.auction.service.impl;
 import com.xdpsx.auction.dto.PageResponse;
 import com.xdpsx.auction.dto.auction.AuctionRequest;
 import com.xdpsx.auction.dto.auction.AuctionDto;
+import com.xdpsx.auction.dto.auction.AuctionResponse;
 import com.xdpsx.auction.exception.NotFoundException;
 import com.xdpsx.auction.mapper.AuctionMapper;
 import com.xdpsx.auction.mapper.PageMapper;
@@ -41,7 +42,7 @@ public class AuctionServiceImpl implements AuctionService {
                 specification.getAllAuctionsSpec(keyword, sort, published),
                 PageRequest.of(pageNum - 1, pageSize)
         );
-        return pageMapper.toPageAuctionResponse(auctionPage, auctionMapper::fromEntityToDto);
+        return pageMapper.toPageAuctionDto(auctionPage, auctionMapper::fromEntityToDto);
     }
 
     @Override
@@ -52,7 +53,7 @@ public class AuctionServiceImpl implements AuctionService {
                 specification.getUserAuctionsSpec(keyword, sort, published, user.getId()),
                 PageRequest.of(pageNum - 1, pageSize)
         );
-        return pageMapper.toPageAuctionResponse(auctionPage, auctionMapper::fromEntityToDto);
+        return pageMapper.toPageAuctionDto(auctionPage, auctionMapper::fromEntityToDto);
     }
 
     @Override
@@ -82,6 +83,16 @@ public class AuctionServiceImpl implements AuctionService {
 
         Auction savedAuction = auctionRepository.save(auction);
         return auctionMapper.fromEntityToDto(savedAuction);
+    }
+
+    @Override
+    public PageResponse<AuctionResponse> getCategoryAuctions(Integer categoryId, int pageNum, int pageSize) {
+        Category category = findPublishedCategory(categoryId);
+        Page<Auction> auctionPage = auctionRepository.findAll(
+                specification.getCategoryAuctionsSpec(category.getId()),
+                PageRequest.of(pageNum - 1, pageSize)
+        );
+        return pageMapper.toPageAuctionResponse(auctionPage, auctionMapper::fromEntityToResponse);
     }
 
     private Category findPublishedCategory(Integer categoryId){

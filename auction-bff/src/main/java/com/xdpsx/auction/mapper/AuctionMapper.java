@@ -2,6 +2,7 @@ package com.xdpsx.auction.mapper;
 
 import com.xdpsx.auction.dto.auction.AuctionRequest;
 import com.xdpsx.auction.dto.auction.AuctionDto;
+import com.xdpsx.auction.dto.auction.AuctionResponse;
 import com.xdpsx.auction.model.Auction;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -20,4 +21,9 @@ public interface AuctionMapper {
     @Mapping(target = "mainImage", source = "entity.mainImage")
     @Mapping(target = "category", source = "entity.category.name")
     AuctionDto fromEntityToDto(Auction entity);
+
+    @Mapping(target = "mainImage", source = "entity.mainImage")
+    @Mapping(target = "category", source = "entity.category.name")
+    @Mapping(target = "seller", source = "entity.seller")
+    AuctionResponse fromEntityToResponse(Auction entity);
 }

@@ -2,6 +2,7 @@ package com.xdpsx.auction.mapper;
 
 import com.xdpsx.auction.dto.PageResponse;
 import com.xdpsx.auction.dto.auction.AuctionDto;
+import com.xdpsx.auction.dto.auction.AuctionResponse;
 import com.xdpsx.auction.dto.category.CategoryDetailsDto;
 import com.xdpsx.auction.model.Auction;
 import com.xdpsx.auction.model.Category;
@@ -19,8 +20,12 @@ public class PageMapper {
         return toPageResponse(categoryPage, CategoryDetailsDto::fromModel);
     }
 
-    public PageResponse<AuctionDto> toPageAuctionResponse(Page<Auction> auctionPage,
-                                                          Function<Auction, AuctionDto> mapper){
+    public PageResponse<AuctionDto> toPageAuctionDto(Page<Auction> auctionPage,
+                                                     Function<Auction, AuctionDto> mapper){
+        return toPageResponse(auctionPage, mapper);
+    }
+    public PageResponse<AuctionResponse> toPageAuctionResponse(Page<Auction> auctionPage,
+                                                     Function<Auction, AuctionResponse> mapper){
         return toPageResponse(auctionPage, mapper);
     }
 

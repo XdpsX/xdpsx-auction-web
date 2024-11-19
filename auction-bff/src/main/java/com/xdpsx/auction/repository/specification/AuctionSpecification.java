@@ -5,6 +5,8 @@ import jakarta.persistence.criteria.Order;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
+import java.time.ZonedDateTime;
+
 import static com.xdpsx.auction.constant.PageConstant.*;
 
 @Component
@@ -25,6 +27,15 @@ public class AuctionSpecification extends AbstractSpecification<Auction> {
                 .and(getSortSpec(sort));
     }
 
+    public Specification<Auction> getCategoryAuctionsSpec(Integer categoryId) {
+        return Specification
+                .where(hasCategory(categoryId))
+                .and(hasTrashed(false))
+                .and(hasPublished(true))
+                .and(sortByEndingTime(true))
+                .and(hasNotEnded());
+    }
+
     private Specification<Auction> hasTrashed(Boolean trashed) {
         return (root, query, criteriaBuilder) -> {
             if (trashed == null) return criteriaBuilder.conjunction();
@@ -36,6 +47,13 @@ public class AuctionSpecification extends AbstractSpecification<Auction> {
         return (root, query, criteriaBuilder) -> {
             if (userId == null) return criteriaBuilder.conjunction();
             return criteriaBuilder.equal(root.get("seller").get("id"), userId);
+        };
+    }
+
+    private Specification<Auction> hasCategory(Integer categoryId) {
+        return (root, query, criteriaBuilder) -> {
+            if (categoryId == null) return criteriaBuilder.conjunction();
+            return criteriaBuilder.equal(root.get("category").get("id"), categoryId);
         };
     }
 
@@ -67,4 +85,21 @@ public class AuctionSpecification extends AbstractSpecification<Auction> {
             return criteriaBuilder.conjunction();
         };
     }
+
+    private Specification<Auction> sortByEndingTime(boolean asc) {
+        return (root, query, criteriaBuilder) -> {
+            assert query != null;
+            Order order = criteriaBuilder.desc(root.get("endingTime"));
+            if (asc){
+                order = criteriaBuilder.asc(root.get("endingTime"));
+            }
+            query.orderBy(order);
+            return criteriaBuilder.conjunction();
+        };
+    }
+
+    private Specification<Auction> hasNotEnded() {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.greaterThan(root.get("endingTime"), ZonedDateTime.now());
+    }
+
 }
