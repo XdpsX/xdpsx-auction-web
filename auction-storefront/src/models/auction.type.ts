@@ -7,7 +7,26 @@ export type Auction = {
   endingTime: string
   auctionType: string
   published: boolean
+  seller: {
+    id: number
+    name: string
+    avatarUrl: string | null
+  }
+}
+
+export type AuctionDetails = {
+  id: number
+  mainImage: string
+  name: string
+  description: string
+  startingPrice: number
+  stepPrice: number
+  startingTime: string
+  endingTime: string
+  auctionType: string
+  published: boolean
   category: string
+  images: string[]
   seller: {
     id: number
     name: string

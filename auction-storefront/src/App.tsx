@@ -17,6 +17,8 @@ import Profile from './pages/Profile'
 import Deposit from './pages/Deposit'
 import PaymentRedirect from './pages/redirect/PaymentRedirect'
 import PaymentHandler from './pages/handler/PaymentSuccess'
+import AuctionDetailsPage from './pages/AuctionDetailsPage'
+import NotFoundPage from './pages/error/NotFoundPage'
 
 const router = createBrowserRouter([
   {
@@ -29,6 +31,15 @@ const router = createBrowserRouter([
           <>
             <PageTitle title="Home" />
             <Home />
+          </>
+        ),
+      },
+      {
+        path: '/auctions/:slug',
+        element: (
+          <>
+            <PageTitle title="Auction Details" />
+            <AuctionDetailsPage />
           </>
         ),
       },
@@ -84,6 +95,14 @@ const router = createBrowserRouter([
         ),
       },
     ],
+  },
+  {
+    path: '/not-found',
+    element: <NotFoundPage />,
+  },
+  {
+    path: '*',
+    element: <NotFoundPage />,
   },
   ...authRoutes,
 ])

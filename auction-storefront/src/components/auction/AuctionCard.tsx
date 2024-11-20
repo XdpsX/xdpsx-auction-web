@@ -1,55 +1,31 @@
+import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { formatDateTime, formatPrice } from '../../utils/format'
+import { formatPrice, generateSlug } from '../../utils/format'
 import { Auction } from '../../models/auction.type'
 import DEFAULT_AVATAR from '../../assets/default-user-icon.png'
-import { Status } from '../ui/Status'
+import AuctionType from '../ui/AuctionType'
+import AuctionDate from '../ui/AuctionDate'
 
 function AuctionCard({ auction }: { auction: Auction }) {
-  const renderDate = (auction: Auction) => {
-    const now = new Date()
-    const endingTime = new Date(auction.endingTime)
-
-    if (now < new Date(auction.startingTime)) {
-      const content = (
-        <div className="bg-gray-100 shadow-sm px-2 py-2">
-          <p>Starting time: {formatDateTime(auction.startingTime)}</p>
-        </div>
-      )
-      return <Status status="Upcoming" content={content} />
-    } else if (endingTime.getTime() - now.getTime() < 24 * 60 * 60 * 1000) {
-      const timeDifference = endingTime.getTime() - now.getTime()
-      const hoursLeft = Math.floor(timeDifference / (1000 * 60 * 60))
-      const content = (
-        <div className="bg-gray-100 shadow-sm px-2 py-2">
-          <p className="font-semibold text-red-500">{hoursLeft} hours left</p>
-          <p>Ending time: {formatDateTime(auction.endingTime)}</p>
-        </div>
-      )
-      return <Status status="Ending soon" content={content} />
-    } else {
-      const content = (
-        <div className="bg-gray-100 shadow-sm px-2 py-2">
-          <p>Starting time: {formatDateTime(auction.startingTime)}</p>
-          <p>Ending time: {formatDateTime(auction.endingTime)}</p>
-        </div>
-      )
-      return <Status status="Live" content={content} />
-    }
-  }
+  const auctionSlug = useMemo(
+    () =>
+      generateSlug({
+        name: auction.name,
+        id: auction.id,
+      }),
+    [auction.name, auction.id]
+  )
 
   return (
     <Link
-      to={'/auctions/details'}
+      to={`/auctions/${auctionSlug}`}
       key={auction.id}
       className="relative border space-y-4 pb-4 group transition-all duration-500 shadow-sm hover:shadow-md hover:-translate-y-2"
     >
-      <div
-        className={`absolute left-2 top-2 p-2 text-white text-sm ${
-          auction.auctionType === 'English' ? 'bg-blue-500' : 'bg-yellow-500'
-        }`}
-      >
-        {auction.auctionType}
-      </div>
+      <AuctionType
+        type={auction.auctionType}
+        className="absolute left-2 top-2"
+      />
 
       <div className="overflow-hidden">
         <img
@@ -80,7 +56,10 @@ function AuctionCard({ auction }: { auction: Auction }) {
             />
             <span>{auction.seller.name}</span>
           </p>
-          {renderDate(auction)}
+          <AuctionDate
+            endingDate={auction.endingTime}
+            startingDate={auction.startingTime}
+          />
         </div>
       </div>
     </Link>
