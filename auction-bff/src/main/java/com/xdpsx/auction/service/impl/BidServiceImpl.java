@@ -42,12 +42,12 @@ public class BidServiceImpl implements BidService {
         if (highestBid != null) {
             if (
 //                    highestBid.getAmount().compareTo(bidRequest.getAmount()) >= 0 &&
-                    highestBid.getAmount().add(auction.getStepPrice()).compareTo(bidRequest.getAmount()) >= 0) {
+                    highestBid.getAmount().add(auction.getStepPrice()).compareTo(bidRequest.getAmount()) > 0) {
             throw new BadRequestException(ErrorCode.BID_LOWER);
 
             }
         } else {
-            if (auction.getStartingPrice().add(auction.getStepPrice()).compareTo(bidRequest.getAmount()) >= 0) {
+            if (auction.getStartingPrice().add(auction.getStepPrice()).compareTo(bidRequest.getAmount()) > 0) {
                 throw new BadRequestException(ErrorCode.BID_LOWER);
             }
         }
