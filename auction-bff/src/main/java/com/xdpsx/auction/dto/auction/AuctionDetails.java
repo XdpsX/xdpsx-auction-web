@@ -1,5 +1,6 @@
 package com.xdpsx.auction.dto.auction;
 
+import com.xdpsx.auction.dto.bid.BidResponse;
 import com.xdpsx.auction.dto.user.UserInfo;
 import com.xdpsx.auction.model.enums.AuctionType;
 
@@ -19,6 +20,7 @@ public record AuctionDetails (
         String mainImage,
         List<String> images,
         String category,
-        UserInfo seller
+        UserInfo seller,
+        BidResponse highestBid
 ) {
 }

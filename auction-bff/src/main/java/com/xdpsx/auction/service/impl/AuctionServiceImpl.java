@@ -10,7 +10,9 @@ import com.xdpsx.auction.exception.NotFoundException;
 import com.xdpsx.auction.mapper.AuctionMapper;
 import com.xdpsx.auction.mapper.PageMapper;
 import com.xdpsx.auction.model.*;
+import com.xdpsx.auction.model.enums.AuctionType;
 import com.xdpsx.auction.repository.AuctionRepository;
+import com.xdpsx.auction.repository.BidRepository;
 import com.xdpsx.auction.repository.CategoryRepository;
 import com.xdpsx.auction.repository.specification.AuctionSpecification;
 import com.xdpsx.auction.security.CustomUserDetails;
@@ -35,6 +37,7 @@ public class AuctionServiceImpl implements AuctionService {
     private final AuctionSpecification specification;
     private final CategoryRepository categoryRepository;
     private final AuctionRepository auctionRepository;
+    private final BidRepository bidRepository;
 
     @PreAuthorize("hasRole('ADMIN')")
     @Override
@@ -101,7 +104,12 @@ public class AuctionServiceImpl implements AuctionService {
     public AuctionDetails getPublishedAuction(Long id) {
         Auction auction = auctionRepository.findActiveAuctionById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.AUCTION_NOT_FOUND, id));
-        return auctionMapper.toAuctionDetails(auction);
+        Bid highestBid = null;
+        if (auction.getAuctionType().equals(AuctionType.ENGLISH)){
+            highestBid = bidRepository.findHighestBidByAuctionId(auction.getId())
+                    .orElse(null);
+        }
+        return auctionMapper.toAuctionDetails(auction, highestBid);
     }
 
     private Category findPublishedCategory(Integer categoryId){

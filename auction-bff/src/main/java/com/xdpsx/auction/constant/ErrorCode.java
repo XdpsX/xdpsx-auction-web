@@ -17,4 +17,9 @@ public class ErrorCode {
     public static final String EMAIL_VALIDATED="EMAIL_VALIDATED";
     public static final String OTP_INVALID="OTP_INVALID";
     public static final String TOO_MANY_REQUEST="TOO_MANY_REQUEST";
+
+    public static final String AUCTION_OWNER="AUCTION_OWNER";
+    public static final String BID_LOWER="BID_LOWER";
+    public static final String WALLET_NOT_ENOUGH="WALLET_NOT_ENOUGH";
+
 }

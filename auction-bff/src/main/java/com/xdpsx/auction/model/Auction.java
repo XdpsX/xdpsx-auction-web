@@ -53,9 +53,10 @@ public class Auction extends AbstractAuditEntity{
     @ManyToOne
     private Category category;
 
+    @OneToMany
+    private List<Bid> bids;
+
     public String getMainImage(){
-        return ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(String.format("/medias/%1$s/file/%2$s", mainImage.getId(), mainImage.getFileName()))
-                .build().toUriString();
+        return mainImage.getUrl();
     }
 }

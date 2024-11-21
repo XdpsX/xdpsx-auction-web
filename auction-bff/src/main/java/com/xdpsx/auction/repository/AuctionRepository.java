@@ -20,4 +20,13 @@ public interface AuctionRepository extends JpaRepository<Auction, Long>,
             "AND a.published = true " +
             "AND a.endingTime > CURRENT_TIMESTAMP")
     Optional<Auction> findActiveAuctionById(@Param("id") Long id);
+
+    @Query("SELECT a FROM Auction a " +
+            "JOIN FETCH a.seller " +
+            "WHERE a.id = :id " +
+            "AND a.trashed = false " +
+            "AND a.published = true " +
+            "AND a.startingTime < CURRENT_TIMESTAMP " +
+            "AND a.endingTime > CURRENT_TIMESTAMP")
+    Optional<Auction> findLiveAuction(@Param("id") Long id);
 }

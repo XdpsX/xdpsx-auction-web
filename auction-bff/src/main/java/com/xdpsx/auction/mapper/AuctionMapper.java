@@ -4,8 +4,10 @@ import com.xdpsx.auction.dto.auction.AuctionDetails;
 import com.xdpsx.auction.dto.auction.AuctionRequest;
 import com.xdpsx.auction.dto.auction.AuctionDto;
 import com.xdpsx.auction.dto.auction.AuctionResponse;
+import com.xdpsx.auction.dto.bid.BidResponse;
 import com.xdpsx.auction.model.Auction;
 import com.xdpsx.auction.model.AuctionImage;
+import com.xdpsx.auction.model.Bid;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -31,14 +33,29 @@ public interface AuctionMapper {
     @Mapping(target = "seller", source = "entity.seller")
     AuctionResponse fromEntityToResponse(Auction entity);
 
-    @Mapping(target = "images", source = "images")
+    @Mapping(target = "id", source = "entity.id")
+    @Mapping(target = "images", source = "entity.images")
     @Mapping(target = "category", source = "entity.category.name")
     @Mapping(target = "seller", source = "entity.seller")
-    AuctionDetails toAuctionDetails(Auction entity);
+    @Mapping(target = "highestBid", source = "highestBid")
+    AuctionDetails toAuctionDetails(Auction entity, Bid highestBid);
 
     default List<String> mapImages(List<AuctionImage> auctionImages) {
         return auctionImages.stream()
                 .map(AuctionImage::getUrl)
                 .collect(Collectors.toList());
+    }
+
+    default BidResponse mapBidToResponse(Bid bid) {
+        if (bid == null) {
+            return null;
+        }
+        return BidResponse.builder()
+                .id(bid.getId())
+                .amount(bid.getAmount())
+                .bidTime(bid.getBidTime())
+                .bidderId(bid.getBidder().getId())
+                .auctionId(bid.getAuction().getId())
+                .build();
     }
 }
