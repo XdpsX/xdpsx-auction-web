@@ -36,9 +36,11 @@ function AuctionCard({ auction }: { auction: Auction }) {
       </div>
 
       <div className="px-4 space-y-4">
-        <h3 className="text-gray-800 text-lg font-semibold line-clamp-2">
-          {auction.name}
-        </h3>
+        <div className="h-16">
+          <h3 className="text-gray-800 text-lg font-semibold line-clamp-2">
+            {auction.name}
+          </h3>
+        </div>
         <div className="flex items-center justify-between gap-4">
           <p className="font-semibold">{formatPrice(auction.startingPrice)}</p>
           <span className="text-sm">1 bids</span>

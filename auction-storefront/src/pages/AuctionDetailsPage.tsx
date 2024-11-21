@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { formatPrice, getIdFromSlug } from '../utils/format'
 import { useEffect } from 'react'
 import { fetchAuctionDetailsAPI } from '../features/auction/auction.service'
@@ -8,6 +8,10 @@ import PreviewImages from '../components/ui/PreviewImages'
 import Button from '../components/ui/Button'
 import AuctionType from '../components/ui/AuctionType'
 import AuctionDate from '../components/ui/AuctionDate'
+import { useAppSelector } from '../store/hooks'
+import { selectAuth } from '../features/auth/auth.slice'
+import RichText from '../components/ui/RichText'
+import BidForm from '../components/ui/BidForm'
 
 function AuctionDetailsPage() {
   const navigate = useNavigate()
@@ -15,6 +19,8 @@ function AuctionDetailsPage() {
   const id = useMemo(() => +getIdFromSlug(slug as string), [slug])
   const [auction, setAuction] = useState<AuctionDetails | null>(null)
   const [showImage, setShowImage] = useState('')
+  const { accessToken } = useAppSelector(selectAuth)
+  const isAuthenticated = !!accessToken
 
   useEffect(() => {
     fetchAuctionDetailsAPI(id)
@@ -46,8 +52,8 @@ function AuctionDetailsPage() {
           )}
         </div>
 
-        <div className="py-6">
-          <div className="flex flex-col gap-4 pb-6 border-b mb-10">
+        <div className="">
+          <div className="flex flex-col gap-4 pb-6 border-b mb-4">
             <div className="space-y-2">
               <h1 className="text-2xl text-gray-800 font-bold">
                 {auction.name}
@@ -79,28 +85,36 @@ function AuctionDetailsPage() {
               {auction.auctionType === 'ENGLISH' && (
                 <div className="flex items-center gap-2">
                   <span className="font-semibold">Step Bid:</span>
-                  <span className="text-red-500 font-bold">
+                  <span className="text-yellow-500 font-bold">
                     {formatPrice(auction.stepPrice)}
+                  </span>
+                </div>
+              )}
+              {auction.auctionType === 'ENGLISH' && (
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">Current Bid:</span>
+                  <span className="text-red-500 font-bold">
+                    {formatPrice(
+                      auction.highestBid
+                        ? auction.highestBid.amount
+                        : auction.startingPrice
+                    )}
                   </span>
                 </div>
               )}
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              // onClick={add_card}
-              className="px-6 py-2 capitalize cursor-pointer hover:shadow-lg hover:shadow-blue-500/40 bg-blue-500 text-white"
+          {!isAuthenticated ? (
+            <Link
+              to="/login"
+              className="px-4 py-2 bg-red-500 text-white text-lg rounded-md hover:bg-red-600"
             >
-              Thêm vào giỏ
-            </button>
-            <button
-              // onClick={buynow}
-              className="px-6 py-2 capitalize cursor-pointer hover:shadow-lg hover:shadow-red-500/40 bg-red-500 text-white"
-            >
-              Mua ngay
-            </button>
-          </div>
+              Login to bid
+            </Link>
+          ) : (
+            <BidForm auction={auction} />
+          )}
         </div>
       </div>
 
@@ -122,12 +136,7 @@ function AuctionDetailsPage() {
       {auction.description && (
         <>
           <hr />
-          <div className="py-2">
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">
-              Description
-            </h3>
-            <div dangerouslySetInnerHTML={{ __html: auction.description }} />
-          </div>
+          <RichText description={auction.description} label="Description" />
         </>
       )}
     </main>

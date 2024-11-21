@@ -24,7 +24,7 @@ export const sendOTPAPI = createAsyncThunk(
   'auth/sendOTPAPI',
   async (payload: { email: string }, thunkAPI) => {
     try {
-      await api.post('/otp-mail/send', payload)
+      await api.post('/otp/mail', payload)
       return
     } catch (error) {
       return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))

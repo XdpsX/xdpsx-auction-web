@@ -1,3 +1,5 @@
+import { Bid } from './bid.type'
+
 export type Auction = {
   id: number
   mainImage: string
@@ -32,4 +34,5 @@ export type AuctionDetails = {
     name: string
     avatarUrl: string | null
   }
+  highestBid: Bid | null
 }
