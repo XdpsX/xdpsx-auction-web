@@ -16,6 +16,7 @@ import com.xdpsx.auction.security.CustomUserDetails;
 import com.xdpsx.auction.security.UserContext;
 import com.xdpsx.auction.service.BidService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,7 @@ public class BidServiceImpl implements BidService {
     private final BidRepository bidRepository;
     private final AuctionRepository auctionRepository;
     private final WalletRepository walletRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Transactional
     @Override
@@ -71,12 +73,14 @@ public class BidServiceImpl implements BidService {
                 .isWinner(false)
                 .build();
         Bid savedBid = bidRepository.save(bid);
-        return BidResponse.builder()
+        BidResponse bidResponse = BidResponse.builder()
                 .id(savedBid.getId())
                 .amount(savedBid.getAmount())
                 .bidTime(savedBid.getBidTime())
                 .bidderId(savedBid.getBidder().getId())
                 .auctionId(savedBid.getAuction().getId())
                 .build();
+        messagingTemplate.convertAndSend("/topic/auction/" + auction.getId(), bidResponse);
+        return bidResponse;
     }
 }
