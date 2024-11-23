@@ -26,6 +26,9 @@ function BidForm({
     control,
     handleSubmit,
     setError,
+    getValues,
+    setValue,
+    clearErrors,
     reset,
     formState: { errors },
   } = useForm({
@@ -35,13 +38,30 @@ function BidForm({
     },
   })
 
-  // Sử dụng useEffect để reset giá trị khi highestBid thay đổi
   useEffect(() => {
     reset({ amount: minAmount })
   }, [highestBid, minAmount, reset])
 
+  const increaseAmount = () => {
+    clearErrors('amount')
+    const amount = Number(getValues('amount'))
+    setValue('amount', amount + auction.stepPrice)
+  }
+
+  const decreaseAmount = () => {
+    clearErrors('amount')
+    const amount = Number(getValues('amount'))
+    if (amount > minAmount) {
+      setValue('amount', amount - auction.stepPrice)
+    } else {
+      setError('amount', {
+        type: 'manual',
+        message: 'Amount must be greater than the current bid',
+      })
+    }
+  }
+
   const onSubmit = (data: BidPayload) => {
-    console.log(data)
     dispatch(placeBid({ auctionId: auction.id, payload: data }))
       .unwrap()
       .then(() => {
@@ -78,19 +98,33 @@ function BidForm({
 
   return (
     <form className="flex flex-col gap-6" onSubmit={handleSubmit(onSubmit)}>
-      <div className="flex flex-col gap-2">
-        <label htmlFor="amount">Amount:</label>
-        <Input
-          control={control}
-          id="amount"
-          name="amount"
-          type="number"
-          placeholder="Enter bid amount"
-          classNameInput="pr-5"
-          min={minAmount}
-          step={auction.stepPrice}
-          error={errors.amount}
-        />
+      <div className="flex flex-col gap-4">
+        <label htmlFor="amount">Enter your bid:</label>
+        <div className={`flex items-center gap-4 ${errors.amount && 'mb-5'}`}>
+          <button
+            type="button"
+            onClick={decreaseAmount}
+            className="w-10 h-10 rounded-full text-lg cursor-pointer border border-blue-500 text-blue-500 font-bold"
+          >
+            -
+          </button>
+          <Input
+            control={control}
+            id="amount"
+            name="amount"
+            type="number"
+            placeholder="Enter bid amount"
+            error={errors.amount}
+            classNameInput="ring-blue-500 focus:outline-blue-500"
+          />
+          <button
+            type="button"
+            onClick={increaseAmount}
+            className="w-10 h-10 rounded-full text-lg cursor-pointer border border-blue-500 text-blue-500 font-bold"
+          >
+            +
+          </button>
+        </div>
       </div>
       <div className="flex items-center gap-2">
         <Button className="px-8 py-2 uppercase bg-blue-500 text-white hover:bg-blue-600">

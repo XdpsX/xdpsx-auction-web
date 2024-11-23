@@ -2,6 +2,7 @@ import { InputHTMLAttributes, useState } from 'react'
 import { Controller } from 'react-hook-form'
 import { Control, FieldError } from 'react-hook-form'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
+import cn from '../../utils/cn'
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -22,23 +23,44 @@ const Input: React.FC<InputProps> = ({
 }) => {
   const [showPassword, setShowPassword] = useState(false)
 
+  const formatNumber = (value: string | number | undefined) =>
+    String(value || '').replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+
+  const unformatNumber = (value: string) => value.replace(/,/g, '')
+
   return (
-    <div
-    // className={`${error?.message ? 'mb-8' : 'mb-4'}`}
-    >
+    <div>
       <div className="relative">
         <Controller
           name={name}
           control={control}
-          render={({ field }) => (
+          render={({ field: { value, onChange } }) => (
             <input
-              {...field}
+              value={type === 'number' ? formatNumber(value) : value}
+              onChange={(e) => {
+                if (type === 'number') {
+                  const unformattedValue = unformatNumber(e.target.value)
+                  if (!isNaN(Number(unformattedValue))) {
+                    onChange(unformattedValue)
+                  }
+                } else {
+                  onChange(e.target.value)
+                }
+              }}
               id={name}
-              type={type === 'password' && showPassword ? 'text' : type}
+              type={type === 'password' && !showPassword ? 'password' : 'text'}
               {...rest}
-              className={`block w-full rounded-md border-0 ps-4 pe-12 py-2 text-gray-900 shadow-sm ring-1 ring-inset ${
-                error ? 'ring-red-300 focus:outline-red-500' : 'ring-gray-300'
-              } placeholder:text-gray-400 text-lg sm:leading-6 ${classNameInput}`}
+              className={cn(
+                'block w-full rounded-md border-0 ps-4 pe-12 py-2 text-gray-900 shadow-sm ring-1 ring-inset',
+                {
+                  'placeholder:text-gray-400 text-lg sm:leading-6 ring-gray-300':
+                    true,
+                },
+                classNameInput,
+                {
+                  'ring-red-300 focus:outline-red-500': error,
+                }
+              )}
             />
           )}
         />

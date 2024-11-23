@@ -15,7 +15,8 @@ import BidForm from '../components/ui/BidForm'
 import SockJS from 'sockjs-client'
 import { Stomp, type Frame } from '@stomp/stompjs'
 import { Bid } from '../models/bid.type'
-// import { Client } from '@stomp/stompjs'
+import { selectUser } from '../features/user/user.slice'
+import { toast } from 'react-toastify'
 
 function AuctionDetailsPage() {
   const navigate = useNavigate()
@@ -24,6 +25,8 @@ function AuctionDetailsPage() {
   const [auction, setAuction] = useState<AuctionDetails | null>(null)
   const [highestBid, setHighestBid] = useState<Bid | null>(null)
   const [showImage, setShowImage] = useState('')
+  const [isBidUpdated, setIsBidUpdated] = useState(false)
+  const { userProfile } = useAppSelector(selectUser)
   const { accessToken } = useAppSelector(selectAuth)
   const isAuthenticated = !!accessToken
 
@@ -40,38 +43,31 @@ function AuctionDetailsPage() {
   }, [id, navigate])
 
   useEffect(() => {
-    // const client = new Client({
-    //   brokerURL: 'http://localhost:8080/ws',
-    //   onConnect: () => {
-    //     client.subscribe('/topic/auction/${id}', (message) =>
-    //       console.log(`Received: ${message.body}`)
-    //     )
-    //   },
-    // })
-    // client.activate()
-    // return () => {
-    //   client.deactivate()
-    // }
-
-    const socket = new SockJS('http://localhost:8080/ws') // Địa chỉ WebSocket
+    const socket = new SockJS('http://localhost:8080/ws')
     const stompClient = Stomp.over(socket)
     stompClient.connect({}, (frame: Frame) => {
       console.log('Connected: ' + frame)
       stompClient.subscribe(`/topic/auction/${id}`, (message) => {
         const bidResponse: Bid = JSON.parse(message.body)
-        console.log('New bid received:', bidResponse)
         setHighestBid(bidResponse)
-        // Cập nhật state với bid mới
-        // setBids((prevBids) => [...prevBids, bidResponse])
+        setIsBidUpdated(true)
+
+        if (bidResponse.bidderId !== userProfile?.id) {
+          toast.warn('New bid has been placed')
+        }
+
+        setTimeout(() => {
+          setIsBidUpdated(false)
+        }, 1000)
       })
     })
-    // Cleanup function to disconnect the WebSocket when the component unmounts
+
     return () => {
       stompClient.disconnect(() => {
         console.log('Disconnected')
       })
     }
-  }, [id])
+  }, [id, userProfile?.id])
 
   if (!auction) return null
   const previewImages = [auction.mainImage, ...auction.images]
@@ -133,7 +129,11 @@ function AuctionDetailsPage() {
               {auction.auctionType === 'ENGLISH' && (
                 <div className="flex items-center gap-2">
                   <span className="font-semibold">Current Bid:</span>
-                  <span className="text-red-500 font-bold">
+                  <span
+                    className={`font-bold text-xl ${
+                      isBidUpdated ? 'text-green-500' : 'text-red-500'
+                    }`}
+                  >
                     {formatPrice(
                       highestBid ? highestBid.amount : auction.startingPrice
                     )}
