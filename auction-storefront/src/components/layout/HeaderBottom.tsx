@@ -5,17 +5,40 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { selectCategory } from '../../features/category/category.slice'
 import { useEffect } from 'react'
 import { getListCategories } from '../../features/category/category.thunk'
-import { selectUser } from '../../features/user/user.slice'
 import { formatPrice } from '../../utils/format'
+import { selectWallet, setWallet } from '../../features/wallet/wallet.slice'
+import SockJS from 'sockjs-client'
+import { Stomp } from '@stomp/stompjs'
+import { Wallet } from '../../models/wallet.type'
 
 function HeaderBottom() {
   const dispatch = useAppDispatch()
   const { categories } = useAppSelector(selectCategory)
-  const { userProfile } = useAppSelector(selectUser)
+  const { wallet } = useAppSelector(selectWallet)
 
   useEffect(() => {
     dispatch(getListCategories())
   }, [dispatch])
+
+  useEffect(() => {
+    if (!wallet) return
+
+    const socket = new SockJS('http://localhost:8080/ws')
+    const stompClient = Stomp.over(socket)
+    stompClient.connect({}, () => {
+      stompClient.subscribe(`/topic/wallet/${wallet.id}`, (message) => {
+        const newWallet: Wallet = JSON.parse(message.body)
+        console.log('New wallet received:', newWallet)
+        dispatch(setWallet(newWallet))
+      })
+    })
+
+    return () => {
+      stompClient.disconnect(() => {
+        console.log('Disconnected')
+      })
+    }
+  }, [wallet, dispatch])
 
   return (
     <div className="border-y-2 shadow-sm py-2">
@@ -48,15 +71,15 @@ function HeaderBottom() {
               Search
             </button>
           </div>
-          {userProfile ? (
+          {wallet ? (
             <div className="hidden sm:flex items-center gap-2 bg-gray-100 rounded-xl p-2 shadow-md">
               <div className="flex items-center gap-2 w-[100px]">
                 <FaMoneyBillWave className="text-green-600" size={20} />
                 <span className="text-black text-sm font-semibold truncate">
-                  {formatPrice(userProfile.balance)}
+                  {formatPrice(wallet.balance)}
                 </span>
               </div>
-              <Link to="#">
+              <Link to="/wallet/deposit">
                 <FaPlusCircle
                   className="text-blue-600 bg-transparent overflow-hidden"
                   size={20}

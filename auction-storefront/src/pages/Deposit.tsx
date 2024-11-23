@@ -1,7 +1,6 @@
 import { useForm } from 'react-hook-form'
 import Button from '../components/ui/Button'
 import PaymentSelect from '../components/ui/PaymentSelect'
-import { selectUser } from '../features/user/user.slice'
 import { useAppSelector } from '../store/hooks'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { DepositPayload, depositSchema } from '../models/transaction.type'
@@ -10,9 +9,10 @@ import Input from '../components/ui/Input'
 import { depositAPI } from '../features/transaction/transaction.service'
 import { toast } from 'react-toastify'
 import { getErrorMessage } from '../utils/error.helper'
+import { selectWallet } from '../features/wallet/wallet.slice'
 
 function Deposit() {
-  const { userProfile } = useAppSelector(selectUser)
+  const { wallet } = useAppSelector(selectWallet)
   const {
     control,
     handleSubmit,
@@ -62,7 +62,7 @@ function Deposit() {
             </div>
             <div className="sm:w-[80%] sm:pl-5">
               <div className="pt-3 text-gray-700">
-                {formatPrice(userProfile?.balance || 0)}
+                {formatPrice(wallet?.balance || 0)}
               </div>
             </div>
           </div>

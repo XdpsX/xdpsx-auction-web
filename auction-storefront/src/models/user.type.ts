@@ -7,7 +7,6 @@ export type UserProfile = {
   avatarUrl: string | null
   mobileNumber: string | null
   address: string | null
-  balance: number
 }
 
 export const profileSchema = yup.object().shape({

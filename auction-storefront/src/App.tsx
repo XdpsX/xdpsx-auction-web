@@ -16,9 +16,14 @@ import ProtectedRoute from './components/route/ProtectedRoute'
 import Profile from './pages/Profile'
 import Deposit from './pages/Deposit'
 import PaymentRedirect from './pages/redirect/PaymentRedirect'
-import PaymentHandler from './pages/handler/PaymentSuccess'
+import PaymentHandler from './pages/handler/PaymentHandler'
 import AuctionDetailsPage from './pages/AuctionDetailsPage'
 import NotFoundPage from './pages/error/NotFoundPage'
+import {
+  getUserWallet,
+  selectWallet,
+  setWallet,
+} from './features/wallet/wallet.slice'
 
 const router = createBrowserRouter([
   {
@@ -111,21 +116,18 @@ function App() {
   const dispatch = useAppDispatch()
   const { accessToken } = useAppSelector(selectAuth)
   const { isFetching } = useAppSelector(selectUser)
-
-  useEffect(() => {
-    if (typeof global === 'undefined') {
-      window.global = window
-    }
-  }, [])
+  const { isLoading } = useAppSelector(selectWallet)
 
   useEffect(() => {
     if (accessToken) {
       dispatch(getUserProfile())
+      dispatch(getUserWallet())
     } else {
       dispatch(setUserProfile(null))
+      dispatch(setWallet(null))
     }
   }, [accessToken, dispatch])
-  if (isFetching) {
+  if (isFetching || isLoading) {
     return (
       <div className="relative h-screen">
         <LoadingOverlay />

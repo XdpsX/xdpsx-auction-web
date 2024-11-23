@@ -7,7 +7,8 @@ import Button from './Button'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { placeBid } from '../../features/bid/bid.slice'
 import { toast } from 'react-toastify'
-import { selectUser, subtractBalance } from '../../features/user/user.slice'
+import { selectUser } from '../../features/user/user.slice'
+import { useEffect } from 'react'
 
 function BidForm({
   auction,
@@ -20,11 +21,12 @@ function BidForm({
   const { userProfile } = useAppSelector(selectUser)
   const minAmount = highestBid
     ? highestBid.amount + auction.stepPrice
-    : auction.startingPrice
+    : auction.startingPrice + auction.stepPrice
   const {
     control,
     handleSubmit,
     setError,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(bidSchema),
@@ -33,12 +35,16 @@ function BidForm({
     },
   })
 
+  // Sử dụng useEffect để reset giá trị khi highestBid thay đổi
+  useEffect(() => {
+    reset({ amount: minAmount })
+  }, [highestBid, minAmount, reset])
+
   const onSubmit = (data: BidPayload) => {
     console.log(data)
     dispatch(placeBid({ auctionId: auction.id, payload: data }))
       .unwrap()
-      .then((data) => {
-        dispatch(subtractBalance(data.amount * 0.1))
+      .then(() => {
         toast.success('Bid successfully')
       })
       .catch((err) => {
@@ -55,6 +61,7 @@ function BidForm({
         }
       })
   }
+
   if (userProfile && userProfile.id === auction.seller.id) {
     return (
       <p className="text-lg font-bold">You can't bid on your own auction</p>
@@ -86,10 +93,7 @@ function BidForm({
         />
       </div>
       <div className="flex items-center gap-2">
-        <Button
-          // onClick={add_card}
-          className="px-8 py-2 uppercase bg-blue-500 text-white hover:bg-blue-600"
-        >
+        <Button className="px-8 py-2 uppercase bg-blue-500 text-white hover:bg-blue-600">
           Bid
         </Button>
       </div>

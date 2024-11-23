@@ -22,16 +22,6 @@ export const userSlice = createSlice({
     setUserProfile(state, action) {
       state.userProfile = action.payload
     },
-    addBalance(state, action) {
-      if (state.userProfile) {
-        state.userProfile.balance += action.payload
-      }
-    },
-    subtractBalance(state, action) {
-      if (state.userProfile) {
-        state.userProfile.balance -= action.payload
-      }
-    },
   },
   extraReducers: (builder) => {
     builder
@@ -63,4 +53,4 @@ export const userSlice = createSlice({
 const userReducer = userSlice.reducer
 export default userReducer
 export const selectUser = (state: RootState) => state.user
-export const { setUserProfile, addBalance, subtractBalance } = userSlice.actions
+export const { setUserProfile } = userSlice.actions

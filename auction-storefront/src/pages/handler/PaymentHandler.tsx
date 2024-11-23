@@ -2,8 +2,9 @@ import { useCallback, useEffect } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { depositCallbackAPI } from '../../features/transaction/transaction.service'
 import { useAppDispatch } from '../../store/hooks'
-import { addBalance } from '../../features/user/user.slice'
+
 import { toast } from 'react-toastify'
+import { addBalance } from '../../features/wallet/wallet.slice'
 
 function PaymentHandler() {
   const location = useLocation()
@@ -22,7 +23,7 @@ function PaymentHandler() {
       if (transaction.status === 'COMPLETED') {
         dispatch(addBalance(transaction.amount))
         navigate('/wallet/deposit')
-        toast.success('Payment completed successfully')
+        toast.success('Deposit successfully')
       } else {
         navigate('/wallet/deposit')
         toast.error(transaction.description)
