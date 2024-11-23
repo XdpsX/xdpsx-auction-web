@@ -10,4 +10,12 @@ export default defineConfig({
   css: {
     devSourcemap: true,
   },
+  optimizeDeps: {
+    esbuildOptions: {
+      // Node.js global to browser globalThis
+      define: {
+        global: 'globalThis',
+      },
+    },
+  },
 })

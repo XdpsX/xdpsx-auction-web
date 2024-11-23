@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm } from 'react-hook-form'
-import { BidPayload, bidSchema } from '../../models/bid.type'
+import { Bid, BidPayload, bidSchema } from '../../models/bid.type'
 import Input from './Input'
 import { AuctionDetails } from '../../models/auction.type'
 import Button from './Button'
@@ -9,11 +9,17 @@ import { placeBid } from '../../features/bid/bid.slice'
 import { toast } from 'react-toastify'
 import { selectUser, subtractBalance } from '../../features/user/user.slice'
 
-function BidForm({ auction }: { auction: AuctionDetails }) {
+function BidForm({
+  auction,
+  highestBid,
+}: {
+  auction: AuctionDetails
+  highestBid: Bid | null
+}) {
   const dispatch = useAppDispatch()
   const { userProfile } = useAppSelector(selectUser)
-  const minAmount = auction.highestBid
-    ? auction.highestBid.amount + auction.stepPrice
+  const minAmount = highestBid
+    ? highestBid.amount + auction.stepPrice
     : auction.startingPrice
   const {
     control,
@@ -32,7 +38,7 @@ function BidForm({ auction }: { auction: AuctionDetails }) {
     dispatch(placeBid({ auctionId: auction.id, payload: data }))
       .unwrap()
       .then((data) => {
-        dispatch(subtractBalance(data.amount))
+        dispatch(subtractBalance(data.amount * 0.1))
         toast.success('Bid successfully')
       })
       .catch((err) => {
@@ -55,7 +61,7 @@ function BidForm({ auction }: { auction: AuctionDetails }) {
     )
   }
 
-  if (userProfile && userProfile.id === auction.highestBid?.bidderId) {
+  if (userProfile && userProfile.id === highestBid?.bidderId) {
     return (
       <p className="text-lg font-semibold text-green-500">
         You are the highest bidder

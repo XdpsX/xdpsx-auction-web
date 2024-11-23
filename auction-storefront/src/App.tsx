@@ -113,6 +113,12 @@ function App() {
   const { isFetching } = useAppSelector(selectUser)
 
   useEffect(() => {
+    if (typeof global === 'undefined') {
+      window.global = window
+    }
+  }, [])
+
+  useEffect(() => {
     if (accessToken) {
       dispatch(getUserProfile())
     } else {

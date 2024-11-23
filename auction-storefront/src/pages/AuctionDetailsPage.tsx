@@ -12,12 +12,17 @@ import { useAppSelector } from '../store/hooks'
 import { selectAuth } from '../features/auth/auth.slice'
 import RichText from '../components/ui/RichText'
 import BidForm from '../components/ui/BidForm'
+import SockJS from 'sockjs-client'
+import { Stomp, type Frame } from '@stomp/stompjs'
+import { Bid } from '../models/bid.type'
+// import { Client } from '@stomp/stompjs'
 
 function AuctionDetailsPage() {
   const navigate = useNavigate()
   const { slug } = useParams()
   const id = useMemo(() => +getIdFromSlug(slug as string), [slug])
   const [auction, setAuction] = useState<AuctionDetails | null>(null)
+  const [highestBid, setHighestBid] = useState<Bid | null>(null)
   const [showImage, setShowImage] = useState('')
   const { accessToken } = useAppSelector(selectAuth)
   const isAuthenticated = !!accessToken
@@ -26,12 +31,47 @@ function AuctionDetailsPage() {
     fetchAuctionDetailsAPI(id)
       .then((data) => {
         setAuction(data)
+        setHighestBid(data.highestBid)
       })
       .catch((error) => {
         console.log(error)
         navigate('/not-found')
       })
   }, [id, navigate])
+
+  useEffect(() => {
+    // const client = new Client({
+    //   brokerURL: 'http://localhost:8080/ws',
+    //   onConnect: () => {
+    //     client.subscribe('/topic/auction/${id}', (message) =>
+    //       console.log(`Received: ${message.body}`)
+    //     )
+    //   },
+    // })
+    // client.activate()
+    // return () => {
+    //   client.deactivate()
+    // }
+
+    const socket = new SockJS('http://localhost:8080/ws') // Địa chỉ WebSocket
+    const stompClient = Stomp.over(socket)
+    stompClient.connect({}, (frame: Frame) => {
+      console.log('Connected: ' + frame)
+      stompClient.subscribe(`/topic/auction/${id}`, (message) => {
+        const bidResponse: Bid = JSON.parse(message.body)
+        console.log('New bid received:', bidResponse)
+        setHighestBid(bidResponse)
+        // Cập nhật state với bid mới
+        // setBids((prevBids) => [...prevBids, bidResponse])
+      })
+    })
+    // Cleanup function to disconnect the WebSocket when the component unmounts
+    return () => {
+      stompClient.disconnect(() => {
+        console.log('Disconnected')
+      })
+    }
+  }, [id])
 
   if (!auction) return null
   const previewImages = [auction.mainImage, ...auction.images]
@@ -95,9 +135,7 @@ function AuctionDetailsPage() {
                   <span className="font-semibold">Current Bid:</span>
                   <span className="text-red-500 font-bold">
                     {formatPrice(
-                      auction.highestBid
-                        ? auction.highestBid.amount
-                        : auction.startingPrice
+                      highestBid ? highestBid.amount : auction.startingPrice
                     )}
                   </span>
                 </div>
@@ -113,7 +151,7 @@ function AuctionDetailsPage() {
               Login to bid
             </Link>
           ) : (
-            <BidForm auction={auction} />
+            <BidForm auction={auction} highestBid={highestBid} />
           )}
         </div>
       </div>
