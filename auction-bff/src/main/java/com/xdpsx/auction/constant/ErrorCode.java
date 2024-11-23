@@ -12,6 +12,7 @@ public class ErrorCode {
     public static final String NAME_DUPLICATED="NAME_DUPLICATED";
     public static final String SLUG_DUPLICATED="SLUG_DUPLICATED";
     public static final String EMAIL_DUPLICATED="EMAIL_DUPLICATED";
+    public static final String BID_NOT_FOUND="BID_NOT_FOUND";
 
     public static final String CATEGORY_IN_USE="CATEGORY_IN_USE";
     public static final String EMAIL_VALIDATED="EMAIL_VALIDATED";

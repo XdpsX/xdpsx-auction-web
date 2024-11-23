@@ -16,13 +16,20 @@ import com.xdpsx.auction.repository.WalletRepository;
 import com.xdpsx.auction.security.CustomUserDetails;
 import com.xdpsx.auction.security.UserContext;
 import com.xdpsx.auction.service.BidService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BidServiceImpl implements BidService {
@@ -32,8 +39,18 @@ public class BidServiceImpl implements BidService {
     private final AuctionRepository auctionRepository;
     private final WalletRepository walletRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
 
-    @Transactional
+    @PostConstruct
+    public void createConsumerGroup() {
+        try {
+            redisTemplate.opsForStream().createGroup("refundStream", "refundGroup");
+        } catch (Exception e) {
+            log.info("Consumer group already exists: {}", e.getMessage());
+        }
+    }
+
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public BidResponse placeBid(Long auctionId, BidRequest bidRequest) {
         CustomUserDetails userDetails = userContext.getLoggedUser();
@@ -85,6 +102,15 @@ public class BidServiceImpl implements BidService {
 
         messagingTemplate.convertAndSend("/topic/wallet/" + savedWallet.getId(), walletMapper.toWalletDto(savedWallet));
         messagingTemplate.convertAndSend("/topic/auction/" + auction.getId(), bidResponse);
+        if (highestBid != null) {
+            publishRefundBid(highestBid.getId());
+        }
         return bidResponse;
+    }
+
+    public void publishRefundBid(Long bidId) {
+        Map<String, String> message = new HashMap<>();
+        message.put("bidId", String.valueOf(bidId));
+        redisTemplate.opsForStream().add("refundStream", message);
     }
 }

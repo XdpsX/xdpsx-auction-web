@@ -26,6 +26,8 @@ public class Bid {
 
     private boolean isWinner;
 
+    private boolean isRefund;
+
     @ManyToOne
     private User bidder;
 
