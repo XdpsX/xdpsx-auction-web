@@ -12,16 +12,15 @@ public record UserProfile (
         String email,
         String avatarUrl,
         String mobileNumber,
-        String address,
-        BigDecimal balance
+        String address
 ) {
     public static UserProfile fromCustomUser(CustomUserDetails user) {
         return new UserProfile(user.getId(), user.getName(), user.getEmail(), user.getAvatarUrl(),
-                user.getMobileNumber(), user.getAddress(), user.getWallet().getBalance());
+                user.getMobileNumber(), user.getAddress());
     }
 
     public static UserProfile fromUser(User user) {
         return new UserProfile(user.getId(), user.getName(), user.getEmail(), user.getAvatarUrl(),
-                user.getMobileNumber(), user.getAddress(), user.getWallet().getBalance());
+                user.getMobileNumber(), user.getAddress());
     }
 }

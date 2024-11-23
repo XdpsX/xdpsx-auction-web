@@ -20,7 +20,7 @@ public class Wallet {
 
     private BigDecimal balance;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     private User owner;
 
     @OneToMany(mappedBy = "wallet")

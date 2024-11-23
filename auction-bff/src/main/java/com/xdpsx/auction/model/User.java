@@ -53,7 +53,7 @@ public class User extends AbstractAuditEntity {
     @OneToMany
     private List<Auction> auctions;
 
-    @OneToOne(mappedBy = "owner", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToOne(mappedBy = "owner", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     private Wallet wallet;
 
     @OneToMany

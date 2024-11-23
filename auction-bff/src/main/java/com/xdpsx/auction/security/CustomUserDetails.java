@@ -32,7 +32,6 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
     private AuthProvider provider;
     private Set<Role> roles;
     private Map<String, Object> attributes;
-    private Wallet wallet;
 
     public static CustomUserDetails fromUser(User user) {
         return CustomUserDetails.builder()
@@ -47,7 +46,6 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
                 .locked(user.isLocked())
                 .provider(user.getProvider())
                 .roles(user.getRoles())
-                .wallet(user.getWallet())
                 .build();
     }
 

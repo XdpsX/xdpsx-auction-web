@@ -5,6 +5,7 @@ import com.xdpsx.auction.dto.bid.BidRequest;
 import com.xdpsx.auction.dto.bid.BidResponse;
 import com.xdpsx.auction.exception.BadRequestException;
 import com.xdpsx.auction.exception.NotFoundException;
+import com.xdpsx.auction.mapper.WalletMapper;
 import com.xdpsx.auction.model.Auction;
 import com.xdpsx.auction.model.Bid;
 import com.xdpsx.auction.model.User;
@@ -26,6 +27,7 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 public class BidServiceImpl implements BidService {
     private final UserContext userContext;
+    private final WalletMapper walletMapper;
     private final BidRepository bidRepository;
     private final AuctionRepository auctionRepository;
     private final WalletRepository walletRepository;
@@ -61,7 +63,7 @@ public class BidServiceImpl implements BidService {
         }
         BigDecimal newBalance = wallet.getBalance().subtract(securityDeposit);
         wallet.setBalance(newBalance);
-        walletRepository.save(wallet);
+        Wallet savedWallet = walletRepository.save(wallet);
 
         User bidder = User.builder()
                 .id(userDetails.getId())
@@ -80,6 +82,8 @@ public class BidServiceImpl implements BidService {
                 .bidderId(savedBid.getBidder().getId())
                 .auctionId(savedBid.getAuction().getId())
                 .build();
+
+        messagingTemplate.convertAndSend("/topic/wallet/" + savedWallet.getId(), walletMapper.toWalletDto(savedWallet));
         messagingTemplate.convertAndSend("/topic/auction/" + auction.getId(), bidResponse);
         return bidResponse;
     }
