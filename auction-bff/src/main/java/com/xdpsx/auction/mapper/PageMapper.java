@@ -4,8 +4,10 @@ import com.xdpsx.auction.dto.PageResponse;
 import com.xdpsx.auction.dto.auction.AuctionDto;
 import com.xdpsx.auction.dto.auction.AuctionResponse;
 import com.xdpsx.auction.dto.category.CategoryDetailsDto;
+import com.xdpsx.auction.dto.notification.NotificationDto;
 import com.xdpsx.auction.model.Auction;
 import com.xdpsx.auction.model.Category;
+import com.xdpsx.auction.model.Notification;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +29,10 @@ public class PageMapper {
     public PageResponse<AuctionResponse> toPageAuctionResponse(Page<Auction> auctionPage,
                                                      Function<Auction, AuctionResponse> mapper){
         return toPageResponse(auctionPage, mapper);
+    }
+    public PageResponse<NotificationDto> toPageNotificationResponse(Page<Notification> page,
+                                                               Function<Notification, NotificationDto> mapper){
+        return toPageResponse(page, mapper);
     }
 
     private <T, R> PageResponse<R> toPageResponse(Page<T> page, Function<T, R> mapper) {

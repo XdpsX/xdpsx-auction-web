@@ -3,7 +3,6 @@ package com.xdpsx.auction.model;
 import com.xdpsx.auction.model.enums.AuthProvider;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
 import java.util.Set;
@@ -58,6 +57,9 @@ public class User extends AbstractAuditEntity {
 
     @OneToMany
     private List<Bid> bids;
+
+    @OneToMany
+    private List<Notification> notifications;
 
     public String getAvatarUrl(){
         if (avatar == null){

@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: 12
+      author: XdpsX
+      comment: 'Add notifications table'
+      changes:
+        - sqlFile:
+            path: db/changelog/sql/changelog-0012.sql
