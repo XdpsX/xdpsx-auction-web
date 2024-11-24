@@ -17,7 +17,7 @@ export const Status = memo(
     const statusColor = statusColorMap[status]
     if (content) {
       return (
-        <Popover renderPopover={content}>
+        <Popover renderPopover={content} placement="bottom">
           <div
             ref={forwardedRef}
             className={`flex w-fit items-center gap-[2px] border border-gray-200 rounded-md bg-gray-50 shadow-sm px-2 py-1 ${className}`}

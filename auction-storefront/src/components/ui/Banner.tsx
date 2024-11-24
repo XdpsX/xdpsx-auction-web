@@ -20,7 +20,7 @@ function Banner() {
     },
   }
   return (
-    <div className="w-full flex md:gap-8 ">
+    <div className="container-lg mx-auto w-full flex md:gap-8">
       <div className="w-full">
         <Carousel
           autoPlay={true}

@@ -18,19 +18,27 @@ function AuctionDate({
     const hoursLeft = Math.floor(
       (timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
     )
-    return { daysLeft, hoursLeft }
+    const minutesLeft = Math.floor(
+      (timeDifference % (1000 * 60 * 60)) / (1000 * 60)
+    )
+    return { daysLeft, hoursLeft, minutesLeft }
   }
 
   const renderContent = (
     daysLeft: number,
     hoursLeft: number,
+    minutesLeft: number,
     timeLabel: string,
     time: string,
     labelClassName: string = ''
   ) => (
     <div className="bg-gray-100 shadow-sm px-2 py-2">
       <p className={labelClassName}>
-        {daysLeft > 0 ? `${daysLeft} days left` : `${hoursLeft} hours left`}{' '}
+        {daysLeft > 0
+          ? `${daysLeft} days left`
+          : hoursLeft > 0
+          ? `${hoursLeft} hours left`
+          : `${minutesLeft > 0 ? minutesLeft : 1} minutes left`}{' '}
         {timeLabel}
       </p>
       <p>
@@ -42,29 +50,33 @@ function AuctionDate({
   )
 
   if (now < startingTime) {
-    const { daysLeft, hoursLeft } = getTimeLeft(startingTime)
+    const { daysLeft, hoursLeft, minutesLeft } = getTimeLeft(startingTime)
     const content = renderContent(
       daysLeft,
       hoursLeft,
+      minutesLeft,
       'until auction starts',
       startingDate,
       'text-slate-600'
     )
     return <Status status="Upcoming" content={content} />
-  } else if (endingTime.getTime() - now.getTime() < 24 * 60 * 60 * 1000) {
-    const { hoursLeft } = getTimeLeft(endingTime)
+  } else if (endingTime.getTime() - now.getTime() < 60 * 60 * 1000) {
+    const { minutesLeft } = getTimeLeft(endingTime)
     const content = (
       <div className="bg-gray-100 shadow-sm px-2 py-2">
-        <p className="font-semibold text-red-500">{hoursLeft} hours left</p>
+        <p className="font-semibold text-red-500">
+          {minutesLeft > 0 ? minutesLeft : 1} minutes left
+        </p>
         <p>Ending time: {formatDateTime(endingDate)}</p>
       </div>
     )
     return <Status status="Ending soon" content={content} />
   } else {
-    const { daysLeft, hoursLeft } = getTimeLeft(endingTime)
+    const { daysLeft, hoursLeft, minutesLeft } = getTimeLeft(endingTime)
     const content = renderContent(
       daysLeft,
       hoursLeft,
+      minutesLeft,
       'until auction ends',
       endingDate,
       'text-green-500'

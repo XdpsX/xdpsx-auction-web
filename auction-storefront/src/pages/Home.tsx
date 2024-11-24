@@ -2,7 +2,7 @@ import { useAppSelector } from '../store/hooks'
 import { selectCategory } from '../features/category/category.slice'
 import DropDown from '../components/ui/DropDown'
 import { Link } from 'react-router-dom'
-import Banner from '../components/home/Banner'
+import Banner from '../components/ui/Banner'
 import AuctionList from '../components/auction/AuctionList'
 import { useEffect, useMemo, useState } from 'react'
 import { Auction } from '../models/auction.type'
@@ -29,8 +29,8 @@ function Home() {
 
   return (
     <div>
-      <div className="container-lg mx-auto">
-        <div className="flex items-center justify-center md:gap-12 lg:gap-20">
+      <div className="mx-auto bg-gray-50 pb-2">
+        <div className="flex items-center justify-center md:gap-12 lg:gap-20 border-b-2 border-gray-200">
           <div className="w-full md:w-auto px-12 md:px-0">
             <DropDown
               renderDropDown={

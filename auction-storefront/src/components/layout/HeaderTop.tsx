@@ -4,7 +4,6 @@ import {
   FaTwitter,
   FaLinkedin,
   FaEnvelope,
-  FaBell,
   FaQuestionCircle,
   FaArrowRight,
   FaBars,
@@ -17,6 +16,7 @@ import Popover from '../ui/Popover'
 import { logoutAPI } from '../../features/auth/auth.thunk'
 import { toast } from 'react-toastify'
 import { googleLogout } from '@react-oauth/google'
+import Notification from '../ui/Notifications'
 
 function HeaderTop({
   setShowSidebar,
@@ -87,16 +87,13 @@ function HeaderTop({
           </div>
         </nav>
         <div className="ml-auto flex items-center gap-6">
-          <div className="divider-next">
+          <div className="flex items-center gap-4">
             <Link to="#" className="font-medium text-slate-700">
-              <FaQuestionCircle size={18} />
+              <FaQuestionCircle size={20} />
             </Link>
+            {userProfile && <Notification />}
           </div>
-          <div className="divider-next flex items-center">
-            <button className="font-medium text-slate-700">
-              <FaBell size={18} />
-            </button>
-          </div>
+
           {!userProfile ? (
             <Link
               to="/login"
@@ -113,13 +110,13 @@ function HeaderTop({
                   <div className="relative rounded-sm border border-gray-200 bg-white shadow-md min-w-[150px]">
                     <Link
                       to="/user/profile"
-                      className="block w-full bg-white px-4 py-3 text-left hover:bg-slate-100 hover:text-yellow-500"
+                      className="block w-full bg-white px-4 py-3 text-left hover:bg-slate-100 hover:text-blue-500"
                     >
                       Profile
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="block w-full bg-white px-4 py-3 text-left hover:bg-slate-100 hover:text-yellow-500"
+                      className="block w-full bg-white px-4 py-3 text-left hover:bg-slate-100 hover:text-blue-500"
                     >
                       Logout
                     </button>
@@ -133,7 +130,7 @@ function HeaderTop({
                   <img
                     src={userProfile.avatarUrl || USER_ICON}
                     alt="avatar"
-                    className="h-6 w-6 rounded-full object-cover"
+                    className="h-8 w-8 rounded-full object-cover"
                   />
                   <p className="max-w-[100px] truncate">{userProfile.name}</p>
                   <FaAngleDown />

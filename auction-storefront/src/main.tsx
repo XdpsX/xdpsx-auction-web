@@ -14,7 +14,7 @@ createRoot(document.getElementById('root')!).render(
   <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
     <Provider store={store}>
       <App />
-      <ToastContainer position="top-right" autoClose={2000} />
+      <ToastContainer position="top-right" autoClose={1200} />
     </Provider>
   </GoogleOAuthProvider>
   // </StrictMode>

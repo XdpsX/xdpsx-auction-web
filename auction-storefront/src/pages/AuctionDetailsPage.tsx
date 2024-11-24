@@ -13,7 +13,7 @@ import { selectAuth } from '../features/auth/auth.slice'
 import RichText from '../components/ui/RichText'
 import BidForm from '../components/ui/BidForm'
 import SockJS from 'sockjs-client'
-import { Stomp, type Frame } from '@stomp/stompjs'
+import { Stomp } from '@stomp/stompjs'
 import { Bid } from '../models/bid.type'
 import { selectUser } from '../features/user/user.slice'
 import { toast } from 'react-toastify'
@@ -45,8 +45,7 @@ function AuctionDetailsPage() {
   useEffect(() => {
     const socket = new SockJS('http://localhost:8080/ws')
     const stompClient = Stomp.over(socket)
-    stompClient.connect({}, (frame: Frame) => {
-      console.log('Connected: ' + frame)
+    stompClient.connect({}, () => {
       stompClient.subscribe(`/topic/auction/${id}`, (message) => {
         const bidResponse: Bid = JSON.parse(message.body)
         setHighestBid(bidResponse)
@@ -60,6 +59,14 @@ function AuctionDetailsPage() {
           setIsBidUpdated(false)
         }, 1000)
       })
+
+      stompClient.subscribe(`/topic/auction/${id}/end`, (message) => {
+        const isEnd: boolean = JSON.parse(message.body)
+        if (isEnd) {
+          navigate('/')
+          toast.warn('Auction has ended')
+        }
+      })
     })
 
     return () => {
@@ -67,7 +74,7 @@ function AuctionDetailsPage() {
         console.log('Disconnected')
       })
     }
-  }, [id, userProfile?.id])
+  }, [id, navigate, userProfile?.id])
 
   if (!auction) return null
   const previewImages = [auction.mainImage, ...auction.images]
