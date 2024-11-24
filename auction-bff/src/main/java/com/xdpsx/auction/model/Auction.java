@@ -40,6 +40,8 @@ public class Auction extends AbstractAuditEntity{
 
     private boolean trashed;
 
+    private boolean isEnd;
+
     @OneToOne
     @JoinColumn(name = "main_image_id")
     private Media mainImage;

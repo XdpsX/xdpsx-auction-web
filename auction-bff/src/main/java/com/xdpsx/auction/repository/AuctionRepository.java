@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface AuctionRepository extends JpaRepository<Auction, Long>,
@@ -29,4 +30,9 @@ public interface AuctionRepository extends JpaRepository<Auction, Long>,
             "AND a.startingTime < CURRENT_TIMESTAMP " +
             "AND a.endingTime > CURRENT_TIMESTAMP")
     Optional<Auction> findLiveAuction(@Param("id") Long id);
+
+    @Query("SELECT a FROM Auction a " +
+            "WHERE a.isEnd = false " +
+            "AND a.endingTime < CURRENT_TIMESTAMP")
+    List<Auction> findEndingAuction();
 }
