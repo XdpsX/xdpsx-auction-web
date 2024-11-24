@@ -57,6 +57,25 @@ public class NotificationServiceImpl implements NotificationService {
         return pageMapper.toPageNotificationResponse(notificationPage, this::maptoNotificationDto);
     }
 
+    @Override
+    public long countUnreadNotifications(Long userId) {
+        return notificationRepository.countUnreadNotification(userId);
+    }
+
+    @Override
+    public void markAsRead(Long id) {
+        Notification notification = notificationRepository.findById(id).orElse(null);
+        if (notification != null) {
+            notification.setRead(true);
+            notificationRepository.save(notification);
+        }
+    }
+
+    @Override
+    public void markAsReadAll(Long userId) {
+        notificationRepository.markAllAsRead(userId);
+    }
+
     private NotificationDto maptoNotificationDto(Notification notification) {
         return NotificationDto.builder()
                 .id(notification.getId())

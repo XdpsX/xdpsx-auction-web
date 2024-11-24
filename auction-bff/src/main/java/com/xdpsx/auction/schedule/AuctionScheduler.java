@@ -9,6 +9,7 @@ import com.xdpsx.auction.repository.BidRepository;
 import com.xdpsx.auction.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ public class AuctionScheduler {
     private final NotificationService notificationService;
     private final AuctionRepository auctionRepository;
     private final BidRepository bidRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Scheduled(fixedRate = 60000)
 //    @Scheduled(cron = "0 * * * * ?")
@@ -31,6 +33,8 @@ public class AuctionScheduler {
         List<Auction> endedAuctions = auctionRepository.findEndingAuction();
 
         for (Auction auction : endedAuctions) {
+            messagingTemplate.convertAndSend("/topic/auction/" + auction.getId() + "/end", true);
+
             Bid highestBid =  bidRepository.findHighestBidByAuctionId(auction.getId()).orElse(null);
             if (highestBid != null) {
                 highestBid.setWinner(true);
