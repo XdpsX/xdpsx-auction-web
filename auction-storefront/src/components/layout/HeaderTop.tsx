@@ -16,7 +16,7 @@ import Popover from '../ui/Popover'
 
 import { toast } from 'react-toastify'
 import { googleLogout } from '@react-oauth/google'
-import Notification from '../ui/Notifications'
+import Notification from '../notification/Notifications'
 import { logoutAsync } from '../../features/auth/slice'
 
 function HeaderTop({

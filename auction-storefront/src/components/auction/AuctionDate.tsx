@@ -1,5 +1,5 @@
 import { formatDateTime } from '../../utils/format'
-import { Status } from './Status'
+import { Status } from '../ui/Status'
 
 function AuctionDate({
   endingDate,

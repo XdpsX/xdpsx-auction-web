@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom'
 import { formatPrice, generateSlug } from '../../utils/format'
 import { Auction } from '../../models/auction.type'
 import DEFAULT_AVATAR from '../../assets/default-user-icon.png'
-import AuctionType from '../ui/AuctionType'
-import AuctionDate from '../ui/AuctionDate'
+import AuctionType from './AuctionType'
+import AuctionDate from './AuctionDate'
 
 function AuctionCard({ auction }: { auction: Auction }) {
   const auctionSlug = useMemo(

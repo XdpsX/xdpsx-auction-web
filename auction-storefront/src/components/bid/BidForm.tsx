@@ -1,15 +1,16 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm } from 'react-hook-form'
 import { Bid, BidPayload, bidSchema } from '../../models/bid.type'
-import Input from './Input'
+import Input from '../ui/Input'
 import { AuctionDetails } from '../../models/auction.type'
-import Button from './Button'
+import Button from '../ui/Button'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 
 import { toast } from 'react-toastify'
 import { selectUser } from '../../features/user/user.slice'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { placeBidAsync } from '../../features/bid/slice'
+import BidAttention from './BidAttention'
 
 function BidForm({
   auction,
@@ -20,6 +21,13 @@ function BidForm({
 }) {
   const dispatch = useAppDispatch()
   const { userProfile } = useAppSelector(selectUser)
+
+  const [showBidAttention, setShowBidAttention] = useState(
+    localStorage.getItem('show-bid-attention') !== 'false'
+  )
+  const [showAttentionAgain, setShowAttentionAgain] = useState(true)
+  const [openAttention, setOpenAttention] = useState(false)
+
   const minAmount = highestBid
     ? highestBid.amount + auction.stepPrice
     : auction.startingPrice + auction.stepPrice
@@ -63,6 +71,14 @@ function BidForm({
   }
 
   const onSubmit = (data: BidPayload) => {
+    if (!showAttentionAgain) {
+      setShowBidAttention(false)
+      localStorage.setItem('show-bid-attention', 'false')
+    }
+    if (openAttention) {
+      setOpenAttention(false)
+    }
+
     dispatch(placeBidAsync({ auctionId: auction.id, payload: data }))
       .unwrap()
       .then(() => {
@@ -83,6 +99,11 @@ function BidForm({
       })
   }
 
+  const handleCloseModal = () => {
+    setOpenAttention(false)
+    setShowAttentionAgain(true)
+  }
+
   if (userProfile && userProfile.id === auction.seller.id) {
     return (
       <p className="text-lg font-bold">You can't bid on your own auction</p>
@@ -98,41 +119,61 @@ function BidForm({
   }
 
   return (
-    <form className="flex flex-col gap-6" onSubmit={handleSubmit(onSubmit)}>
-      <div className="flex flex-col gap-4">
-        <label htmlFor="amount">Enter your bid:</label>
-        <div className={`flex items-center gap-4 ${errors.amount && 'mb-5'}`}>
-          <button
-            type="button"
-            onClick={decreaseAmount}
-            className="w-10 h-10 rounded-full text-lg cursor-pointer border border-blue-500 text-blue-500 font-bold"
-          >
-            -
-          </button>
-          <Input
-            control={control}
-            id="amount"
-            name="amount"
-            type="number"
-            placeholder="Enter bid amount"
-            error={errors.amount}
-            classNameInput="ring-blue-500 focus:outline-blue-500"
-          />
-          <button
-            type="button"
-            onClick={increaseAmount}
-            className="w-10 h-10 rounded-full text-lg cursor-pointer border border-blue-500 text-blue-500 font-bold"
-          >
-            +
-          </button>
+    <>
+      <BidAttention
+        open={openAttention}
+        onClose={handleCloseModal}
+        showAttentionAgain={showAttentionAgain}
+        setShowAttentionAgain={setShowAttentionAgain}
+        onSubmit={handleSubmit(onSubmit)}
+      />
+      <form
+        className="flex flex-col gap-6"
+        onSubmit={(e) => {
+          e.preventDefault()
+          if (showBidAttention) {
+            setOpenAttention(true)
+          } else {
+            handleSubmit(onSubmit)()
+          }
+        }}
+      >
+        <div className="flex flex-col gap-4">
+          <label htmlFor="amount">Enter your bid:</label>
+
+          <div className={`flex items-center gap-4 ${errors.amount && 'mb-5'}`}>
+            <button
+              type="button"
+              onClick={decreaseAmount}
+              className="w-10 h-10 rounded-full text-lg cursor-pointer border border-blue-500 text-blue-500 font-bold"
+            >
+              -
+            </button>
+            <Input
+              control={control}
+              id="amount"
+              name="amount"
+              type="number"
+              placeholder="Enter bid amount"
+              error={errors.amount}
+              classNameInput="ring-blue-500 focus:outline-blue-500"
+            />
+            <button
+              type="button"
+              onClick={increaseAmount}
+              className="w-10 h-10 rounded-full text-lg cursor-pointer border border-blue-500 text-blue-500 font-bold"
+            >
+              +
+            </button>
+          </div>
         </div>
-      </div>
-      <div className="flex items-center gap-2">
-        <Button className="px-8 py-2 uppercase bg-blue-500 text-white hover:bg-blue-600">
-          Bid
-        </Button>
-      </div>
-    </form>
+        <div className="flex items-center gap-2">
+          <Button className="px-8 py-2 uppercase bg-blue-500 text-white hover:bg-blue-600">
+            Bid
+          </Button>
+        </div>
+      </form>
+    </>
   )
 }
 export default BidForm

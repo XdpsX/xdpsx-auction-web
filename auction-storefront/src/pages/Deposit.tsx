@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form'
 import Button from '../components/ui/Button'
-import PaymentSelect from '../components/ui/PaymentSelect'
+import PaymentSelect from '../components/payment/PaymentSelect'
 import { useAppSelector } from '../store/hooks'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { DepositPayload, depositSchema } from '../models/transaction.type'

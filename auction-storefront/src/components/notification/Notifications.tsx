@@ -1,4 +1,4 @@
-import Popover from './Popover'
+import Popover from '../ui/Popover'
 import { FaBell } from 'react-icons/fa'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { useEffect } from 'react'
