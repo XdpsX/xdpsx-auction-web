@@ -1,5 +1,7 @@
 package com.xdpsx.auction.model;
 
+import com.xdpsx.auction.model.enums.BidPaymentStatus;
+import com.xdpsx.auction.model.enums.BidStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -24,9 +26,9 @@ public class Bid {
     @CreationTimestamp
     private ZonedDateTime bidTime;
 
-    private boolean isWinner;
+    private BidStatus status;
 
-    private boolean isRefund;
+    private BidPaymentStatus paymentStatus;
 
     @ManyToOne
     private User bidder;

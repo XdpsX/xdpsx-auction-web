@@ -10,6 +10,8 @@ import com.xdpsx.auction.model.Auction;
 import com.xdpsx.auction.model.Bid;
 import com.xdpsx.auction.model.User;
 import com.xdpsx.auction.model.Wallet;
+import com.xdpsx.auction.model.enums.BidPaymentStatus;
+import com.xdpsx.auction.model.enums.BidStatus;
 import com.xdpsx.auction.repository.AuctionRepository;
 import com.xdpsx.auction.repository.BidRepository;
 import com.xdpsx.auction.repository.WalletRepository;
@@ -89,7 +91,8 @@ public class BidServiceImpl implements BidService {
                 .amount(bidRequest.getAmount())
                 .bidder(bidder)
                 .auction(auction)
-                .isWinner(false)
+                .status(BidStatus.ACTIVE)
+                .paymentStatus(BidPaymentStatus.DEPOSIT)
                 .build();
         Bid savedBid = bidRepository.save(bid);
         BidResponse bidResponse = BidResponse.builder()

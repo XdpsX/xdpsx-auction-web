@@ -3,6 +3,7 @@ package com.xdpsx.auction.schedule;
 import com.xdpsx.auction.dto.notification.NotificationRequest;
 import com.xdpsx.auction.model.Auction;
 import com.xdpsx.auction.model.Bid;
+import com.xdpsx.auction.model.enums.BidStatus;
 import com.xdpsx.auction.model.enums.NotificationType;
 import com.xdpsx.auction.repository.AuctionRepository;
 import com.xdpsx.auction.repository.BidRepository;
@@ -37,7 +38,7 @@ public class AuctionScheduler {
 
             Bid highestBid =  bidRepository.findHighestBidByAuctionId(auction.getId()).orElse(null);
             if (highestBid != null) {
-                highestBid.setWinner(true);
+                highestBid.setStatus(BidStatus.WON);
                 bidRepository.save(highestBid);
 
                 NotificationRequest winnerNotification = NotificationRequest.builder()

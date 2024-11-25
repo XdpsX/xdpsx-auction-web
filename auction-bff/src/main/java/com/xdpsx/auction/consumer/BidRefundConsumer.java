@@ -5,6 +5,8 @@ import com.xdpsx.auction.exception.NotFoundException;
 import com.xdpsx.auction.mapper.WalletMapper;
 import com.xdpsx.auction.model.Bid;
 import com.xdpsx.auction.model.Wallet;
+import com.xdpsx.auction.model.enums.BidPaymentStatus;
+import com.xdpsx.auction.model.enums.BidStatus;
 import com.xdpsx.auction.repository.BidRepository;
 import com.xdpsx.auction.repository.WalletRepository;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +43,8 @@ public class BidRefundConsumer {
         wallet.setBalance(wallet.getBalance().add(securityDeposit));
         Wallet savedWallet = walletRepository.save(wallet);
 
-        bid.setRefund(true);
+        bid.setStatus(BidStatus.LOST);
+        bid.setPaymentStatus(BidPaymentStatus.REFUND);
         bidRepository.save(bid);
 
          messagingTemplate.convertAndSend("/topic/wallet/" + wallet.getId(), walletMapper.toWalletDto(savedWallet));
