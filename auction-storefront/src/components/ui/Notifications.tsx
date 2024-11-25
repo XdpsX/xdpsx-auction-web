@@ -4,9 +4,9 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { useEffect } from 'react'
 import {
   addNotification,
-  fetchUserNotificaitons,
+  fetchUserNotificaitonsAsync,
   selectNotification,
-} from '../../features/notification/notification.slice'
+} from '../../features/notification/slice'
 import { useSelector } from 'react-redux'
 import { Notification } from '../../models/notification.type'
 import SockJS from 'sockjs-client'
@@ -20,7 +20,7 @@ function Notifications() {
   const { userProfile } = useAppSelector(selectUser)
 
   useEffect(() => {
-    dispatch(fetchUserNotificaitons())
+    dispatch(fetchUserNotificaitonsAsync())
   }, [dispatch])
 
   useEffect(() => {

@@ -4,7 +4,7 @@ import categoryReducer from '../features/category/slice'
 import userReducer from '../features/user/user.slice'
 import bidReducer from '../features/bid/slice'
 import walletReducer from '../features/wallet/wallet.slice'
-import notificationReducer from '../features/notification/notification.slice'
+import notificationReducer from '../features/notification/slice'
 
 const store = configureStore({
   reducer: {

@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom'
 import { BsCheck2 } from 'react-icons/bs'
-import { markNotificaitonAsRead } from '../../features/notification/notification.slice'
 import { Page } from '../../models/page.type'
 import { formatNotificationDate } from '../../utils/format'
 import { useAppDispatch } from '../../store/hooks'
 import { Notification } from '../../models/notification.type'
+import { markNotificaitonAsReadAsync } from '../../features/notification/slice'
 
 function NotificationContent({
   notifications,
@@ -14,7 +14,7 @@ function NotificationContent({
   const dispatch = useAppDispatch()
 
   const handleMarkAsRead = (id: number) => {
-    dispatch(markNotificaitonAsRead(id))
+    dispatch(markNotificaitonAsReadAsync(id))
   }
 
   const handleMarkAllAsRead = () => {
@@ -24,7 +24,7 @@ function NotificationContent({
         .map((noti) => noti.id)
       if (unreadIds.length > 0) {
         unreadIds.forEach((id) => {
-          dispatch(markNotificaitonAsRead(id))
+          dispatch(markNotificaitonAsReadAsync(id))
         })
       }
     }

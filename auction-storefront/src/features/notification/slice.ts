@@ -1,24 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { Notification } from '../../models/notification.type'
 import { RootState } from '../../store/type'
-import api from '../../utils/api'
 import { Page } from '../../models/page.type'
-
-export const fetchUserNotificaitons = createAsyncThunk(
-  'notification/fetchUserNotificaitons',
-  async () => {
-    const response = await api.get(`/storefront/notifications`)
-    return response.data
-  }
-)
-
-export const markNotificaitonAsRead = createAsyncThunk(
-  'notification/markNotificaitonAsRead',
-  async (notificationId: number) => {
-    await api.put(`/storefront/notifications/${notificationId}/read`)
-    return notificationId
-  }
-)
+import { fetchUserNotificaitonsAPI, markNotificaitonAsReadAPI } from './service'
 
 export interface NotificationState {
   notifications: Page<Notification> | null
@@ -48,11 +32,11 @@ export const notificationSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchUserNotificaitons.fulfilled, (state, action) => {
+      .addCase(fetchUserNotificaitonsAsync.fulfilled, (state, action) => {
         state.notifications = action.payload.notifications
         state.unreadCount = action.payload.unreadCount
       })
-      .addCase(markNotificaitonAsRead.fulfilled, (state, action) => {
+      .addCase(markNotificaitonAsReadAsync.fulfilled, (state, action) => {
         const notification = state.notifications?.items.find(
           (n) => n.id === action.payload
         )
@@ -68,3 +52,19 @@ const notificationReducer = notificationSlice.reducer
 export default notificationReducer
 export const selectNotification = (state: RootState) => state.notification
 export const { addNotification } = notificationSlice.actions
+
+export const fetchUserNotificaitonsAsync = createAsyncThunk(
+  'notification/fetchUserNotificaitonsAsync',
+  async () => {
+    const data = await fetchUserNotificaitonsAPI()
+    return data
+  }
+)
+
+export const markNotificaitonAsReadAsync = createAsyncThunk(
+  'notification/markNotificaitonAsReadAsync',
+  async (notificationId: number) => {
+    await markNotificaitonAsReadAPI(notificationId)
+    return notificationId
+  }
+)
