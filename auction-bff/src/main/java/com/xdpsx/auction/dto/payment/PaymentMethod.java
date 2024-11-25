@@ -1,4 +1,4 @@
-package com.xdpsx.auction.model.enums;
+package com.xdpsx.auction.dto.payment;
 
 public enum PaymentMethod {
     VNPAY

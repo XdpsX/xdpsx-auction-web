@@ -83,17 +83,18 @@ public class OTPServiceImpl implements OTPService {
     }
 
     private String genOTPAndSave(String email){
-        String otp = generateCode();
+        String otp = generateOTP(OTP_LENGTH);
         String key = CacheKey.getOTPKey(email);
         redisTemplate.opsForValue().set(key, otp, OTP_VALID_MINUTES, TimeUnit.MINUTES);
         return otp;
     }
 
-    private String generateCode() {
+    @Override
+    public String generateOTP(int otpLength) {
         String characters = "0123456789";
         StringBuilder codeBuilder = new StringBuilder();
         SecureRandom secureRandom = new SecureRandom();
-        for (int i = 0; i < OTP_LENGTH; i++){
+        for (int i = 0; i < otpLength; i++){
             int randomIndex = secureRandom.nextInt(characters.length());
             codeBuilder.append(characters.charAt(randomIndex));
         }

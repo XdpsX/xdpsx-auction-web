@@ -6,4 +6,5 @@ import com.xdpsx.auction.dto.otp.OTPVerifyRequest;
 public interface OTPService {
     void sendValidEmailOTP(MailOTPRequest request);
     void verifyOTP(OTPVerifyRequest request);
+    String generateOTP(int otpLength);
 }
