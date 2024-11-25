@@ -2,9 +2,12 @@ import { Link } from 'react-router-dom'
 import LOGO from '../../assets/logo.svg'
 import { FaMoneyBillWave, FaPlusCircle } from 'react-icons/fa'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { selectCategory } from '../../features/category/category.slice'
+import {
+  getListCategoriesAsync,
+  selectCategory,
+} from '../../features/category/slice'
 import { useEffect } from 'react'
-import { getListCategories } from '../../features/category/category.thunk'
+
 import { formatPrice } from '../../utils/format'
 import { selectWallet, setWallet } from '../../features/wallet/wallet.slice'
 import SockJS from 'sockjs-client'
@@ -17,7 +20,7 @@ function HeaderBottom() {
   const { wallet } = useAppSelector(selectWallet)
 
   useEffect(() => {
-    dispatch(getListCategories())
+    dispatch(getListCategoriesAsync())
   }, [dispatch])
 
   useEffect(() => {

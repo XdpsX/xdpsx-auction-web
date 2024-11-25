@@ -1,5 +1,5 @@
 import { useAppSelector } from '../store/hooks'
-import { selectCategory } from '../features/category/category.slice'
+import { selectCategory } from '../features/category/slice'
 import DropDown from '../components/ui/DropDown'
 import { Link } from 'react-router-dom'
 import Banner from '../components/ui/Banner'
