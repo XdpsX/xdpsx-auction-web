@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom'
-import { selectAuth } from '../../features/auth/auth.slice'
+import { selectAuth } from '../../features/auth/slice'
 import { useAppSelector } from '../../store/hooks'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {

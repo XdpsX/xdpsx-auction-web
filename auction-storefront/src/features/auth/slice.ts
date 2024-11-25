@@ -1,13 +1,19 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import {
   createAccountAPI,
   loginAPI,
   logoutAPI,
   registerAPI,
   sendOTPAPI,
-} from './auth.thunk'
+} from './service'
 import { APIErrorDetails } from '../../models/error.type'
 import { RootState } from '../../store/type'
+import {
+  AccountCreateRequest,
+  LoginRequest,
+  RegisterRequest,
+} from '../../models/auth.type'
+import { fromAxiosErrorToAPIErrorDetails } from '../../utils/error.helper'
 
 export interface AuthState {
   accessToken: string | null
@@ -43,65 +49,65 @@ export const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      //registerAPI
-      .addCase(registerAPI.pending, (state) => {
+      //registerAsync
+      .addCase(registerAsync.pending, (state) => {
         state.isLoading = true
         state.error = null
       })
-      .addCase(registerAPI.fulfilled, (state, action) => {
+      .addCase(registerAsync.fulfilled, (state, action) => {
         state.emailRegister = action.payload.email
         state.isLoading = false
       })
-      .addCase(registerAPI.rejected, (state, action) => {
+      .addCase(registerAsync.rejected, (state, action) => {
         state.isLoading = false
         state.error = action.payload as APIErrorDetails
       })
-      //sendOTPAPI
-      .addCase(sendOTPAPI.pending, (state) => {
+      //sendOTPAsync
+      .addCase(sendOTPAsync.pending, (state) => {
         state.isSendingOTP = true
         state.error = null
       })
-      .addCase(sendOTPAPI.fulfilled, (state) => {
+      .addCase(sendOTPAsync.fulfilled, (state) => {
         state.isSendingOTP = false
       })
-      .addCase(sendOTPAPI.rejected, (state, { payload }) => {
+      .addCase(sendOTPAsync.rejected, (state, { payload }) => {
         state.isSendingOTP = false
         state.error = payload as APIErrorDetails
       })
-      //createAccountAPI
-      .addCase(createAccountAPI.pending, (state) => {
+      //createAccountAsync
+      .addCase(createAccountAsync.pending, (state) => {
         state.isLoading = true
         state.error = null
       })
-      .addCase(createAccountAPI.fulfilled, (state, { payload }) => {
+      .addCase(createAccountAsync.fulfilled, (state, { payload }) => {
         state.isLoading = false
         state.accessToken = payload.accessToken
         state.refreshToken = payload.refreshToken
         localStorage.setItem('accessToken', payload.accessToken)
         localStorage.setItem('refreshToken', payload.refreshToken)
       })
-      .addCase(createAccountAPI.rejected, (state, { payload }) => {
+      .addCase(createAccountAsync.rejected, (state, { payload }) => {
         state.isLoading = false
         state.error = payload as APIErrorDetails
       })
-      //loginAPI
-      .addCase(loginAPI.pending, (state) => {
+      //loginAsync
+      .addCase(loginAsync.pending, (state) => {
         state.isLoading = true
         state.error = null
       })
-      .addCase(loginAPI.fulfilled, (state, { payload }) => {
+      .addCase(loginAsync.fulfilled, (state, { payload }) => {
         state.isLoading = false
         state.accessToken = payload.accessToken
         state.refreshToken = payload.refreshToken
         localStorage.setItem('accessToken', payload.accessToken)
         localStorage.setItem('refreshToken', payload.refreshToken)
       })
-      .addCase(loginAPI.rejected, (state, { payload }) => {
+      .addCase(loginAsync.rejected, (state, { payload }) => {
         state.isLoading = false
         state.error = payload as APIErrorDetails
       })
-      //logoutAPI
-      .addCase(logoutAPI.fulfilled, (state) => {
+      //logoutAsync
+      .addCase(logoutAsync.fulfilled, (state) => {
         state.accessToken = null
         state.refreshToken = null
         localStorage.removeItem('accessToken')
@@ -114,3 +120,61 @@ const authReducer = authSlice.reducer
 export default authReducer
 export const selectAuth = (state: RootState) => state.auth
 export const { setError, setToken } = authSlice.actions
+
+export const registerAsync = createAsyncThunk(
+  'auth/registerAsync',
+  async (payload: RegisterRequest, thunkAPI) => {
+    try {
+      const data = await registerAPI(payload)
+      return data
+    } catch (error) {
+      return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))
+    }
+  }
+)
+
+export const sendOTPAsync = createAsyncThunk(
+  'auth/sendOTPAsync',
+  async (payload: { email: string }, thunkAPI) => {
+    try {
+      await sendOTPAPI(payload)
+    } catch (error) {
+      return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))
+    }
+  }
+)
+
+export const createAccountAsync = createAsyncThunk(
+  'auth/createAccountAsync',
+  async (payload: AccountCreateRequest, thunkAPI) => {
+    try {
+      const data = await createAccountAPI(payload)
+      return data
+    } catch (error) {
+      return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))
+    }
+  }
+)
+
+export const loginAsync = createAsyncThunk(
+  'auth/loginAsync',
+  async (payload: LoginRequest, thunkAPI) => {
+    try {
+      const data = await loginAPI(payload)
+      return data
+    } catch (error) {
+      return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))
+    }
+  }
+)
+
+export const logoutAsync = createAsyncThunk(
+  'auth/logoutAsync',
+  async (_, thunkAPI) => {
+    try {
+      await logoutAPI()
+    } catch (error) {
+      return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))
+    }
+  }
+)

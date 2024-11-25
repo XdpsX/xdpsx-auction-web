@@ -4,11 +4,13 @@ import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { toast } from 'react-toastify'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { createAccountAPI, sendOTPAPI } from '../../features/auth/auth.thunk'
+
 import {
+  createAccountAsync,
   selectAuth,
+  sendOTPAsync,
   setError as setAPIError,
-} from '../../features/auth/auth.slice'
+} from '../../features/auth/slice'
 import {
   AccountCreateRequest,
   accountCreateSchema,
@@ -74,7 +76,7 @@ function CreateAccountForm({
       setIntervalId(interval)
     }
 
-    dispatch(sendOTPAPI({ email: emailRegister }))
+    dispatch(sendOTPAsync({ email: emailRegister }))
       .unwrap()
       .then(() => {
         setMessage(`OTP sent successfully to ${emailRegister}`)
@@ -103,7 +105,7 @@ function CreateAccountForm({
 
   const onSubmit = (data: AccountCreateRequest) => {
     console.log(data)
-    dispatch(createAccountAPI(data))
+    dispatch(createAccountAsync(data))
       .unwrap()
       .then(() => {
         navigate('/')

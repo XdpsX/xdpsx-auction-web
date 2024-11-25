@@ -2,14 +2,14 @@ import { useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { formatPrice, getIdFromSlug } from '../utils/format'
 import { useEffect } from 'react'
-import { fetchAuctionDetailsAPI } from '../features/auction/auction.service'
+import { fetchAuctionDetailsAPI } from '../features/auction/service'
 import { AuctionDetails } from '../models/auction.type'
 import PreviewImages from '../components/ui/PreviewImages'
 import Button from '../components/ui/Button'
 import AuctionType from '../components/ui/AuctionType'
 import AuctionDate from '../components/ui/AuctionDate'
 import { useAppSelector } from '../store/hooks'
-import { selectAuth } from '../features/auth/auth.slice'
+import { selectAuth } from '../features/auth/slice'
 import RichText from '../components/ui/RichText'
 import BidForm from '../components/ui/BidForm'
 import SockJS from 'sockjs-client'
@@ -17,6 +17,7 @@ import { Stomp } from '@stomp/stompjs'
 import { Bid } from '../models/bid.type'
 import { selectUser } from '../features/user/user.slice'
 import { toast } from 'react-toastify'
+import USER_ICON from '../assets/default-user-icon.png'
 
 function AuctionDetailsPage() {
   const navigate = useNavigate()
@@ -167,7 +168,7 @@ function AuctionDetailsPage() {
 
       <div className="flex items-center gap-5 py-4 ">
         <img
-          src={auction.seller.avatarUrl || '/images/default-avatar.png'}
+          src={auction.seller.avatarUrl || USER_ICON}
           alt="Seller avatar"
           className="w-16 h-16 object-cover rounded-full"
         />

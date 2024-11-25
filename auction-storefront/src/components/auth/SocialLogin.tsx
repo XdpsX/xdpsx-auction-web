@@ -3,7 +3,7 @@ import FACEBOOK_ICON from '../../assets/facebook.svg'
 import { useGoogleOneTapLogin } from '@react-oauth/google'
 import { useNavigate } from 'react-router-dom'
 import api from '../../utils/api'
-import { setToken } from '../../features/auth/auth.slice'
+import { setToken } from '../../features/auth/slice'
 import { toast } from 'react-toastify'
 import { useAppDispatch } from '../../store/hooks'
 

@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAppDispatch } from '../../store/hooks'
-import { setToken } from '../../features/auth/auth.slice'
+import { setToken } from '../../features/auth/slice'
 
 function OAuth2RedirectHandler() {
   const navigate = useNavigate()

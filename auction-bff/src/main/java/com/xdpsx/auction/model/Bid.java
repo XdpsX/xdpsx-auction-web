@@ -26,8 +26,10 @@ public class Bid {
     @CreationTimestamp
     private ZonedDateTime bidTime;
 
+    @Enumerated(EnumType.STRING)
     private BidStatus status;
 
+    @Enumerated(EnumType.STRING)
     private BidPaymentStatus paymentStatus;
 
     @ManyToOne

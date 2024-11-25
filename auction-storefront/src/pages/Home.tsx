@@ -7,7 +7,7 @@ import AuctionList from '../components/auction/AuctionList'
 import { useEffect, useMemo, useState } from 'react'
 import { Auction } from '../models/auction.type'
 import { Page } from '../models/page.type'
-import { fetchCategoryAuctionsAPI } from '../features/auction/auction.service'
+import { fetchCategoryAuctionsAPI } from '../features/auction/service'
 const NUMBER_CATEGORIES = 3
 function Home() {
   const { categories } = useAppSelector(selectCategory)
