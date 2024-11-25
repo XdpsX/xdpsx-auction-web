@@ -5,10 +5,11 @@ import Input from './Input'
 import { AuctionDetails } from '../../models/auction.type'
 import Button from './Button'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { placeBid } from '../../features/bid/bid.slice'
+
 import { toast } from 'react-toastify'
 import { selectUser } from '../../features/user/user.slice'
 import { useEffect } from 'react'
+import { placeBidAsync } from '../../features/bid/slice'
 
 function BidForm({
   auction,
@@ -62,7 +63,7 @@ function BidForm({
   }
 
   const onSubmit = (data: BidPayload) => {
-    dispatch(placeBid({ auctionId: auction.id, payload: data }))
+    dispatch(placeBidAsync({ auctionId: auction.id, payload: data }))
       .unwrap()
       .then(() => {
         toast.success('Bid successfully')
