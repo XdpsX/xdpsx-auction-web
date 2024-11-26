@@ -12,10 +12,13 @@ import { useEffect, useState } from 'react'
 import {
   getUserBidAsync,
   placeBidAsync,
+  refundBidAsync,
   selectBid,
 } from '../../features/bid/slice'
 import BidAttention from './BidAttention'
 import { formatPrice } from '../../utils/format'
+import { selectWallet } from '../../features/wallet/wallet.slice'
+import BidRefundModal from './BidRefundModal'
 
 function BidForm({
   auction,
@@ -25,8 +28,9 @@ function BidForm({
   highestBid: Bid | null
 }) {
   const dispatch = useAppDispatch()
-  const { userBid } = useAppSelector(selectBid)
+  const { userBid, isProcessing } = useAppSelector(selectBid)
   const { userProfile } = useAppSelector(selectUser)
+  const { wallet } = useAppSelector(selectWallet)
   const isAuthenticated = !!userProfile
 
   const [securityFee, setSecurityFee] = useState(0)
@@ -35,6 +39,7 @@ function BidForm({
   )
   const [showAttentionAgain, setShowAttentionAgain] = useState(true)
   const [openAttention, setOpenAttention] = useState(false)
+  const [openRefund, setOpenRefund] = useState(false)
 
   const minAmount = highestBid
     ? highestBid.amount + auction.stepPrice
@@ -75,9 +80,24 @@ function BidForm({
     }
   }, [userBid, amountWatch])
 
+  useEffect(() => {
+    if (wallet && wallet.balance < securityFee) {
+      setError('amount', {
+        type: 'manual',
+        message: 'Wallet balance is not enough',
+      })
+    } else {
+      clearErrors('amount')
+    }
+  }, [clearErrors, securityFee, setError, wallet])
+
   const increaseAmount = () => {
     clearErrors('amount')
     const amount = Number(getValues('amount'))
+    if (amount < minAmount) {
+      setValue('amount', minAmount)
+      return
+    }
     setValue('amount', amount + auction.stepPrice)
   }
 
@@ -123,6 +143,10 @@ function BidForm({
       })
   }
 
+  const handleRefund = (bidId: number) => {
+    dispatch(refundBidAsync(bidId))
+  }
+
   const handleCloseModal = () => {
     setOpenAttention(false)
     setShowAttentionAgain(true)
@@ -144,13 +168,6 @@ function BidForm({
 
   return (
     <>
-      <BidAttention
-        open={openAttention}
-        onClose={handleCloseModal}
-        showAttentionAgain={showAttentionAgain}
-        setShowAttentionAgain={setShowAttentionAgain}
-        onSubmit={handleSubmit(onSubmit)}
-      />
       <form
         className="flex flex-col gap-6"
         onSubmit={(e) => {
@@ -197,11 +214,40 @@ function BidForm({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button className="px-8 py-2 uppercase bg-blue-500 text-white hover:bg-blue-600">
+          <Button
+            disabled={isProcessing}
+            className="px-8 py-2 uppercase bg-blue-500 text-white hover:bg-blue-600"
+          >
             Bid
           </Button>
+          {userBid && (
+            <Button
+              disabled={isProcessing}
+              type="button"
+              className="text-sm text-red-500 underline"
+              onClick={setOpenRefund.bind(null, true)}
+            >
+              Accept lost (Refund)
+            </Button>
+          )}
         </div>
       </form>
+
+      <BidAttention
+        open={openAttention}
+        onClose={handleCloseModal}
+        showAttentionAgain={showAttentionAgain}
+        setShowAttentionAgain={setShowAttentionAgain}
+        onSubmit={handleSubmit(onSubmit)}
+      />
+      {userBid && (
+        <BidRefundModal
+          open={openRefund}
+          onClose={() => setOpenRefund(false)}
+          onSubmit={handleRefund.bind(null, userBid.id)}
+          amount={userBid.amount / 10}
+        />
+      )}
     </>
   )
 }

@@ -2,10 +2,9 @@ import * as yup from 'yup'
 
 export type Transaction = {
   id: number
-  type: 'DEPOSIT' | 'WITHDRAW'
+  type: 'DEPOSIT' | 'WITHDRAW' | 'SECURITY_FEE' | 'REFUND' | 'BID_PAID'
   amount: number
   status: 'PENDING' | 'COMPLETED' | 'FAILED'
-  paymentMethod: 'VNPAY' | 'MOMO'
   description: string
   createdAt: Date
   updatedAt: Date

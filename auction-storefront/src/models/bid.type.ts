@@ -3,7 +3,6 @@ import * as yup from 'yup'
 export type Bid = {
   id: number
   amount: number
-  bidTime: string
   auctionId: number
   bidderId: number
 }

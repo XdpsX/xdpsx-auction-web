@@ -61,14 +61,14 @@ function NotificationContent({
       <div className="max-h-[300px] overflow-y-auto">
         {items.map((noti) => (
           <Link
-            to={noti.type === 'AUCTION' ? `/auctions` : '#'}
+            to={noti.href ? noti.href : '#'}
             key={noti.id}
             onClick={handleMarkAsRead.bind(null, noti.id)}
             className="hover:underline group"
           >
             <div className={`px-4 py-2 ${noti.isRead ? '' : 'bg-white'}`}>
               <h4 className="font-bold text-sm capitalize group-hover:text-blue-500">
-                {noti.type.toLowerCase()}
+                {noti?.title || 'New notification'}
               </h4>
               <p className="text-sm group-hover:text-blue-500">
                 {noti.message}
