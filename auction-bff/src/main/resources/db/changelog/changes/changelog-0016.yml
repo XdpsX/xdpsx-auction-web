@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: 16
+      author: XdpsX
+      comment: 'Update type column in transactions'
+      changes:
+        - sqlFile:
+            path: db/changelog/sql/changelog-0016.sql
