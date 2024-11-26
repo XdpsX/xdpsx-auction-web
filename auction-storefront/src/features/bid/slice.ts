@@ -3,16 +3,16 @@ import { Bid, BidPayload } from '../../models/bid.type'
 import { RootState } from '../../store/type'
 import { fromAxiosErrorToAPIErrorDetails } from '../../utils/error.helper'
 import { APIErrorDetails } from '../../models/error.type'
-import { placeBidAPI } from './service'
+import { getUserBidAPI, placeBidAPI } from './service'
 
 export interface BidState {
-  bid: Bid | null
+  userBid: Bid | null
   isLoading: boolean
   error: APIErrorDetails | null
 }
 
 const initialState: BidState = {
-  bid: null,
+  userBid: null,
   isLoading: false,
   error: null,
 }
@@ -22,14 +22,27 @@ export const bidSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
+    // placeBidAsync
     builder.addCase(placeBidAsync.pending, (state) => {
       state.isLoading = true
     })
     builder.addCase(placeBidAsync.fulfilled, (state, action) => {
       state.isLoading = false
-      state.bid = action.payload
+      state.userBid = action.payload
     })
     builder.addCase(placeBidAsync.rejected, (state, action) => {
+      state.isLoading = false
+      state.error = action.payload as APIErrorDetails
+    })
+    // getUserBidAsync
+    builder.addCase(getUserBidAsync.pending, (state) => {
+      state.isLoading = true
+    })
+    builder.addCase(getUserBidAsync.fulfilled, (state, action) => {
+      state.isLoading = false
+      state.userBid = action.payload
+    })
+    builder.addCase(getUserBidAsync.rejected, (state, action) => {
       state.isLoading = false
       state.error = action.payload as APIErrorDetails
     })
@@ -48,6 +61,18 @@ export const placeBidAsync = createAsyncThunk(
   ) => {
     try {
       const data = await placeBidAPI({ auctionId, payload })
+      return data
+    } catch (error) {
+      return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))
+    }
+  }
+)
+
+export const getUserBidAsync = createAsyncThunk(
+  'bid/getUserBidAsync',
+  async (auctionId: number, thunkAPI) => {
+    try {
+      const data = await getUserBidAPI(auctionId)
       return data
     } catch (error) {
       return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))

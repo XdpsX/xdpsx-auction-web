@@ -9,7 +9,6 @@ import Button from '../components/ui/Button'
 import AuctionType from '../components/auction/AuctionType'
 import AuctionDate from '../components/auction/AuctionDate'
 import { useAppSelector } from '../store/hooks'
-import { selectAuth } from '../features/auth/slice'
 import RichText from '../components/ui/RichText'
 import BidForm from '../components/bid/BidForm'
 import SockJS from 'sockjs-client'
@@ -28,8 +27,7 @@ function AuctionDetailsPage() {
   const [showImage, setShowImage] = useState('')
   const [isBidUpdated, setIsBidUpdated] = useState(false)
   const { userProfile } = useAppSelector(selectUser)
-  const { accessToken } = useAppSelector(selectAuth)
-  const isAuthenticated = !!accessToken
+  const isAuthenticated = !!userProfile
 
   useEffect(() => {
     fetchAuctionDetailsAPI(id)

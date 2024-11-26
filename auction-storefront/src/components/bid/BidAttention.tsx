@@ -19,7 +19,7 @@ const BidAttention: React.FC<BidAttentionProps> = ({
   return (
     <Modal open={open} onClose={onClose} title="Attention">
       <p className="mt-2 text-black text-lg mb-2">
-        Bidding requires a deposit of 10%.
+        Bidding requires a security fee of 10%.
       </p>
       <div className="flex items-center gap-2">
         <input

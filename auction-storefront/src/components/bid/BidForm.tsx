@@ -9,8 +9,13 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { toast } from 'react-toastify'
 import { selectUser } from '../../features/user/user.slice'
 import { useEffect, useState } from 'react'
-import { placeBidAsync } from '../../features/bid/slice'
+import {
+  getUserBidAsync,
+  placeBidAsync,
+  selectBid,
+} from '../../features/bid/slice'
 import BidAttention from './BidAttention'
+import { formatPrice } from '../../utils/format'
 
 function BidForm({
   auction,
@@ -20,8 +25,11 @@ function BidForm({
   highestBid: Bid | null
 }) {
   const dispatch = useAppDispatch()
+  const { userBid } = useAppSelector(selectBid)
   const { userProfile } = useAppSelector(selectUser)
+  const isAuthenticated = !!userProfile
 
+  const [securityFee, setSecurityFee] = useState(0)
   const [showBidAttention, setShowBidAttention] = useState(
     localStorage.getItem('show-bid-attention') !== 'false'
   )
@@ -35,6 +43,7 @@ function BidForm({
     control,
     handleSubmit,
     setError,
+    watch,
     getValues,
     setValue,
     clearErrors,
@@ -46,10 +55,25 @@ function BidForm({
       amount: minAmount,
     },
   })
+  const amountWatch = watch('amount')
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(getUserBidAsync(auction.id))
+    }
+  }, [auction.id, dispatch, isAuthenticated])
 
   useEffect(() => {
     reset({ amount: minAmount })
   }, [highestBid, minAmount, reset])
+
+  useEffect(() => {
+    if (userBid) {
+      setSecurityFee((amountWatch - userBid.amount) * 0.1)
+    } else {
+      setSecurityFee(amountWatch * 0.1)
+    }
+  }, [userBid, amountWatch])
 
   const increaseAmount = () => {
     clearErrors('amount')
@@ -139,7 +163,12 @@ function BidForm({
         }}
       >
         <div className="flex flex-col gap-4">
-          <label htmlFor="amount">Enter your bid:</label>
+          <div className="flex items-center justify-between">
+            <label htmlFor="amount">Enter your bid:</label>
+            <span className="text-gray-500 text-sm">
+              Security Fee: {formatPrice(securityFee)}
+            </span>
+          </div>
 
           <div className={`flex items-center gap-4 ${errors.amount && 'mb-5'}`}>
             <button
