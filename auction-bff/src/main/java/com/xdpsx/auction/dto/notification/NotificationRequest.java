@@ -1,15 +1,14 @@
 package com.xdpsx.auction.dto.notification;
 
-import com.xdpsx.auction.model.enums.NotificationType;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
 @Builder
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class NotificationRequest {
+    private String title;
     private String message;
-    private NotificationType type;
+    private String href;
     private Long userId;
 }

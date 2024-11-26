@@ -48,7 +48,7 @@ public class NotificationController {
 
     @PostMapping("/test/notifications/create")
     ResponseEntity<Void> createNotificationTest() {
-        notificationService.createNotificationTest();
+        notificationService.pushNotificationTest();
         return ResponseEntity.ok().build();
     }
 }

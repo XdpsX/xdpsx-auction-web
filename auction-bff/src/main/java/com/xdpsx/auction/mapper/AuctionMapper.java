@@ -23,6 +23,8 @@ public interface AuctionMapper {
     @Mapping(target = "images", ignore = true)
     @Mapping(target = "mainImage", ignore = true)
     @Mapping(target = "trashed", ignore = true)
+    @Mapping(target = "isEnd", ignore = true)
+    @Mapping(target = "bids", ignore = true)
     Auction fromRequestToEntity(AuctionRequest dto);
 
     @Mapping(target = "mainImage", source = "entity.mainImage")

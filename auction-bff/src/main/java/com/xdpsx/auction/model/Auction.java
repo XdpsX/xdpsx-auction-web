@@ -3,7 +3,6 @@ package com.xdpsx.auction.model;
 import com.xdpsx.auction.model.enums.AuctionType;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;

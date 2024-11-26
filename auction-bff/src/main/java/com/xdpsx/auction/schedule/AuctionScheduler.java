@@ -4,7 +4,6 @@ import com.xdpsx.auction.dto.notification.NotificationRequest;
 import com.xdpsx.auction.model.Auction;
 import com.xdpsx.auction.model.Bid;
 import com.xdpsx.auction.model.enums.BidStatus;
-import com.xdpsx.auction.model.enums.NotificationType;
 import com.xdpsx.auction.repository.AuctionRepository;
 import com.xdpsx.auction.repository.BidRepository;
 import com.xdpsx.auction.service.NotificationService;
@@ -42,16 +41,16 @@ public class AuctionScheduler {
                 bidRepository.save(highestBid);
 
                 NotificationRequest winnerNotification = NotificationRequest.builder()
+                        .title("Bid Winner")
                         .message("You are the bid winner of " + auction.getName())
-                        .type(NotificationType.AUCTION)
                         .userId(highestBid.getBidder().getId())
                         .build();
                 notificationService.pushNotification(winnerNotification);
             }
 
             NotificationRequest sellerNotification = NotificationRequest.builder()
+                    .title("Bid Ending")
                     .message("Your auction: %s has ended".formatted(auction.getName()))
-                    .type(NotificationType.AUCTION)
                     .userId(auction.getSeller().getId())
                     .build();
             notificationService.pushNotification(sellerNotification);
