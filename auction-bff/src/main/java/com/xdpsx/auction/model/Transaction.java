@@ -32,4 +32,7 @@ public class Transaction extends AbstractAuditEntity {
     @ManyToOne
     private Wallet wallet;
 
+    public Transaction(Long id) {
+        this.id = id;
+    }
 }

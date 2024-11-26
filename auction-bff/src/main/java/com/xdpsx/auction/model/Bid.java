@@ -1,6 +1,5 @@
 package com.xdpsx.auction.model;
 
-import com.xdpsx.auction.model.enums.BidPaymentStatus;
 import com.xdpsx.auction.model.enums.BidStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,21 +15,18 @@ import java.time.ZonedDateTime;
 @Builder
 @Entity
 @Table(name = "bids")
-public class Bid {
+public class Bid extends AbstractAuditEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private BigDecimal amount;
 
-    @CreationTimestamp
-    private ZonedDateTime bidTime;
-
     @Enumerated(EnumType.STRING)
     private BidStatus status;
 
-    @Enumerated(EnumType.STRING)
-    private BidPaymentStatus paymentStatus;
+    @OneToOne
+    private Transaction transaction;
 
     @ManyToOne
     private User bidder;

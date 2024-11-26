@@ -6,6 +6,7 @@ import com.xdpsx.auction.constant.VNPayCode;
 import com.xdpsx.auction.dto.transaction.TransactionMessage;
 import com.xdpsx.auction.dto.transaction.TransactionRequest;
 import com.xdpsx.auction.dto.transaction.TransactionResponse;
+import com.xdpsx.auction.dto.transaction.UpdateTransactionDto;
 import com.xdpsx.auction.exception.NotFoundException;
 import com.xdpsx.auction.mapper.TransactionMapper;
 import com.xdpsx.auction.model.Transaction;
@@ -92,6 +93,24 @@ public class TransactionServiceImpl implements TransactionService {
         return TransactionMapper.INSTANCE.toResponse(savedTransaction);
     }
 
+    @Override
+    public TransactionResponse updateTransaction(Long transactionId, UpdateTransactionDto request) {
+        Transaction transaction = transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.TRANSACTION_NOT_FOUND, transactionId));
+        transaction.setAmount(request.getAmount());
+        transaction.setDescription(request.getDescription());
+        Transaction savedTransaction = transactionRepository.save(transaction);
+        if (savedTransaction.getType().equals(TransactionType.SECURITY_FEE)) {
+            TransactionMessage message = TransactionMessage.builder()
+                    .amount(savedTransaction.getAmount().subtract(transaction.getAmount()))
+                    .type(savedTransaction.getType())
+                    .walletId(savedTransaction.getWallet().getId())
+                    .build();
+            pushTransactionMessage(message);
+        }
+        return TransactionMapper.INSTANCE.toResponse(savedTransaction);
+    }
+
     private void pushTransactionMessage(Transaction transaction) {
         TransactionMessage message = TransactionMessage.builder()
                 .amount(transaction.getAmount())
@@ -99,6 +118,10 @@ public class TransactionServiceImpl implements TransactionService {
                 .walletId(transaction.getWallet().getId())
                 .build();
         transactionProducer.produceTransaction(message);
+    }
+
+    private void pushTransactionMessage(TransactionMessage transaction) {
+        transactionProducer.produceTransaction(transaction);
     }
 
     private Wallet getUserWallet() {

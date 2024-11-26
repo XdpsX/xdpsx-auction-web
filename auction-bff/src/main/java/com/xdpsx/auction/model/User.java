@@ -61,6 +61,10 @@ public class User extends AbstractAuditEntity {
     @OneToMany
     private List<Notification> notifications;
 
+    public User(Long id) {
+        this.id = id;
+    }
+
     public String getAvatarUrl(){
         if (avatar == null){
             return null;

@@ -5,11 +5,13 @@ import com.xdpsx.auction.constant.ErrorCode;
 import com.xdpsx.auction.dto.bid.BidRequest;
 import com.xdpsx.auction.dto.bid.BidResponse;
 import com.xdpsx.auction.dto.transaction.TransactionRequest;
+import com.xdpsx.auction.dto.transaction.TransactionResponse;
+import com.xdpsx.auction.dto.transaction.UpdateTransactionDto;
 import com.xdpsx.auction.exception.BadRequestException;
 import com.xdpsx.auction.exception.NotFoundException;
 import com.xdpsx.auction.model.*;
-import com.xdpsx.auction.model.enums.BidPaymentStatus;
 import com.xdpsx.auction.model.enums.BidStatus;
+import com.xdpsx.auction.model.enums.TransactionStatus;
 import com.xdpsx.auction.model.enums.TransactionType;
 import com.xdpsx.auction.repository.AuctionRepository;
 import com.xdpsx.auction.repository.BidRepository;
@@ -75,22 +77,20 @@ public class BidServiceImpl implements BidService {
         BigDecimal securityFee = bidRequest.getAmount().multiply(BidConstants.SECURITY_FEE_RATE);
         walletService.validateWalletBalance(userId, securityFee);
 
-        TransactionRequest transaction = TransactionRequest.builder()
+        TransactionRequest transactionRequest = TransactionRequest.builder()
                 .amount(securityFee)
                 .type(TransactionType.SECURITY_FEE)
                 .description("Security Fee for auction: " + auction.getName())
+                .status(TransactionStatus.COMPLETED)
                 .build();
-        transactionService.createTransaction(transaction);
+        TransactionResponse transactionResponse = transactionService.createTransaction(transactionRequest);
 
-        User bidder = User.builder()
-                .id(userId)
-                .build();
         Bid bid = Bid.builder()
                 .amount(bidRequest.getAmount())
-                .bidder(bidder)
+                .bidder(new User(userId))
                 .auction(auction)
                 .status(BidStatus.ACTIVE)
-                .paymentStatus(BidPaymentStatus.DEPOSIT)
+                .transaction(new Transaction(transactionResponse.getId()))
                 .build();
         Bid savedBid = bidRepository.save(bid);
         BidResponse bidResponse = mapToBidResponse(savedBid);
@@ -101,17 +101,19 @@ public class BidServiceImpl implements BidService {
     }
 
     private BidResponse updateBid(Auction auction, BidRequest bidRequest, Bid existingBid, Long userId) {
-        BigDecimal diffAmount = bidRequest.getAmount().subtract(existingBid.getAmount());
-        BigDecimal securityFee = diffAmount.multiply(BidConstants.SECURITY_FEE_RATE);
+        BigDecimal newSecurityFee = bidRequest.getAmount().multiply(BidConstants.SECURITY_FEE_RATE);
 
-        walletService.validateWalletBalance(userId, securityFee);
+        BigDecimal oldSecurityFee = existingBid.getAmount().multiply(BidConstants.SECURITY_FEE_RATE);
+        BigDecimal diffSecurityFee = newSecurityFee.subtract(oldSecurityFee);
 
-        TransactionRequest transaction = TransactionRequest.builder()
-                .amount(securityFee)
-                .type(TransactionType.SECURITY_FEE)
-                .description("Security Fee for auction: " + auction.getName())
+        walletService.validateWalletBalance(userId, diffSecurityFee);
+
+        Transaction existingTransaction = existingBid.getTransaction();
+        UpdateTransactionDto transactionRequest = UpdateTransactionDto.builder()
+                .amount(newSecurityFee)
+                .description(existingTransaction.getDescription())
                 .build();
-        transactionService.createTransaction(transaction);
+        transactionService.updateTransaction(existingTransaction.getId(), transactionRequest);
 
         existingBid.setAmount(bidRequest.getAmount());
         Bid savedBid = bidRepository.save(existingBid);
@@ -139,7 +141,6 @@ public class BidServiceImpl implements BidService {
         return BidResponse.builder()
                 .id(bid.getId())
                 .amount(bid.getAmount())
-                .bidTime(bid.getBidTime())
                 .bidderId(bid.getBidder().getId())
                 .auctionId(bid.getAuction().getId())
                 .build();

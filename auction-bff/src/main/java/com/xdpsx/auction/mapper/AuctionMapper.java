@@ -55,7 +55,6 @@ public interface AuctionMapper {
         return BidResponse.builder()
                 .id(bid.getId())
                 .amount(bid.getAmount())
-                .bidTime(bid.getBidTime())
                 .bidderId(bid.getBidder().getId())
                 .auctionId(bid.getAuction().getId())
                 .build();
