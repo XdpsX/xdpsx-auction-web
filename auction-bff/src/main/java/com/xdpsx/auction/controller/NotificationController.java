@@ -45,4 +45,10 @@ public class NotificationController {
         notificationService.markAsReadAll(userContext.getLoggedUser().getId());
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/test/notifications/create")
+    ResponseEntity<Void> createNotificationTest() {
+        notificationService.createNotificationTest();
+        return ResponseEntity.ok().build();
+    }
 }

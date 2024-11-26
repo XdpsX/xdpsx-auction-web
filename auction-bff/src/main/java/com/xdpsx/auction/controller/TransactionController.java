@@ -42,7 +42,7 @@ public class TransactionController {
         TransactionRequest test = TransactionRequest.builder()
                 .amount(BigDecimal.valueOf(50000))
                 .description("Test transaction")
-                .type(TransactionType.SECURITY_FEE)
+                .type(TransactionType.DEPOSIT)
                 .build();
         transactionService.createTransaction(test);
         return ResponseEntity.ok().build();

@@ -3,6 +3,7 @@ package com.xdpsx.auction.service.impl;
 import com.xdpsx.auction.constant.ErrorCode;
 import com.xdpsx.auction.dto.PageResponse;
 import com.xdpsx.auction.dto.notification.NotificationDto;
+import com.xdpsx.auction.dto.notification.NotificationMsg;
 import com.xdpsx.auction.dto.notification.NotificationRequest;
 import com.xdpsx.auction.exception.NotFoundException;
 import com.xdpsx.auction.mapper.PageMapper;
@@ -14,6 +15,7 @@ import com.xdpsx.auction.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,7 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
     private final PageMapper pageMapper;
+    private final KafkaTemplate<String, NotificationMsg> kafkaTemplate;
 
     @Override
     public void pushNotification(NotificationRequest request) {
@@ -84,5 +87,14 @@ public class NotificationServiceImpl implements NotificationService {
                 .isRead(notification.isRead())
                 .createdAt(notification.getCreatedAt())
                 .build();
+    }
+
+    @Override
+    public void createNotificationTest() {
+        NotificationMsg notification = NotificationMsg.builder()
+                .message("Test message")
+                .title("Message Title")
+                .build();
+        kafkaTemplate.send("notification-topic", notification);
     }
 }
