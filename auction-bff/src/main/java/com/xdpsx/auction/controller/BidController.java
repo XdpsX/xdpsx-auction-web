@@ -20,4 +20,10 @@ public class BidController {
         BidResponse response = bidService.placeBid(auctionId, bidRequest);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
+    @GetMapping("/storefront/auctions/{auctionId}/my-bid")
+    ResponseEntity<BidResponse> getMyActiveBid(@PathVariable("auctionId") Long auctionId) {
+        BidResponse response = bidService.getMyActiveBidInAuction(auctionId);
+        return ResponseEntity.ok(response);
+    }
 }

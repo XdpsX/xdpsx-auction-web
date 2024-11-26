@@ -16,7 +16,8 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
     @Query("SELECT b FROM Bid b WHERE " +
             "b.auction.id = :auctionId AND " +
             "b.bidder.id = :userId AND " +
-            "b.status = :status")
+            "b.status = :status " +
+            "ORDER BY b.amount DESC")
     List<Bid> findBidsWithStatusAndAuctionAndUser(@Param("auctionId") Long auctionId,
                                                  @Param("userId") Long userId,
                                                  @Param("status") BidStatus status);
