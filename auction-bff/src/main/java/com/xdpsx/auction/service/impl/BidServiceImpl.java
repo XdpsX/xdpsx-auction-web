@@ -1,56 +1,43 @@
 package com.xdpsx.auction.service.impl;
 
+import com.xdpsx.auction.constant.BidConstants;
 import com.xdpsx.auction.constant.ErrorCode;
 import com.xdpsx.auction.dto.bid.BidRequest;
 import com.xdpsx.auction.dto.bid.BidResponse;
+import com.xdpsx.auction.dto.transaction.TransactionRequest;
 import com.xdpsx.auction.exception.BadRequestException;
 import com.xdpsx.auction.exception.NotFoundException;
-import com.xdpsx.auction.mapper.WalletMapper;
-import com.xdpsx.auction.model.Auction;
-import com.xdpsx.auction.model.Bid;
-import com.xdpsx.auction.model.User;
-import com.xdpsx.auction.model.Wallet;
+import com.xdpsx.auction.model.*;
 import com.xdpsx.auction.model.enums.BidPaymentStatus;
 import com.xdpsx.auction.model.enums.BidStatus;
+import com.xdpsx.auction.model.enums.TransactionType;
 import com.xdpsx.auction.repository.AuctionRepository;
 import com.xdpsx.auction.repository.BidRepository;
-import com.xdpsx.auction.repository.WalletRepository;
 import com.xdpsx.auction.security.CustomUserDetails;
 import com.xdpsx.auction.security.UserContext;
 import com.xdpsx.auction.service.BidService;
-import jakarta.annotation.PostConstruct;
+import com.xdpsx.auction.service.TransactionService;
+import com.xdpsx.auction.service.WalletService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class BidServiceImpl implements BidService {
     private final UserContext userContext;
-    private final WalletMapper walletMapper;
     private final BidRepository bidRepository;
     private final AuctionRepository auctionRepository;
-    private final WalletRepository walletRepository;
+    private final WalletService walletService;
+    private final TransactionService transactionService;
     private final SimpMessagingTemplate messagingTemplate;
-    private final RedisTemplate<String, String> redisTemplate;
-
-    @PostConstruct
-    public void createConsumerGroup() {
-        try {
-            redisTemplate.opsForStream().createGroup("refundStream", "refundGroup");
-        } catch (Exception e) {
-            log.info("Consumer group already exists: {}", e.getMessage());
-        }
-    }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
@@ -61,31 +48,31 @@ public class BidServiceImpl implements BidService {
         if (userDetails.getId().equals(auction.getSeller().getId())) {
             throw new BadRequestException(ErrorCode.AUCTION_OWNER);
         }
-        Bid highestBid = bidRepository.findHighestBidByAuctionId(auction.getId()).orElse(null);
-        if (highestBid != null) {
-            if (
-//                    highestBid.getAmount().compareTo(bidRequest.getAmount()) >= 0 &&
-                    highestBid.getAmount().add(auction.getStepPrice()).compareTo(bidRequest.getAmount()) > 0) {
-            throw new BadRequestException(ErrorCode.BID_LOWER);
 
-            }
-        } else {
-            if (auction.getStartingPrice().add(auction.getStepPrice()).compareTo(bidRequest.getAmount()) > 0) {
-                throw new BadRequestException(ErrorCode.BID_LOWER);
-            }
+
+        List<Bid> activeBids = bidRepository.findBidsWithStatusAndAuctionAndUser(auction.getId(), userDetails.getId(), BidStatus.ACTIVE);
+        if (!activeBids.isEmpty()) { // create new bid
+            return createNewBid(auction, bidRequest, userDetails.getId());
         }
-        Wallet wallet = walletRepository.findByOwnerId(userDetails.getId())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.WALLET_NOT_FOUND, userDetails.getId()));
-        BigDecimal securityDeposit = bidRequest.getAmount().multiply(BigDecimal.valueOf(0.10));
-        if (securityDeposit.compareTo(wallet.getBalance()) > 0){
-            throw new BadRequestException(ErrorCode.WALLET_NOT_ENOUGH);
-        }
-        BigDecimal newBalance = wallet.getBalance().subtract(securityDeposit);
-        wallet.setBalance(newBalance);
-        Wallet savedWallet = walletRepository.save(wallet);
+        return null;
+
+    }
+
+    private BidResponse createNewBid(Auction auction, BidRequest bidRequest, Long userId) {
+        validateEnglishBidAmount(auction.getId(), bidRequest.getAmount(), auction.getStartingPrice(), auction.getStepPrice());
+
+        BigDecimal securityFee = bidRequest.getAmount().multiply(BidConstants.SECURITY_FEE_RATE);
+        walletService.validateWalletBalance(userId, securityFee);
+
+        TransactionRequest transaction = TransactionRequest.builder()
+                .amount(securityFee)
+                .type(TransactionType.SECURITY_FEE)
+                .description("Security Fee for auction: " + auction.getName())
+                .build();
+        transactionService.createTransaction(transaction);
 
         User bidder = User.builder()
-                .id(userDetails.getId())
+                .id(userId)
                 .build();
         Bid bid = Bid.builder()
                 .amount(bidRequest.getAmount())
@@ -103,17 +90,22 @@ public class BidServiceImpl implements BidService {
                 .auctionId(savedBid.getAuction().getId())
                 .build();
 
-        messagingTemplate.convertAndSend("/topic/wallet/" + savedWallet.getId(), walletMapper.toWalletDto(savedWallet));
         messagingTemplate.convertAndSend("/topic/auction/" + auction.getId(), bidResponse);
-        if (highestBid != null) {
-            publishRefundBid(highestBid.getId());
-        }
+
         return bidResponse;
     }
 
-    public void publishRefundBid(Long bidId) {
-        Map<String, String> message = new HashMap<>();
-        message.put("bidId", String.valueOf(bidId));
-        redisTemplate.opsForStream().add("refundStream", message);
+    private void validateEnglishBidAmount(Long auctionId, BigDecimal amount, BigDecimal startingAmount, BigDecimal stepAmount) {
+        Bid highestBid = bidRepository.findHighestBidByAuctionId(auctionId).orElse(null);
+        if (highestBid != null) {
+            if (highestBid.getAmount().add(stepAmount).compareTo(amount) > 0) {
+                throw new BadRequestException(ErrorCode.BID_LOWER);
+            }
+        } else {
+            if (startingAmount.add(stepAmount).compareTo(amount) > 0) {
+                throw new BadRequestException(ErrorCode.BID_LOWER);
+            }
+        }
     }
+
 }

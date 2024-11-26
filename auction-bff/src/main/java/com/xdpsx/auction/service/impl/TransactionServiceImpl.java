@@ -3,6 +3,7 @@ package com.xdpsx.auction.service.impl;
 import com.xdpsx.auction.constant.CacheKey;
 import com.xdpsx.auction.constant.ErrorCode;
 import com.xdpsx.auction.constant.VNPayCode;
+import com.xdpsx.auction.dto.transaction.TransactionRequest;
 import com.xdpsx.auction.dto.transaction.TransactionResponse;
 import com.xdpsx.auction.exception.NotFoundException;
 import com.xdpsx.auction.model.Transaction;
@@ -32,9 +33,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional
     @Override
     public TransactionResponse deposit(String transactionId, String responseCode) {
-        CustomUserDetails userDetails = userContext.getLoggedUser();
-        Wallet wallet = walletRepository.findByOwnerId(userDetails.getId())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.WALLET_NOT_FOUND, userDetails.getId()));
+        Wallet wallet = getUserWallet();
 
         String amountStr = redisTemplate.opsForValue().get(CacheKey.getTransactionKey(transactionId));
         if (amountStr == null) {
@@ -70,6 +69,27 @@ public class TransactionServiceImpl implements TransactionService {
                 .createdAt(savedTransaction.getCreatedAt())
                 .updatedAt(savedTransaction.getUpdatedAt())
                 .build();
+    }
+
+
+
+    @Override
+    public void createTransaction(TransactionRequest request) {
+        Wallet wallet = getUserWallet();
+        Transaction transaction = Transaction.builder()
+                .amount(request.getAmount())
+                .type(request.getType())
+                .description(request.getDescription())
+                .status(TransactionStatus.PENDING)
+                .wallet(wallet)
+                .build();
+        transactionRepository.save(transaction);
+    }
+
+    private Wallet getUserWallet() {
+        CustomUserDetails userDetails = userContext.getLoggedUser();
+        return walletRepository.findByOwnerId(userDetails.getId())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.WALLET_NOT_FOUND, userDetails.getId()));
     }
 
 }
