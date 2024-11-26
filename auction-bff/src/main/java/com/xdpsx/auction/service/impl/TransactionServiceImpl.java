@@ -3,9 +3,11 @@ package com.xdpsx.auction.service.impl;
 import com.xdpsx.auction.constant.CacheKey;
 import com.xdpsx.auction.constant.ErrorCode;
 import com.xdpsx.auction.constant.VNPayCode;
+import com.xdpsx.auction.dto.transaction.TransactionMessage;
 import com.xdpsx.auction.dto.transaction.TransactionRequest;
 import com.xdpsx.auction.dto.transaction.TransactionResponse;
 import com.xdpsx.auction.exception.NotFoundException;
+import com.xdpsx.auction.mapper.TransactionMapper;
 import com.xdpsx.auction.model.Transaction;
 import com.xdpsx.auction.model.Wallet;
 import com.xdpsx.auction.model.enums.TransactionStatus;
@@ -15,9 +17,9 @@ import com.xdpsx.auction.repository.WalletRepository;
 import com.xdpsx.auction.security.CustomUserDetails;
 import com.xdpsx.auction.security.UserContext;
 import com.xdpsx.auction.service.TransactionService;
+import com.xdpsx.auction.service.producer.TransactionProducer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +32,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final WalletRepository walletRepository;
     private final TransactionRepository transactionRepository;
     private final RedisTemplate<String, String> redisTemplate;
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final TransactionProducer transactionProducer;
 
     @Transactional
     @Override
@@ -74,17 +76,29 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public void createTransaction(TransactionRequest request) {
+    public TransactionResponse createTransaction(TransactionRequest request) {
         Wallet wallet = getUserWallet();
         Transaction transaction = Transaction.builder()
                 .amount(request.getAmount())
                 .type(request.getType())
                 .description(request.getDescription())
-                .status(TransactionStatus.PENDING)
+                .status(request.getStatus())
                 .wallet(wallet)
                 .build();
         Transaction savedTransaction = transactionRepository.save(transaction);
-        kafkaTemplate.send("transaction-topic", String.valueOf(savedTransaction.getId()));
+        if (savedTransaction.getStatus() == TransactionStatus.COMPLETED) {
+            pushTransactionMessage(savedTransaction);
+        }
+        return TransactionMapper.INSTANCE.toResponse(savedTransaction);
+    }
+
+    private void pushTransactionMessage(Transaction transaction) {
+        TransactionMessage message = TransactionMessage.builder()
+                .amount(transaction.getAmount())
+                .type(transaction.getType())
+                .walletId(transaction.getWallet().getId())
+                .build();
+        transactionProducer.produceTransaction(message);
     }
 
     private Wallet getUserWallet() {

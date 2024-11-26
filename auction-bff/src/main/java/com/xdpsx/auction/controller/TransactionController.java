@@ -4,6 +4,7 @@ import com.xdpsx.auction.constant.VNPayParams;
 import com.xdpsx.auction.dto.transaction.TransactionRequest;
 import com.xdpsx.auction.dto.transaction.TransactionResponse;
 import com.xdpsx.auction.exception.BadRequestException;
+import com.xdpsx.auction.model.enums.TransactionStatus;
 import com.xdpsx.auction.model.enums.TransactionType;
 import com.xdpsx.auction.service.PaymentService;
 import com.xdpsx.auction.service.TransactionService;
@@ -38,14 +39,15 @@ public class TransactionController {
 
     @PostMapping("/test/transactions/create")
     @Hidden
-    ResponseEntity<Void> create() {
+    ResponseEntity<TransactionResponse> create() {
         TransactionRequest test = TransactionRequest.builder()
                 .amount(BigDecimal.valueOf(50000))
                 .description("Test transaction")
                 .type(TransactionType.DEPOSIT)
+                .status(TransactionStatus.COMPLETED)
                 .build();
-        transactionService.createTransaction(test);
-        return ResponseEntity.ok().build();
+        TransactionResponse response = transactionService.createTransaction(test);
+        return ResponseEntity.ok(response);
     }
 
 }
