@@ -97,12 +97,13 @@ public class TransactionServiceImpl implements TransactionService {
     public TransactionResponse updateTransaction(Long transactionId, UpdateTransactionDto request) {
         Transaction transaction = transactionRepository.findById(transactionId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.TRANSACTION_NOT_FOUND, transactionId));
+        BigDecimal oldAmount = transaction.getAmount();
         transaction.setAmount(request.getAmount());
         transaction.setDescription(request.getDescription());
         Transaction savedTransaction = transactionRepository.save(transaction);
         if (savedTransaction.getType().equals(TransactionType.SECURITY_FEE)) {
             TransactionMessage message = TransactionMessage.builder()
-                    .amount(savedTransaction.getAmount().subtract(transaction.getAmount()))
+                    .amount(savedTransaction.getAmount().subtract(oldAmount))
                     .type(savedTransaction.getType())
                     .walletId(savedTransaction.getWallet().getId())
                     .build();

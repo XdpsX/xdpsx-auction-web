@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -50,6 +51,32 @@ public class BidServiceImpl implements BidService {
         }else {
             return mapToBidResponse(activeBids.get(0));
         }
+    }
+
+    @Override
+    @Transactional
+    public void refundBid(Long id) {
+        CustomUserDetails userDetails = userContext.getLoggedUser();
+        Bid bid = bidRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.BID_NOT_FOUND, id));
+        if (!Objects.equals(bid.getBidder().getId(), userDetails.getId())){
+            throw new NotFoundException(ErrorCode.BID_NOT_FOUND, id);
+        }
+        Bid highestBid = bidRepository.findHighestBidByAuctionId(bid.getAuction().getId())
+                        .orElse(null);
+        if (highestBid != null && Objects.equals(highestBid.getId(), bid.getId())) {
+            throw new BadRequestException(ErrorCode.CAN_NOT_REFUND);
+        }
+        bid.setStatus(BidStatus.LOST);
+        Bid savedBid = bidRepository.save(bid);
+
+        TransactionRequest transactionRequest = TransactionRequest.builder()
+                .amount(savedBid.getTransaction().getAmount())
+                .type(TransactionType.REFUND)
+                .description("Refund for bid in auction: " + bid.getAuction().getName())
+                .status(TransactionStatus.COMPLETED)
+                .build();
+        transactionService.createTransaction(transactionRequest);
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)

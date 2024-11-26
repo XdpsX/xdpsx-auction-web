@@ -26,4 +26,10 @@ public class BidController {
         BidResponse response = bidService.getMyActiveBidInAuction(auctionId);
         return ResponseEntity.ok(response);
     }
+
+    @PutMapping("/storefront/bids/{id}/refund")
+    ResponseEntity<Void> refundBid(@PathVariable Long id) {
+        bidService.refundBid(id);
+        return ResponseEntity.noContent().build();
+    }
 }

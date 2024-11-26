@@ -22,5 +22,6 @@ public class ErrorCode {
     public static final String AUCTION_OWNER="AUCTION_OWNER";
     public static final String BID_LOWER="BID_LOWER";
     public static final String WALLET_NOT_ENOUGH="WALLET_NOT_ENOUGH";
+    public static final String CAN_NOT_REFUND="CAN_NOT_REFUND";
 
 }
