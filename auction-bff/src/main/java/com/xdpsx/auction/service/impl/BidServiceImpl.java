@@ -10,6 +10,7 @@ import com.xdpsx.auction.dto.transaction.UpdateTransactionDto;
 import com.xdpsx.auction.exception.BadRequestException;
 import com.xdpsx.auction.exception.NotFoundException;
 import com.xdpsx.auction.model.*;
+import com.xdpsx.auction.model.enums.AuctionType;
 import com.xdpsx.auction.model.enums.BidStatus;
 import com.xdpsx.auction.model.enums.TransactionStatus;
 import com.xdpsx.auction.model.enums.TransactionType;
@@ -43,14 +44,23 @@ public class BidServiceImpl implements BidService {
     private final SimpMessagingTemplate messagingTemplate;
 
     @Override
-    public BidResponse getMyActiveBidInAuction(Long auctionId){
+    public BidResponse getMyBidInAuction(Long auctionId){
         CustomUserDetails userDetails = userContext.getLoggedUser();
-        List<Bid> activeBids = bidRepository.findBidsWithStatusAndAuctionAndUser(auctionId, userDetails.getId(), BidStatus.ACTIVE);
-        if (activeBids.isEmpty()){
-            return null;
-        }else {
-            return mapToBidResponse(activeBids.get(0));
+        Auction auction = auctionRepository.findLiveAuction(auctionId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.AUCTION_NOT_FOUND, auctionId));
+        if (auction.getAuctionType().equals(AuctionType.ENGLISH)) {
+            List<Bid> activeBids = bidRepository.findBidsWithStatusAndAuctionAndUser(auctionId, userDetails.getId(), BidStatus.ACTIVE);
+            if (!activeBids.isEmpty()){
+                return mapToBidResponse(activeBids.get(0));
+            }
+        } else {
+            Bid bid = bidRepository.findByBidderIdAndAuctionId(userDetails.getId(), auction.getId())
+                    .orElse(null);
+            if (bid != null) {
+                return mapToBidResponse(bid);
+            }
         }
+        return null;
     }
 
     @Override
@@ -75,6 +85,7 @@ public class BidServiceImpl implements BidService {
                 .type(TransactionType.REFUND)
                 .description("Refund for bid in auction: " + bid.getAuction().getName())
                 .status(TransactionStatus.COMPLETED)
+                .userId(userDetails.getId())
                 .build();
         transactionService.createTransaction(transactionRequest);
     }
@@ -89,15 +100,38 @@ public class BidServiceImpl implements BidService {
             throw new BadRequestException(ErrorCode.AUCTION_OWNER);
         }
 
+        if (auction.getAuctionType().equals(AuctionType.ENGLISH)) {
+            return placeBidForEnglishAuction(auction, bidRequest, userDetails.getId());
+        } else {
+            return placeBidForSealedAuction(auction, bidRequest, userDetails.getId());
+        }
+    }
+
+    private BidResponse placeBidForEnglishAuction(Auction auction, BidRequest bidRequest, Long userId) {
         validateEnglishBidAmount(auction.getId(), bidRequest.getAmount(), auction.getStartingPrice(), auction.getStepPrice());
 
-        List<Bid> activeBids = bidRepository.findBidsWithStatusAndAuctionAndUser(auction.getId(), userDetails.getId(), BidStatus.ACTIVE);
+        List<Bid> activeBids = bidRepository.findBidsWithStatusAndAuctionAndUser(auction.getId(), userId, BidStatus.ACTIVE);
+        BidResponse bidResponse;
         if (activeBids.isEmpty()) { // create new bid
-            return createNewBid(auction, bidRequest, userDetails.getId());
+            bidResponse = createNewBid(auction, bidRequest, userId);
         } else {
             Bid existingBid = activeBids.get(0);
-            return updateBid(auction, bidRequest, existingBid, userDetails.getId());
+            bidResponse = updateBid(bidRequest, existingBid, userId);
         }
+        messagingTemplate.convertAndSend("/topic/auction/" + auction.getId(), bidResponse);
+        return bidResponse;
+    }
+
+    private BidResponse placeBidForSealedAuction(Auction auction, BidRequest bidRequest, Long userId) {
+        if (bidRequest.getAmount().compareTo(auction.getStartingPrice()) >= 0) {
+            throw new BadRequestException(ErrorCode.BID_HIGHER);
+        }
+        Bid existingBid = bidRepository.findByBidderIdAndAuctionId(userId, auction.getId())
+                .orElse(null);
+        if (existingBid != null) {
+            throw new BadRequestException(ErrorCode.BID_DUPLICATED);
+        }
+        return createNewBid(auction, bidRequest, userId);
     }
 
     private BidResponse createNewBid(Auction auction, BidRequest bidRequest, Long userId) {
@@ -109,6 +143,7 @@ public class BidServiceImpl implements BidService {
                 .type(TransactionType.SECURITY_FEE)
                 .description("Security Fee for auction: " + auction.getName())
                 .status(TransactionStatus.COMPLETED)
+                .userId(userId)
                 .build();
         TransactionResponse transactionResponse = transactionService.createTransaction(transactionRequest);
 
@@ -120,14 +155,11 @@ public class BidServiceImpl implements BidService {
                 .transaction(new Transaction(transactionResponse.getId()))
                 .build();
         Bid savedBid = bidRepository.save(bid);
-        BidResponse bidResponse = mapToBidResponse(savedBid);
 
-        messagingTemplate.convertAndSend("/topic/auction/" + auction.getId(), bidResponse);
-
-        return bidResponse;
+        return mapToBidResponse(savedBid);
     }
 
-    private BidResponse updateBid(Auction auction, BidRequest bidRequest, Bid existingBid, Long userId) {
+    private BidResponse updateBid(BidRequest bidRequest, Bid existingBid, Long userId) {
         BigDecimal newSecurityFee = bidRequest.getAmount().multiply(BidConstants.SECURITY_FEE_RATE);
 
         BigDecimal oldSecurityFee = existingBid.getAmount().multiply(BidConstants.SECURITY_FEE_RATE);
@@ -144,11 +176,8 @@ public class BidServiceImpl implements BidService {
 
         existingBid.setAmount(bidRequest.getAmount());
         Bid savedBid = bidRepository.save(existingBid);
-        BidResponse bidResponse = mapToBidResponse(savedBid);
 
-        messagingTemplate.convertAndSend("/topic/auction/" + auction.getId(), bidResponse);
-
-        return bidResponse;
+        return mapToBidResponse(savedBid);
     }
 
     private void validateEnglishBidAmount(Long auctionId, BigDecimal amount, BigDecimal startingAmount, BigDecimal stepAmount) {

@@ -78,7 +78,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionResponse createTransaction(TransactionRequest request) {
-        Wallet wallet = getUserWallet();
+        Wallet wallet = getWalletByUserId(request.getUserId());
         Transaction transaction = Transaction.builder()
                 .amount(request.getAmount())
                 .type(request.getType())
@@ -129,6 +129,11 @@ public class TransactionServiceImpl implements TransactionService {
         CustomUserDetails userDetails = userContext.getLoggedUser();
         return walletRepository.findByOwnerId(userDetails.getId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.WALLET_NOT_FOUND, userDetails.getId()));
+    }
+
+    private Wallet getWalletByUserId(Long userId) {
+        return walletRepository.findByOwnerId(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.WALLET_NOT_FOUND, userId));
     }
 
 }

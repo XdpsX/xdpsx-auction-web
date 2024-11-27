@@ -10,8 +10,17 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BidRepository extends JpaRepository<Bid, Long> {
-    @Query("SELECT b FROM Bid b WHERE b.auction.id = :auctionId ORDER BY b.amount DESC LIMIT 1")
+    @Query("SELECT b FROM Bid b WHERE " +
+            "b.auction.id = :auctionId AND " +
+            "b.status = 'ACTIVE' " +
+            "ORDER BY b.amount DESC LIMIT 1")
     Optional<Bid> findHighestBidByAuctionId(@Param("auctionId") Long auctionId);
+
+    @Query("SELECT b FROM Bid b WHERE " +
+            "b.auction.id = :auctionId AND " +
+            "b.status = 'ACTIVE' " +
+            "ORDER BY b.amount DESC")
+    List<Bid> findBidsByAuctionIdOrderByAmountDesc(@Param("auctionId") Long auctionId);
 
     @Query("SELECT b FROM Bid b WHERE " +
             "b.auction.id = :auctionId AND " +
@@ -21,4 +30,6 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
     List<Bid> findBidsWithStatusAndAuctionAndUser(@Param("auctionId") Long auctionId,
                                                  @Param("userId") Long userId,
                                                  @Param("status") BidStatus status);
+
+    Optional<Bid> findByBidderIdAndAuctionId(Long bidderId, Long auctionId);
 }

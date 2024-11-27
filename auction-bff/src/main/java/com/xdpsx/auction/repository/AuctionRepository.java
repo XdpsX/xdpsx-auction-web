@@ -18,8 +18,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long>,
             "JOIN FETCH a.category " +
             "WHERE a.id = :id " +
             "AND a.trashed = false " +
-            "AND a.published = true " +
-            "AND a.endingTime > CURRENT_TIMESTAMP")
+            "AND a.published = true")
     Optional<Auction> findActiveAuctionById(@Param("id") Long id);
 
     @Query("SELECT a FROM Auction a " +

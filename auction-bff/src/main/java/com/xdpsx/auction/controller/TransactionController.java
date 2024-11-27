@@ -45,6 +45,7 @@ public class TransactionController {
                 .description("Test transaction")
                 .type(TransactionType.DEPOSIT)
                 .status(TransactionStatus.COMPLETED)
+                .userId(1L)
                 .build();
         TransactionResponse response = transactionService.createTransaction(test);
         return ResponseEntity.ok(response);

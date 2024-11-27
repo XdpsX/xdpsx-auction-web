@@ -16,4 +16,5 @@ public class TransactionRequest {
     private TransactionType type;
     private TransactionStatus status;
     private String description;
+    private Long userId;
 }
