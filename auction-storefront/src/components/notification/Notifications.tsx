@@ -9,10 +9,10 @@ import {
 } from '../../features/notification/slice'
 import { useSelector } from 'react-redux'
 import { Notification } from '../../models/notification.type'
-import SockJS from 'sockjs-client'
-import { Stomp } from '@stomp/stompjs'
+import { Client } from '@stomp/stompjs'
 import { selectUser } from '../../features/user/user.slice'
 import NotificationContent from './NotificationContent'
+import socket from '../../utils/socket'
 
 function Notifications() {
   const dispatch = useAppDispatch()
@@ -25,22 +25,27 @@ function Notifications() {
 
   useEffect(() => {
     if (!userProfile) return
-    const socket = new SockJS('http://localhost:8080/ws')
-    const stompClient = Stomp.over(socket)
-    stompClient.connect({}, () => {
-      stompClient.subscribe(
-        `/topic/notification/${userProfile.id}`,
-        (message) => {
-          const newNotification: Notification = JSON.parse(message.body)
-          dispatch(addNotification(newNotification))
-        }
-      )
+    const stompClient = new Client({
+      webSocketFactory: () => socket,
+      onConnect: () => {
+        stompClient.subscribe(
+          `/topic/notification/${userProfile.id}`,
+          (message) => {
+            const newNotification: Notification = JSON.parse(message.body)
+            dispatch(addNotification(newNotification))
+          }
+        )
+      },
+      onStompError: (frame) => {
+        console.error('STOMP error: ', frame)
+      },
     })
 
+    stompClient.activate()
+
     return () => {
-      stompClient.disconnect(() => {
-        console.log('Disconnected')
-      })
+      stompClient.deactivate()
+      console.log('Disconnected')
     }
   }, [dispatch, userProfile])
 
@@ -52,7 +57,7 @@ function Notifications() {
     >
       <FaBell size={20} />
       {unreadCount > 0 && (
-        <div className="absolute top-[-10px] right-[-10px] z-[99]  w-5 h-5 rounded-full flex items-center justify-center bg-red-500 text-white text-[12px]">
+        <div className="absolute top-[-10px] right-[-10px] z-[10]  w-5 h-5 rounded-full flex items-center justify-center bg-red-500 text-white text-[12px]">
           {unreadCount > 99 ? '99+' : unreadCount}
         </div>
       )}

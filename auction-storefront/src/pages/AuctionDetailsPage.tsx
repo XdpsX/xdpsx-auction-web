@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { formatPrice, getIdFromSlug } from '../utils/format'
 import { useEffect } from 'react'
 import { fetchAuctionDetailsAPI } from '../features/auction/service'
@@ -7,16 +7,16 @@ import { AuctionDetails } from '../models/auction.type'
 import PreviewImages from '../components/ui/PreviewImages'
 import Button from '../components/ui/Button'
 import AuctionType from '../components/auction/AuctionType'
-import AuctionDate from '../components/auction/AuctionDate'
+import AuctionStatus from '../components/auction/AuctionStatus'
 import { useAppSelector } from '../store/hooks'
 import RichText from '../components/ui/RichText'
-import BidForm from '../components/bid/BidForm'
-import SockJS from 'sockjs-client'
-import { Stomp } from '@stomp/stompjs'
+import { Client } from '@stomp/stompjs'
 import { Bid } from '../models/bid.type'
 import { selectUser } from '../features/user/user.slice'
 import { toast } from 'react-toastify'
 import USER_ICON from '../assets/default-user-icon.png'
+import AuctionBid from '../components/auction/AuctionBid'
+import socket from '../utils/socket'
 
 function AuctionDetailsPage() {
   const navigate = useNavigate()
@@ -26,8 +26,8 @@ function AuctionDetailsPage() {
   const [highestBid, setHighestBid] = useState<Bid | null>(null)
   const [showImage, setShowImage] = useState('')
   const [isBidUpdated, setIsBidUpdated] = useState(false)
+  const [isAuctionEnded, setIsAuctionEnded] = useState(false)
   const { userProfile } = useAppSelector(selectUser)
-  const isAuthenticated = !!userProfile
 
   useEffect(() => {
     fetchAuctionDetailsAPI(id)
@@ -42,38 +42,34 @@ function AuctionDetailsPage() {
   }, [id, navigate])
 
   useEffect(() => {
-    const socket = new SockJS('http://localhost:8080/ws')
-    const stompClient = Stomp.over(socket)
-    stompClient.connect({}, () => {
-      stompClient.subscribe(`/topic/auction/${id}`, (message) => {
-        const bidResponse: Bid = JSON.parse(message.body)
-        setHighestBid(bidResponse)
-        setIsBidUpdated(true)
-
-        if (bidResponse.bidderId !== userProfile?.id) {
-          toast.warn('New bid has been placed')
-        }
-
-        setTimeout(() => {
-          setIsBidUpdated(false)
-        }, 1000)
-      })
-
-      stompClient.subscribe(`/topic/auction/${id}/end`, (message) => {
-        const isEnd: boolean = JSON.parse(message.body)
-        if (isEnd) {
-          navigate('/')
-          toast.warn('Auction has ended')
-        }
-      })
+    const stompClient = new Client({
+      webSocketFactory: () => socket,
+      onConnect: (frame) => {
+        console.log('Connected: ' + frame)
+        stompClient.subscribe(`/topic/auction/${id}`, (message) => {
+          const bidResponse = JSON.parse(message.body)
+          setHighestBid(bidResponse)
+          setIsBidUpdated(true)
+          if (bidResponse.bidderId !== userProfile?.id) {
+            toast.warn('New bid has been placed')
+          }
+          setTimeout(() => {
+            setIsBidUpdated(false)
+          }, 1000)
+        })
+      },
+      onStompError: (frame) => {
+        console.error('STOMP error: ', frame)
+      },
     })
 
+    stompClient.activate()
+
     return () => {
-      stompClient.disconnect(() => {
-        console.log('Disconnected')
-      })
+      stompClient.deactivate()
+      console.log('Disconnected')
     }
-  }, [id, navigate, userProfile?.id])
+  }, [id, userProfile?.id])
 
   if (!auction) return null
   const previewImages = [auction.mainImage, ...auction.images]
@@ -112,9 +108,10 @@ function AuctionDetailsPage() {
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-semibold">Status:</span>
-                <AuctionDate
+                <AuctionStatus
                   endingDate={auction.endingTime}
                   startingDate={auction.startingTime}
+                  onAuctionEnd={() => setIsAuctionEnded(true)}
                 />
               </div>
               <div></div>
@@ -149,16 +146,11 @@ function AuctionDetailsPage() {
             </div>
           </div>
 
-          {!isAuthenticated ? (
-            <Link
-              to="/login"
-              className="px-4 py-2 bg-red-500 text-white text-lg rounded-md hover:bg-red-600"
-            >
-              Login to bid
-            </Link>
-          ) : (
-            <BidForm auction={auction} highestBid={highestBid} />
-          )}
+          <AuctionBid
+            isAuctionEnded={isAuctionEnded}
+            auction={auction}
+            highestBid={highestBid}
+          />
         </div>
       </div>
 

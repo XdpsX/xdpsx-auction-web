@@ -4,7 +4,7 @@ import { formatPrice, generateSlug } from '../../utils/format'
 import { Auction } from '../../models/auction.type'
 import DEFAULT_AVATAR from '../../assets/default-user-icon.png'
 import AuctionType from './AuctionType'
-import AuctionDate from './AuctionDate'
+import AuctionStatus from './AuctionStatus'
 
 function AuctionCard({ auction }: { auction: Auction }) {
   const auctionSlug = useMemo(
@@ -58,7 +58,7 @@ function AuctionCard({ auction }: { auction: Auction }) {
             />
             <span>{auction.seller.name}</span>
           </p>
-          <AuctionDate
+          <AuctionStatus
             endingDate={auction.endingTime}
             startingDate={auction.startingTime}
           />

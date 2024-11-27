@@ -7,7 +7,6 @@ import Button from '../ui/Button'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 
 import { toast } from 'react-toastify'
-import { selectUser } from '../../features/user/user.slice'
 import { useEffect, useState } from 'react'
 import {
   getUserBidAsync,
@@ -29,9 +28,7 @@ function BidForm({
 }) {
   const dispatch = useAppDispatch()
   const { userBid, isProcessing } = useAppSelector(selectBid)
-  const { userProfile } = useAppSelector(selectUser)
   const { wallet } = useAppSelector(selectWallet)
-  const isAuthenticated = !!userProfile
 
   const [securityFee, setSecurityFee] = useState(0)
   const [showBidAttention, setShowBidAttention] = useState(
@@ -63,10 +60,8 @@ function BidForm({
   const amountWatch = watch('amount')
 
   useEffect(() => {
-    if (isAuthenticated) {
-      dispatch(getUserBidAsync(auction.id))
-    }
-  }, [auction.id, dispatch, isAuthenticated])
+    dispatch(getUserBidAsync(auction.id))
+  }, [auction.id, dispatch])
 
   useEffect(() => {
     reset({ amount: minAmount })
@@ -150,20 +145,6 @@ function BidForm({
   const handleCloseModal = () => {
     setOpenAttention(false)
     setShowAttentionAgain(true)
-  }
-
-  if (userProfile && userProfile.id === auction.seller.id) {
-    return (
-      <p className="text-lg font-bold">You can't bid on your own auction</p>
-    )
-  }
-
-  if (userProfile && userProfile.id === highestBid?.bidderId) {
-    return (
-      <p className="text-lg font-semibold text-green-500">
-        You are the highest bidder
-      </p>
-    )
   }
 
   return (

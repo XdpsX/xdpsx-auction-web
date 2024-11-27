@@ -10,9 +10,9 @@ import { useEffect } from 'react'
 
 import { formatPrice } from '../../utils/format'
 import { selectWallet, setWallet } from '../../features/wallet/wallet.slice'
-import SockJS from 'sockjs-client'
-import { Stomp } from '@stomp/stompjs'
+import { Client } from '@stomp/stompjs'
 import { Wallet } from '../../models/wallet.type'
+import socket from '../../utils/socket'
 
 function HeaderBottom() {
   const dispatch = useAppDispatch()
@@ -26,20 +26,24 @@ function HeaderBottom() {
   useEffect(() => {
     if (!wallet) return
 
-    const socket = new SockJS('http://localhost:8080/ws')
-    const stompClient = Stomp.over(socket)
-    stompClient.connect({}, () => {
-      stompClient.subscribe(`/topic/wallet/${wallet.id}`, (message) => {
-        const newWallet: Wallet = JSON.parse(message.body)
-        console.log('New wallet received:', newWallet)
-        dispatch(setWallet(newWallet))
-      })
+    const stompClient = new Client({
+      webSocketFactory: () => socket,
+      onConnect: () => {
+        stompClient.subscribe(`/topic/wallet/${wallet.id}`, (message) => {
+          const newWallet: Wallet = JSON.parse(message.body)
+          dispatch(setWallet(newWallet))
+        })
+      },
+      onStompError: (frame) => {
+        console.error('STOMP error: ', frame)
+      },
     })
 
+    stompClient.activate()
+
     return () => {
-      stompClient.disconnect(() => {
-        console.log('Disconnected')
-      })
+      stompClient.deactivate()
+      console.log('Disconnected')
     }
   }, [wallet, dispatch])
 
