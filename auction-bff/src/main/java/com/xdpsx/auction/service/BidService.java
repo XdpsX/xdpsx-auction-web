@@ -6,5 +6,5 @@ import com.xdpsx.auction.dto.bid.BidResponse;
 public interface BidService {
     BidResponse placeBid(Long auctionId, BidRequest bidRequest);
     BidResponse getMyBidInAuction(Long auctionId);
-    void refundBid(Long id);
+    BidResponse refundBid(Long id);
 }

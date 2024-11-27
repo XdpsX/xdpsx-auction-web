@@ -28,8 +28,8 @@ public class BidController {
     }
 
     @PutMapping("/storefront/bids/{id}/refund")
-    ResponseEntity<Void> refundBid(@PathVariable Long id) {
-        bidService.refundBid(id);
-        return ResponseEntity.noContent().build();
+    ResponseEntity<BidResponse> refundBid(@PathVariable Long id) {
+        BidResponse response = bidService.refundBid(id);
+        return ResponseEntity.ok(response);
     }
 }

@@ -4,6 +4,7 @@ import com.xdpsx.auction.constant.BidConstants;
 import com.xdpsx.auction.constant.ErrorCode;
 import com.xdpsx.auction.dto.bid.BidRequest;
 import com.xdpsx.auction.dto.bid.BidResponse;
+import com.xdpsx.auction.dto.notification.NotificationRequest;
 import com.xdpsx.auction.dto.transaction.TransactionRequest;
 import com.xdpsx.auction.dto.transaction.TransactionResponse;
 import com.xdpsx.auction.dto.transaction.UpdateTransactionDto;
@@ -19,6 +20,7 @@ import com.xdpsx.auction.repository.BidRepository;
 import com.xdpsx.auction.security.CustomUserDetails;
 import com.xdpsx.auction.security.UserContext;
 import com.xdpsx.auction.service.BidService;
+import com.xdpsx.auction.service.NotificationService;
 import com.xdpsx.auction.service.TransactionService;
 import com.xdpsx.auction.service.WalletService;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +31,9 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 @Slf4j
@@ -41,6 +45,7 @@ public class BidServiceImpl implements BidService {
     private final AuctionRepository auctionRepository;
     private final WalletService walletService;
     private final TransactionService transactionService;
+    private final NotificationService notificationService;
     private final SimpMessagingTemplate messagingTemplate;
 
     @Override
@@ -65,18 +70,30 @@ public class BidServiceImpl implements BidService {
 
     @Override
     @Transactional
-    public void refundBid(Long id) {
+    public BidResponse refundBid(Long id) {
         CustomUserDetails userDetails = userContext.getLoggedUser();
         Bid bid = bidRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.BID_NOT_FOUND, id));
-        if (!Objects.equals(bid.getBidder().getId(), userDetails.getId())){
+        if (!Objects.equals(bid.getBidder().getId(), userDetails.getId()) || !bid.getStatus().equals(BidStatus.ACTIVE)){
             throw new NotFoundException(ErrorCode.BID_NOT_FOUND, id);
         }
-        Bid highestBid = bidRepository.findHighestBidByAuctionId(bid.getAuction().getId())
-                        .orElse(null);
-        if (highestBid != null && Objects.equals(highestBid.getId(), bid.getId())) {
-            throw new BadRequestException(ErrorCode.CAN_NOT_REFUND);
+        Auction auction = bid.getAuction();
+        if (auction.getAuctionType().equals(AuctionType.ENGLISH)) {
+            Bid highestBid = bidRepository.findHighestBidByAuctionId(bid.getAuction().getId())
+                    .orElse(null);
+            if (highestBid != null && Objects.equals(highestBid.getId(), bid.getId())) {
+                throw new BadRequestException(ErrorCode.CAN_NOT_REFUND);
+            }
+            updateBidToLost(userDetails, bid);
+            return null;
+        } else {
+            Bid savedBid = updateBidToLost(userDetails, bid);
+
+            return mapToBidResponse(savedBid);
         }
+    }
+
+    private Bid updateBidToLost(CustomUserDetails userDetails, Bid bid) {
         bid.setStatus(BidStatus.LOST);
         Bid savedBid = bidRepository.save(bid);
 
@@ -88,6 +105,16 @@ public class BidServiceImpl implements BidService {
                 .userId(userDetails.getId())
                 .build();
         transactionService.createTransaction(transactionRequest);
+
+        NumberFormat numberFormat = NumberFormat.getInstance(Locale.getDefault());
+        NotificationRequest refundNotification = NotificationRequest.builder()
+                .title("Refund Bid")
+                .message("You have refunded: " + numberFormat.format(bid.getTransaction().getAmount()))
+                .userId(bid.getBidder().getId())
+                .build();
+        notificationService.pushNotification(refundNotification);
+
+        return savedBid;
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
@@ -199,6 +226,7 @@ public class BidServiceImpl implements BidService {
                 .amount(bid.getAmount())
                 .bidderId(bid.getBidder().getId())
                 .auctionId(bid.getAuction().getId())
+                .status(bid.getStatus())
                 .build();
     }
 

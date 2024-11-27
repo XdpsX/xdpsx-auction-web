@@ -28,7 +28,6 @@ public class AuctionScheduler {
     private final AuctionRepository auctionRepository;
     private final BidRepository bidRepository;
     private final TransactionService transactionService;
-    private final SimpMessagingTemplate messagingTemplate;
 
     @Scheduled(fixedRate = 60000)
     // @Scheduled(cron = "0 * * * * ?")
