@@ -2,6 +2,8 @@ package com.xdpsx.auction.service.impl;
 
 import com.xdpsx.auction.constant.BidConstants;
 import com.xdpsx.auction.constant.ErrorCode;
+import com.xdpsx.auction.dto.PageResponse;
+import com.xdpsx.auction.dto.bid.BidAuctionDto;
 import com.xdpsx.auction.dto.bid.BidRequest;
 import com.xdpsx.auction.dto.bid.BidResponse;
 import com.xdpsx.auction.dto.notification.NotificationRequest;
@@ -10,6 +12,8 @@ import com.xdpsx.auction.dto.transaction.TransactionResponse;
 import com.xdpsx.auction.dto.transaction.UpdateTransactionDto;
 import com.xdpsx.auction.exception.BadRequestException;
 import com.xdpsx.auction.exception.NotFoundException;
+import com.xdpsx.auction.mapper.BidMapper;
+import com.xdpsx.auction.mapper.PageMapper;
 import com.xdpsx.auction.model.*;
 import com.xdpsx.auction.model.enums.AuctionType;
 import com.xdpsx.auction.model.enums.BidStatus;
@@ -25,6 +29,9 @@ import com.xdpsx.auction.service.TransactionService;
 import com.xdpsx.auction.service.WalletService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -56,13 +63,13 @@ public class BidServiceImpl implements BidService {
         if (auction.getAuctionType().equals(AuctionType.ENGLISH)) {
             List<Bid> activeBids = bidRepository.findBidsWithStatusAndAuctionAndUser(auctionId, userDetails.getId(), BidStatus.ACTIVE);
             if (!activeBids.isEmpty()){
-                return mapToBidResponse(activeBids.get(0));
+                return BidMapper.INSTANCE.toResponse(activeBids.get(0));
             }
         } else {
             Bid bid = bidRepository.findByBidderIdAndAuctionId(userDetails.getId(), auction.getId())
                     .orElse(null);
             if (bid != null) {
-                return mapToBidResponse(bid);
+                return BidMapper.INSTANCE.toResponse(bid);
             }
         }
         return null;
@@ -89,7 +96,7 @@ public class BidServiceImpl implements BidService {
         } else {
             Bid savedBid = updateBidToLost(userDetails, bid);
 
-            return mapToBidResponse(savedBid);
+            return BidMapper.INSTANCE.toResponse(savedBid);
         }
     }
 
@@ -183,7 +190,7 @@ public class BidServiceImpl implements BidService {
                 .build();
         Bid savedBid = bidRepository.save(bid);
 
-        return mapToBidResponse(savedBid);
+        return BidMapper.INSTANCE.toResponse(savedBid);
     }
 
     private BidResponse updateBid(BidRequest bidRequest, Bid existingBid, Long userId) {
@@ -204,7 +211,7 @@ public class BidServiceImpl implements BidService {
         existingBid.setAmount(bidRequest.getAmount());
         Bid savedBid = bidRepository.save(existingBid);
 
-        return mapToBidResponse(savedBid);
+        return BidMapper.INSTANCE.toResponse(savedBid);
     }
 
     private void validateEnglishBidAmount(Long auctionId, BigDecimal amount, BigDecimal startingAmount, BigDecimal stepAmount) {
@@ -220,14 +227,25 @@ public class BidServiceImpl implements BidService {
         }
     }
 
-    private BidResponse mapToBidResponse(Bid bid) {
-        return BidResponse.builder()
-                .id(bid.getId())
-                .amount(bid.getAmount())
-                .bidderId(bid.getBidder().getId())
-                .auctionId(bid.getAuction().getId())
-                .status(bid.getStatus())
-                .build();
+    @Override
+    public PageResponse<BidAuctionDto> getUserBids(Long userId, int pageNum, int pageSize, String sort, BidStatus status) {
+        Page<Bid> bidPage = bidRepository.findUserBids(
+                userId, status, PageRequest.of(pageNum - 1, pageSize, getSort(sort))
+        );
+        return PageMapper.toPageResponse(bidPage, BidMapper.INSTANCE::toBidAuctionDto);
+    }
+
+    private Sort getSort(String sortParam) {
+        if (sortParam == null) {
+            return Sort.by("updatedAt").descending();
+        }
+
+        return switch (sortParam) {
+            case "amount" -> Sort.by("amount").ascending();
+            case "-amount" -> Sort.by("amount").descending();
+            case "date" -> Sort.by("updatedAt").ascending();
+            default -> Sort.by("updatedAt").descending();
+        };
     }
 
 }

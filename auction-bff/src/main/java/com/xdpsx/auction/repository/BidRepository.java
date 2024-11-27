@@ -2,14 +2,17 @@ package com.xdpsx.auction.repository;
 
 import com.xdpsx.auction.model.Bid;
 import com.xdpsx.auction.model.enums.BidStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface BidRepository extends JpaRepository<Bid, Long> {
+public interface BidRepository extends JpaRepository<Bid, Long>, JpaSpecificationExecutor<Bid> {
     @Query("SELECT b FROM Bid b WHERE " +
             "b.auction.id = :auctionId AND " +
             "b.status = 'ACTIVE' " +
@@ -32,4 +35,10 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
                                                  @Param("status") BidStatus status);
 
     Optional<Bid> findByBidderIdAndAuctionId(Long bidderId, Long auctionId);
+
+    @Query("SELECT b FROM Bid b WHERE b.bidder.id = :bidderId" +
+            " AND (:status IS NULL OR b.status = :status)")
+    Page<Bid> findUserBids(@Param("bidderId") Long bidderId,
+                           @Param("status") BidStatus status,
+                           Pageable pageable);
 }

@@ -3,10 +3,8 @@ package com.xdpsx.auction.model;
 import com.xdpsx.auction.model.enums.BidStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
-import java.time.ZonedDateTime;
 
 @Getter
 @Setter
