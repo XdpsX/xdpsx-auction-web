@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
-    private final PageMapper pageMapper;
     private final NotificationProducer notificationProducer;
 
     @Override
@@ -32,7 +31,7 @@ public class NotificationServiceImpl implements NotificationService {
                 userId,
                 PageRequest.of(pageNum - 1, pageSize)
         );
-        return pageMapper.toPageNotificationResponse(notificationPage, NotificationMapper.INSTANCE::toDto);
+        return PageMapper.toPageResponse(notificationPage, NotificationMapper.INSTANCE::toDto);
     }
 
     @Override

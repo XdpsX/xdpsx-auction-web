@@ -17,7 +17,6 @@ import java.math.BigDecimal;
 @Service
 @RequiredArgsConstructor
 public class TransactionConsumer {
-    private final WalletMapper walletMapper;
     private final WalletRepository walletRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
@@ -31,7 +30,7 @@ public class TransactionConsumer {
             BigDecimal newBalance = wallet.getBalance().add(getAmount(transaction));
             wallet.setBalance(newBalance);
             Wallet savedWallet = walletRepository.save(wallet);
-            messagingTemplate.convertAndSend("/topic/wallet/" + wallet.getId(), walletMapper.toWalletDto(savedWallet));
+            messagingTemplate.convertAndSend("/topic/wallet/" + wallet.getId(), WalletMapper.INSTANCE.toWalletDto(savedWallet));
         }else {
             log.error("Wallet not found: {}", transaction.getWalletId());
         }

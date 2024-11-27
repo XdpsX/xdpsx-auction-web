@@ -10,12 +10,14 @@ import com.xdpsx.auction.model.AuctionImage;
 import com.xdpsx.auction.model.Bid;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring")
+@Mapper
 public interface AuctionMapper {
+    AuctionMapper INSTANCE = Mappers.getMapper(AuctionMapper.class);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "seller", ignore = true)
@@ -25,15 +27,15 @@ public interface AuctionMapper {
     @Mapping(target = "trashed", ignore = true)
     @Mapping(target = "isEnd", ignore = true)
     @Mapping(target = "bids", ignore = true)
-    Auction fromRequestToEntity(AuctionRequest dto);
+    Auction toEntity(AuctionRequest dto);
 
     @Mapping(target = "mainImage", source = "entity.mainImage")
     @Mapping(target = "category", source = "entity.category.name")
-    AuctionDto fromEntityToDto(Auction entity);
+    AuctionDto toDto(Auction entity);
 
     @Mapping(target = "mainImage", source = "entity.mainImage")
     @Mapping(target = "seller", source = "entity.seller")
-    AuctionResponse fromEntityToResponse(Auction entity);
+    AuctionResponse toResponse(Auction entity);
 
     @Mapping(target = "id", source = "entity.id")
     @Mapping(target = "images", source = "entity.images")

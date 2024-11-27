@@ -27,7 +27,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
-    private final PageMapper pageMapper;
     private final MediaService mediaService;
     private final CategoryRepository categoryRepository;
     private final SimpleSpecification<Category> specification;
@@ -54,7 +53,7 @@ public class CategoryServiceImpl implements CategoryService {
                 specification.getSimpleSpec(keyword, sort, published),
                 PageRequest.of(pageNum - 1, pageSize)
         );
-        return pageMapper.toPageCategoryResponse(categoryPage);
+        return PageMapper.toPageResponse(categoryPage, CategoryDetailsDto::fromModel);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

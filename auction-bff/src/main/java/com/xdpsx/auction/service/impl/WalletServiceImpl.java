@@ -16,14 +16,13 @@ import java.math.BigDecimal;
 @Service
 @RequiredArgsConstructor
 public class WalletServiceImpl implements WalletService {
-    private final WalletMapper walletMapper;
     private final WalletRepository walletRepository;
 
     @Override
     public WalletDto getWalletByOwnerId(Long ownerId) {
         Wallet wallet = walletRepository.findByOwnerId(ownerId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.WALLET_NOT_FOUND, ownerId));
-        return walletMapper.toWalletDto(wallet);
+        return WalletMapper.INSTANCE.toWalletDto(wallet);
     }
 
     @Override
