@@ -1,15 +1,13 @@
+import { useEffect, useMemo, useState } from 'react'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm } from 'react-hook-form'
+import { toast } from 'react-toastify'
 import { Bid, BidPayload, bidSchema } from '../../models/bid.type'
-import Input from '../ui/Input'
 import { AuctionDetails } from '../../models/auction.type'
+import Input from '../ui/Input'
 import Button from '../ui/Button'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
-
-import { toast } from 'react-toastify'
-import { useEffect, useState } from 'react'
 import {
-  getUserBidAsync,
   placeBidAsync,
   refundBidAsync,
   selectBid,
@@ -22,12 +20,14 @@ import BidRefundModal from './BidRefundModal'
 function BidForm({
   auction,
   highestBid,
+  userBid,
 }: {
   auction: AuctionDetails
   highestBid: Bid | null
+  userBid: Bid | null
 }) {
   const dispatch = useAppDispatch()
-  const { userBid, isProcessing } = useAppSelector(selectBid)
+  const { isProcessing } = useAppSelector(selectBid)
   const { wallet } = useAppSelector(selectWallet)
 
   const [securityFee, setSecurityFee] = useState(0)
@@ -38,9 +38,19 @@ function BidForm({
   const [openAttention, setOpenAttention] = useState(false)
   const [openRefund, setOpenRefund] = useState(false)
 
-  const minAmount = highestBid
-    ? highestBid.amount + auction.stepPrice
-    : auction.startingPrice + auction.stepPrice
+  const defaultAmount = useMemo(() => {
+    return auction.auctionType === 'ENGLISH'
+      ? highestBid
+        ? highestBid.amount + auction.stepPrice
+        : auction.startingPrice + auction.stepPrice
+      : auction.startingPrice / 10
+  }, [
+    auction.auctionType,
+    auction.startingPrice,
+    auction.stepPrice,
+    highestBid,
+  ])
+
   const {
     control,
     handleSubmit,
@@ -54,18 +64,14 @@ function BidForm({
   } = useForm({
     resolver: yupResolver(bidSchema),
     defaultValues: {
-      amount: minAmount,
+      amount: defaultAmount,
     },
   })
   const amountWatch = watch('amount')
 
   useEffect(() => {
-    dispatch(getUserBidAsync(auction.id))
-  }, [auction.id, dispatch])
-
-  useEffect(() => {
-    reset({ amount: minAmount })
-  }, [highestBid, minAmount, reset])
+    reset({ amount: defaultAmount })
+  }, [highestBid, defaultAmount, reset])
 
   useEffect(() => {
     if (userBid) {
@@ -81,31 +87,46 @@ function BidForm({
         type: 'manual',
         message: 'Wallet balance is not enough',
       })
+    } else if (userBid && userBid.amount > amountWatch) {
+      setError('amount', {
+        type: 'manual',
+        message: 'Amount must be greater than the current bid',
+      })
     } else {
       clearErrors('amount')
     }
-  }, [clearErrors, securityFee, setError, wallet])
+  }, [amountWatch, clearErrors, securityFee, setError, userBid, wallet])
 
   const increaseAmount = () => {
     clearErrors('amount')
     const amount = Number(getValues('amount'))
-    if (amount < minAmount) {
-      setValue('amount', minAmount)
-      return
+    if (auction.auctionType === 'ENGLISH') {
+      if (amount < defaultAmount) {
+        setValue('amount', defaultAmount)
+        return
+      }
+      setValue('amount', amount + auction.stepPrice)
+    } else {
+      if (amount + defaultAmount >= auction.startingPrice) return
+      setValue('amount', amount + defaultAmount)
     }
-    setValue('amount', amount + auction.stepPrice)
   }
 
   const decreaseAmount = () => {
     clearErrors('amount')
     const amount = Number(getValues('amount'))
-    if (amount > minAmount) {
-      setValue('amount', amount - auction.stepPrice)
+    if (auction.auctionType === 'ENGLISH') {
+      if (amount > defaultAmount) {
+        setValue('amount', amount - auction.stepPrice)
+      } else {
+        setError('amount', {
+          type: 'manual',
+          message: 'Amount must be greater than the current bid',
+        })
+      }
     } else {
-      setError('amount', {
-        type: 'manual',
-        message: 'Amount must be greater than the current bid',
-      })
+      if (amount - defaultAmount < defaultAmount) return
+      setValue('amount', amount - defaultAmount)
     }
   }
 
@@ -140,11 +161,43 @@ function BidForm({
 
   const handleRefund = (bidId: number) => {
     dispatch(refundBidAsync(bidId))
+      .unwrap()
+      .then(() => {
+        toast.success('Refund successfully')
+      })
   }
 
   const handleCloseModal = () => {
     setOpenAttention(false)
     setShowAttentionAgain(true)
+  }
+
+  if (
+    auction.auctionType === 'SEALED_BID' &&
+    userBid &&
+    userBid.status === 'ACTIVE'
+  ) {
+    return (
+      <div>
+        <p className="text-lg font-semibold text-green-500">
+          You have already placed a bid ({formatPrice(userBid.amount)})
+        </p>
+        <BidRefundModal
+          open={openRefund}
+          onClose={() => setOpenRefund(false)}
+          onSubmit={handleRefund.bind(null, userBid.id)}
+          amount={userBid.amount / 10}
+        />
+        <Button
+          disabled={isProcessing}
+          type="button"
+          className="text-sm text-red-500 underline shadow-none"
+          onClick={setOpenRefund.bind(null, true)}
+        >
+          Accept lost (Refund)
+        </Button>
+      </div>
+    )
   }
 
   return (
@@ -164,7 +217,7 @@ function BidForm({
           <div className="flex items-center justify-between">
             <label htmlFor="amount">Enter your bid:</label>
             <span className="text-gray-500 text-sm">
-              Security Fee: {formatPrice(securityFee)}
+              Security Fee: {formatPrice(securityFee > 0 ? securityFee : 0)}
             </span>
           </div>
 
@@ -196,7 +249,7 @@ function BidForm({
         </div>
         <div className="flex items-center gap-2">
           <Button
-            disabled={isProcessing}
+            disabled={isProcessing || (errors.amount ? true : false)}
             className="px-8 py-2 uppercase bg-blue-500 text-white hover:bg-blue-600"
           >
             Bid
@@ -205,7 +258,7 @@ function BidForm({
             <Button
               disabled={isProcessing}
               type="button"
-              className="text-sm text-red-500 underline"
+              className="text-sm text-red-500 underline shadow-none"
               onClick={setOpenRefund.bind(null, true)}
             >
               Accept lost (Refund)

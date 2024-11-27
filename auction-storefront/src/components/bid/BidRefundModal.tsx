@@ -23,11 +23,11 @@ function BidRefundModal({
           <BsExclamationTriangle className="text-red-500   h-8 w-8" />
         </div>
         <p className="mt-2 text-black text-lg mb-2">
-          Do you want to accept the lost and refund 10% (
+          Do you want to accept the loss and refund (
           <span className="text-blue-500 font-semibold">
             {formatPrice(amount)}
           </span>
-          ) of the bid amount?
+          )?
         </p>
         <div className="mt-6 flex items-center gap-4">
           <Button

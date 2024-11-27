@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import LOGO from '../../assets/logo.svg'
 import { FaMoneyBillWave, FaPlusCircle } from 'react-icons/fa'
@@ -6,13 +7,13 @@ import {
   getListCategoriesAsync,
   selectCategory,
 } from '../../features/category/slice'
-import { useEffect } from 'react'
 
 import { formatPrice } from '../../utils/format'
 import { selectWallet, setWallet } from '../../features/wallet/wallet.slice'
 import { Client } from '@stomp/stompjs'
 import { Wallet } from '../../models/wallet.type'
-import socket from '../../utils/socket'
+import SockJS from 'sockjs-client'
+import socketUrl from '../../utils/socket'
 
 function HeaderBottom() {
   const dispatch = useAppDispatch()
@@ -27,7 +28,7 @@ function HeaderBottom() {
     if (!wallet) return
 
     const stompClient = new Client({
-      webSocketFactory: () => socket,
+      webSocketFactory: () => new SockJS(socketUrl),
       onConnect: () => {
         stompClient.subscribe(`/topic/wallet/${wallet.id}`, (message) => {
           const newWallet: Wallet = JSON.parse(message.body)
@@ -40,7 +41,6 @@ function HeaderBottom() {
     })
 
     stompClient.activate()
-
     return () => {
       stompClient.deactivate()
       console.log('Disconnected')

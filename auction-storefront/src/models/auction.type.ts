@@ -25,7 +25,7 @@ export type AuctionDetails = {
   stepPrice: number
   startingTime: string
   endingTime: string
-  auctionType: string
+  auctionType: 'ENGLISH' | 'SEALED_BID'
   published: boolean
   category: string
   images: string[]

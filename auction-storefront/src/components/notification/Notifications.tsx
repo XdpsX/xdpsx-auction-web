@@ -1,7 +1,7 @@
+import { useEffect } from 'react'
 import Popover from '../ui/Popover'
 import { FaBell } from 'react-icons/fa'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { useEffect } from 'react'
 import {
   addNotification,
   fetchUserNotificaitonsAsync,
@@ -12,7 +12,8 @@ import { Notification } from '../../models/notification.type'
 import { Client } from '@stomp/stompjs'
 import { selectUser } from '../../features/user/user.slice'
 import NotificationContent from './NotificationContent'
-import socket from '../../utils/socket'
+import socketUrl from '../../utils/socket'
+import SockJS from 'sockjs-client'
 
 function Notifications() {
   const dispatch = useAppDispatch()
@@ -26,7 +27,7 @@ function Notifications() {
   useEffect(() => {
     if (!userProfile) return
     const stompClient = new Client({
-      webSocketFactory: () => socket,
+      webSocketFactory: () => new SockJS(socketUrl),
       onConnect: () => {
         stompClient.subscribe(
           `/topic/notification/${userProfile.id}`,
@@ -42,7 +43,6 @@ function Notifications() {
     })
 
     stompClient.activate()
-
     return () => {
       stompClient.deactivate()
       console.log('Disconnected')

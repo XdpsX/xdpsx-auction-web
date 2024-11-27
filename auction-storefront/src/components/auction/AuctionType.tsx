@@ -12,8 +12,8 @@ function AuctionType({
       className={cn(
         ' p-2 text-white text-sm font-semibold text-center capitalize tracking-wider',
         {
-          'bg-blue-200/90 text-blue-600': type === 'English',
-          'bg-yellow-200/90 text-yellow-600': type !== 'English',
+          'bg-green-200/90 text-green-600': type === 'ENGLISH',
+          'bg-yellow-200/90 text-yellow-600': type !== 'ENGLISH',
         },
         className
       )}

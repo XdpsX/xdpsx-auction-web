@@ -5,6 +5,7 @@ export type Bid = {
   amount: number
   auctionId: number
   bidderId: number
+  status: 'ACTIVE' | 'WON' | 'LOST'
 }
 
 export const bidSchema = yup.object().shape({

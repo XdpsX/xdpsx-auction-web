@@ -15,7 +15,7 @@ function MainSideBar({ showSidebar, setShowSidebar }: MainSideBarProps) {
         onClick={() => setShowSidebar(false)}
         className={`fixed duration-200 transition-all ${
           !showSidebar ? 'invisible' : 'visible'
-        } block md:hidden w-screen h-screen bg-[rgba(0,0,0,0.5)] top-0 left-0 z-20`}
+        } block md:hidden w-screen h-screen bg-[rgba(0,0,0,0.5)] top-0 left-0 z-[9999]`}
       ></div>
 
       <div

@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom'
 import { selectUser } from '../../features/user/user.slice'
-import { useAppSelector } from '../../store/hooks'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { AuctionDetails } from '../../models/auction.type'
 import { Bid } from '../../models/bid.type'
 import BidForm from '../bid/BidForm'
+import { getUserBidAsync, selectBid } from '../../features/bid/slice'
+import { useEffect } from 'react'
 
 interface AuctionBidProps {
   isAuctionEnded: boolean
@@ -12,8 +14,14 @@ interface AuctionBidProps {
 }
 
 function AuctionBid({ isAuctionEnded, auction, highestBid }: AuctionBidProps) {
+  const dispatch = useAppDispatch()
+  const { userBid } = useAppSelector(selectBid)
   const { userProfile } = useAppSelector(selectUser)
   const isAuthenticated = !!userProfile
+
+  useEffect(() => {
+    dispatch(getUserBidAsync(auction.id))
+  }, [auction.id, dispatch])
 
   if (isAuctionEnded) {
     return (
@@ -48,6 +56,16 @@ function AuctionBid({ isAuctionEnded, auction, highestBid }: AuctionBidProps) {
     )
   }
 
-  return <BidForm auction={auction} highestBid={highestBid} />
+  if (
+    auction.auctionType === 'SEALED_BID' &&
+    userBid &&
+    userBid.status === 'LOST'
+  ) {
+    return (
+      <p className="text-lg font-semibold text-red-500">You lost the auction</p>
+    )
+  }
+
+  return <BidForm auction={auction} highestBid={highestBid} userBid={userBid} />
 }
 export default AuctionBid

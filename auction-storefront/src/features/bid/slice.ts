@@ -52,9 +52,9 @@ export const bidSlice = createSlice({
     builder.addCase(refundBidAsync.pending, (state) => {
       state.isProcessing = true
     })
-    builder.addCase(refundBidAsync.fulfilled, (state) => {
+    builder.addCase(refundBidAsync.fulfilled, (state, action) => {
       state.isProcessing = false
-      state.userBid = null
+      state.userBid = action.payload
     })
     builder.addCase(refundBidAsync.rejected, (state) => {
       state.isProcessing = false
@@ -96,6 +96,7 @@ export const getUserBidAsync = createAsyncThunk(
 export const refundBidAsync = createAsyncThunk(
   'bid/refundBidAsync',
   async (bidId: number) => {
-    await refundBidAPI(bidId)
+    const data = await refundBidAPI(bidId)
+    return data
   }
 )
