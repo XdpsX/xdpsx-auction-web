@@ -1,12 +1,19 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { Bid, BidPayload } from '../../models/bid.type'
+import { Bid, BidInfo, BidPayload } from '../../models/bid.type'
 import { RootState } from '../../store/type'
 import { fromAxiosErrorToAPIErrorDetails } from '../../utils/error.helper'
 import { APIErrorDetails } from '../../models/error.type'
-import { getUserBidAPI, placeBidAPI, refundBidAPI } from './service'
+import {
+  fetchMyBidsAPI,
+  getUserBidAPI,
+  placeBidAPI,
+  refundBidAPI,
+} from './service'
+import { Page } from '../../models/page.type'
 
 export interface BidState {
   userBid: Bid | null
+  userBids: Page<BidInfo> | null
   isLoading: boolean
   isProcessing: boolean
   error: APIErrorDetails | null
@@ -14,6 +21,7 @@ export interface BidState {
 
 const initialState: BidState = {
   userBid: null,
+  userBids: null,
   isLoading: false,
   isProcessing: false,
   error: null,
@@ -59,6 +67,17 @@ export const bidSlice = createSlice({
     builder.addCase(refundBidAsync.rejected, (state) => {
       state.isProcessing = false
     })
+    // fetchMyBidsAsync
+    builder.addCase(fetchMyBidsAsync.pending, (state) => {
+      state.isLoading = true
+    })
+    builder.addCase(fetchMyBidsAsync.fulfilled, (state, action) => {
+      state.isLoading = false
+      state.userBids = action.payload
+    })
+    builder.addCase(fetchMyBidsAsync.rejected, (state) => {
+      state.isLoading = false
+    })
   },
 })
 
@@ -98,5 +117,29 @@ export const refundBidAsync = createAsyncThunk(
   async (bidId: number) => {
     const data = await refundBidAPI(bidId)
     return data
+  }
+)
+export const fetchMyBidsAsync = createAsyncThunk(
+  'bid/fetchMyBidsAsync',
+  async (
+    {
+      pageNum,
+      pageSize,
+      sort,
+      status,
+    }: {
+      pageNum: number
+      pageSize: number
+      sort: string
+      status: string
+    },
+    thunkAPI
+  ) => {
+    try {
+      const data = await fetchMyBidsAPI(pageNum, pageSize, sort, status)
+      return data
+    } catch (error) {
+      return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))
+    }
   }
 )

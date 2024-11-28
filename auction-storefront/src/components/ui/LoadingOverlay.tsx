@@ -1,7 +1,7 @@
 import PulseLoader from 'react-spinners/PulseLoader'
 
 function LoadingOverlay({
-  children = <PulseLoader />,
+  children = <PulseLoader color="#3b82f6" />,
 }: {
   children?: React.ReactNode
 }) {

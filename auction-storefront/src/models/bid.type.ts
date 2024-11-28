@@ -16,3 +16,15 @@ export const bidSchema = yup.object().shape({
 })
 
 export type BidPayload = yup.InferType<typeof bidSchema>
+
+export type BidInfo = {
+  id: number
+  amount: number
+  status: 'ACTIVE' | 'WON' | 'LOST'
+  createdAt: string
+  updatedAt: string
+  auction: {
+    name: string
+    mainImage: string
+  }
+}
