@@ -1,11 +1,12 @@
 import * as yup from 'yup'
+import { AuctionInfo } from './auction.type'
 
 export type Bid = {
   id: number
   amount: number
-  bidTime: string
   auctionId: number
   bidderId: number
+  status: 'ACTIVE' | 'WON' | 'LOST'
 }
 
 export const bidSchema = yup.object().shape({
@@ -16,3 +17,13 @@ export const bidSchema = yup.object().shape({
 })
 
 export type BidPayload = yup.InferType<typeof bidSchema>
+
+export type BidInfo = {
+  id: number
+  amount: number
+  status: 'ACTIVE' | 'WON' | 'LOST'
+  createdAt: string
+  updatedAt: string
+  canRefund: boolean
+  auction: AuctionInfo
+}

@@ -4,8 +4,8 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { FaArrowRight } from 'react-icons/fa'
 import { RegisterRequest, registerSchema } from '../../models/auth.type'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { registerAPI } from '../../features/auth/auth.thunk'
-import { selectAuth } from '../../features/auth/auth.slice'
+
+import { registerAsync, selectAuth } from '../../features/auth/slice'
 import { CREATE_ACCOUNT_STEP } from '../../constants/steps'
 import SocialLogin from './SocialLogin'
 import Input from '../ui/Input'
@@ -32,7 +32,7 @@ function RegisterForm({
   })
 
   const onSubmit = (data: RegisterRequest) => {
-    dispatch(registerAPI(data))
+    dispatch(registerAsync(data))
       .unwrap()
       .then(() => {
         setCurrentStep(CREATE_ACCOUNT_STEP)

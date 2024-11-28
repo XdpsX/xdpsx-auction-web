@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { depositCallbackAPI } from '../../features/transaction/transaction.service'
+import { depositCallbackAPI } from '../../features/transaction/service'
 import { useAppDispatch } from '../../store/hooks'
 
 import { toast } from 'react-toastify'

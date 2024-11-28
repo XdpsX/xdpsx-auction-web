@@ -3,8 +3,8 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { loginAPI } from '../../features/auth/auth.thunk'
-import { selectAuth } from '../../features/auth/auth.slice'
+
+import { loginAsync, selectAuth } from '../../features/auth/slice'
 import { LoginRequest, loginSchema } from '../../models/auth.type'
 import SocialLogin from '../../components/auth/SocialLogin'
 import Input from '../../components/ui/Input'
@@ -29,7 +29,7 @@ function Login() {
   })
 
   const onSubmit = (data: LoginRequest) => {
-    dispatch(loginAPI(data))
+    dispatch(loginAsync(data))
       .unwrap()
       .then(() => {
         navigate('/')

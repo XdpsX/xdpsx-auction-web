@@ -1,6 +1,5 @@
 package com.xdpsx.auction.model;
 
-import com.xdpsx.auction.model.enums.NotificationType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -19,12 +18,13 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String title;
+
     private String message;
 
-    private boolean isRead;
+    private String href;
 
-    @Enumerated(EnumType.STRING)
-    private NotificationType type;
+    private boolean isRead;
 
     @ManyToOne
     private User user;

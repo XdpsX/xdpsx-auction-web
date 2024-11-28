@@ -1,21 +1,26 @@
 package com.xdpsx.auction.service.impl;
 
+import com.xdpsx.auction.constant.CacheKey;
 import com.xdpsx.auction.constant.Symbol;
 import com.xdpsx.auction.constant.VNPayParams;
 import com.xdpsx.auction.dto.payment.InitPaymentRequest;
 import com.xdpsx.auction.dto.payment.InitPaymentResponse;
+import com.xdpsx.auction.dto.transaction.DepositRequest;
+import com.xdpsx.auction.service.OTPService;
 import com.xdpsx.auction.service.PaymentService;
 import com.xdpsx.auction.util.DateUtil;
 import com.xdpsx.auction.util.VNPayEncryption;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -39,8 +44,30 @@ public class VNPayServiceImpl implements PaymentService {
     private Integer paymentTimeout;
 
     private final VNPayEncryption encryption;
+    private final OTPService otpService;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Override
+    public InitPaymentResponse createPayment(DepositRequest request) {
+//        String transactionId = UUID.randomUUID().toString();
+        String transactionId = otpService.generateOTP(10);
+        redisTemplate.opsForValue().set(
+                CacheKey.getTransactionKey(transactionId),
+                request.getAmount().toString(),
+                paymentTimeout,
+                TimeUnit.MINUTES
+        );
+
+        InitPaymentRequest initPaymentRequest = InitPaymentRequest.builder()
+                .amount(request.getAmount())
+                .txnRef(transactionId)
+                .requestId(transactionId)
+                .ipAddress(request.getIpAddress())
+                .prefixReturn("transactions")
+                .build();
+        return init(initPaymentRequest);
+    }
+
     public InitPaymentResponse init(InitPaymentRequest request) {
         var amount = request.getAmount().multiply(BigDecimal.valueOf(DEFAULT_MULTIPLIER));  // 1. amount * 100
         var txnRef = request.getTxnRef();                       // 2. transaction id

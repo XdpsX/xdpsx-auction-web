@@ -1,11 +1,10 @@
 package com.xdpsx.auction.model;
 
+import com.xdpsx.auction.model.enums.BidStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
-import java.time.ZonedDateTime;
 
 @Getter
 @Setter
@@ -14,19 +13,18 @@ import java.time.ZonedDateTime;
 @Builder
 @Entity
 @Table(name = "bids")
-public class Bid {
+public class Bid extends AbstractAuditEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private BigDecimal amount;
 
-    @CreationTimestamp
-    private ZonedDateTime bidTime;
+    @Enumerated(EnumType.STRING)
+    private BidStatus status;
 
-    private boolean isWinner;
-
-    private boolean isRefund;
+    @OneToOne
+    private Transaction transaction;
 
     @ManyToOne
     private User bidder;

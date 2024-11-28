@@ -1,16 +1,16 @@
 package com.xdpsx.auction.dto.bid;
 
+import com.xdpsx.auction.model.enums.BidStatus;
 import lombok.Builder;
 
 import java.math.BigDecimal;
-import java.time.ZonedDateTime;
 
 @Builder
 public record BidResponse (
         Long id,
         BigDecimal amount,
-        ZonedDateTime bidTime,
         Long auctionId,
-        Long bidderId
+        Long bidderId,
+        BidStatus status
 ) {
 }

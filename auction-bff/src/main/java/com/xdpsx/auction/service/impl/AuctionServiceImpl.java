@@ -10,7 +10,6 @@ import com.xdpsx.auction.exception.NotFoundException;
 import com.xdpsx.auction.mapper.AuctionMapper;
 import com.xdpsx.auction.mapper.PageMapper;
 import com.xdpsx.auction.model.*;
-import com.xdpsx.auction.model.enums.AuctionType;
 import com.xdpsx.auction.repository.AuctionRepository;
 import com.xdpsx.auction.repository.BidRepository;
 import com.xdpsx.auction.repository.CategoryRepository;
@@ -30,8 +29,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class AuctionServiceImpl implements AuctionService {
-    private final AuctionMapper auctionMapper;
-    private final PageMapper pageMapper;
     private final UserContext userContext;
     private final MediaService mediaService;
     private final AuctionSpecification specification;
@@ -47,7 +44,7 @@ public class AuctionServiceImpl implements AuctionService {
                 specification.getAllAuctionsSpec(keyword, sort, published),
                 PageRequest.of(pageNum - 1, pageSize)
         );
-        return pageMapper.toPageAuctionDto(auctionPage, auctionMapper::fromEntityToDto);
+        return PageMapper.toPageResponse(auctionPage, AuctionMapper.INSTANCE::toDto);
     }
 
     @Override
@@ -58,12 +55,12 @@ public class AuctionServiceImpl implements AuctionService {
                 specification.getUserAuctionsSpec(keyword, sort, published, user.getId()),
                 PageRequest.of(pageNum - 1, pageSize)
         );
-        return pageMapper.toPageAuctionDto(auctionPage, auctionMapper::fromEntityToDto);
+        return PageMapper.toPageResponse(auctionPage, AuctionMapper.INSTANCE::toDto);
     }
 
     @Override
     public AuctionDto createAuction(AuctionRequest request) {
-        Auction auction = auctionMapper.fromRequestToEntity(request);
+        Auction auction = AuctionMapper.INSTANCE.toEntity(request);
 
         Category category = findPublishedCategory(request.getCategoryId());
         auction.setCategory(category);
@@ -87,7 +84,7 @@ public class AuctionServiceImpl implements AuctionService {
         auction.setSeller(seller);
 
         Auction savedAuction = auctionRepository.save(auction);
-        return auctionMapper.fromEntityToDto(savedAuction);
+        return AuctionMapper.INSTANCE.toDto(savedAuction);
     }
 
     @Override
@@ -97,7 +94,7 @@ public class AuctionServiceImpl implements AuctionService {
                 specification.getCategoryAuctionsSpec(category.getId()),
                 PageRequest.of(pageNum - 1, pageSize)
         );
-        return pageMapper.toPageAuctionResponse(auctionPage, auctionMapper::fromEntityToResponse);
+        return PageMapper.toPageResponse(auctionPage, AuctionMapper.INSTANCE::toResponse);
     }
 
     @Override
@@ -105,11 +102,11 @@ public class AuctionServiceImpl implements AuctionService {
         Auction auction = auctionRepository.findActiveAuctionById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.AUCTION_NOT_FOUND, id));
         Bid highestBid = null;
-        if (auction.getAuctionType().equals(AuctionType.ENGLISH)){
+        if (auction.isEnglishAuction()){
             highestBid = bidRepository.findHighestBidByAuctionId(auction.getId())
                     .orElse(null);
         }
-        return auctionMapper.toAuctionDetails(auction, highestBid);
+        return AuctionMapper.INSTANCE.toAuctionDetails(auction, highestBid);
     }
 
     private Category findPublishedCategory(Integer categoryId){

@@ -13,10 +13,11 @@ import USER_ICON from '../../assets/default-user-icon.png'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { selectUser } from '../../features/user/user.slice'
 import Popover from '../ui/Popover'
-import { logoutAPI } from '../../features/auth/auth.thunk'
+
 import { toast } from 'react-toastify'
 import { googleLogout } from '@react-oauth/google'
-import Notification from '../ui/Notifications'
+import Notification from '../notification/Notifications'
+import { logoutAsync } from '../../features/auth/slice'
 
 function HeaderTop({
   setShowSidebar,
@@ -27,7 +28,7 @@ function HeaderTop({
   const { userProfile } = useAppSelector(selectUser)
 
   const handleLogout = () => {
-    dispatch(logoutAPI())
+    dispatch(logoutAsync())
       .unwrap()
       .then(() => {
         toast.success('Logout successfully')

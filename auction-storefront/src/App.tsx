@@ -5,7 +5,7 @@ import MainLayout from './layouts/MainLayout'
 import PageTitle from './components/layout/PageTitle'
 import { useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from './store/hooks'
-import { selectAuth } from './features/auth/auth.slice'
+import { selectAuth } from './features/auth/slice'
 import { getUserProfile } from './features/user/user.thunk'
 import { selectUser, setUserProfile } from './features/user/user.slice'
 import LoadingOverlay from './components/ui/LoadingOverlay'
@@ -24,6 +24,8 @@ import {
   selectWallet,
   setWallet,
 } from './features/wallet/wallet.slice'
+import ChangePasswordPage from './pages/ChangePasswordPage'
+import BidsPage from './pages/BidsPage'
 
 const router = createBrowserRouter([
   {
@@ -91,11 +93,29 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: '/user/change-password',
+        element: (
+          <>
+            <PageTitle title="Change Password" />
+            <ChangePasswordPage />
+          </>
+        ),
+      },
+      {
         path: '/wallet/deposit',
         element: (
           <>
             <PageTitle title="Wallet | Deposite" />
             <Deposit />
+          </>
+        ),
+      },
+      {
+        path: '/user/bids',
+        element: (
+          <>
+            <PageTitle title="My Bids" />
+            <BidsPage />
           </>
         ),
       },

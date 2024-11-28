@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: 19
+      author: XdpsX
+      comment: 'Change auction_type column to type in auctions table'
+      changes:
+        - sqlFile:
+            path: db/changelog/sql/changelog-0019.sql

@@ -1,21 +1,20 @@
 package com.xdpsx.auction.dto.transaction;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.xdpsx.auction.model.enums.PaymentMethod;
-import com.xdpsx.auction.validation.PriceConstraint;
+import com.xdpsx.auction.model.enums.TransactionStatus;
+import com.xdpsx.auction.model.enums.TransactionType;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 
-@Setter
+@Builder
 @Getter
+@Setter
 public class TransactionRequest {
-    @PriceConstraint
     private BigDecimal amount;
-
-    private PaymentMethod paymentMethod;
-
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private String ipAddress;
+    private TransactionType type;
+    private TransactionStatus status;
+    private String description;
+    private Long userId;
 }

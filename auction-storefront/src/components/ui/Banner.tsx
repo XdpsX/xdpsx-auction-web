@@ -28,6 +28,7 @@ function Banner() {
           arrows={true}
           showDots={true}
           responsive={responsive}
+          removeArrowOnDeviceType={['tablet', 'mobile']}
         >
           {[1, 2, 3, 4].map((i) => (
             <div

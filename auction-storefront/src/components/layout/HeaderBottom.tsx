@@ -1,15 +1,19 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import LOGO from '../../assets/logo.svg'
 import { FaMoneyBillWave, FaPlusCircle } from 'react-icons/fa'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { selectCategory } from '../../features/category/category.slice'
-import { useEffect } from 'react'
-import { getListCategories } from '../../features/category/category.thunk'
+import {
+  getListCategoriesAsync,
+  selectCategory,
+} from '../../features/category/slice'
+
 import { formatPrice } from '../../utils/format'
 import { selectWallet, setWallet } from '../../features/wallet/wallet.slice'
-import SockJS from 'sockjs-client'
-import { Stomp } from '@stomp/stompjs'
+import { Client } from '@stomp/stompjs'
 import { Wallet } from '../../models/wallet.type'
+import SockJS from 'sockjs-client'
+import socketUrl from '../../utils/socket'
 
 function HeaderBottom() {
   const dispatch = useAppDispatch()
@@ -17,26 +21,29 @@ function HeaderBottom() {
   const { wallet } = useAppSelector(selectWallet)
 
   useEffect(() => {
-    dispatch(getListCategories())
+    dispatch(getListCategoriesAsync())
   }, [dispatch])
 
   useEffect(() => {
     if (!wallet) return
 
-    const socket = new SockJS('http://localhost:8080/ws')
-    const stompClient = Stomp.over(socket)
-    stompClient.connect({}, () => {
-      stompClient.subscribe(`/topic/wallet/${wallet.id}`, (message) => {
-        const newWallet: Wallet = JSON.parse(message.body)
-        console.log('New wallet received:', newWallet)
-        dispatch(setWallet(newWallet))
-      })
+    const stompClient = new Client({
+      webSocketFactory: () => new SockJS(socketUrl),
+      onConnect: () => {
+        stompClient.subscribe(`/topic/wallet/${wallet.id}`, (message) => {
+          const newWallet: Wallet = JSON.parse(message.body)
+          dispatch(setWallet(newWallet))
+        })
+      },
+      onStompError: (frame) => {
+        console.error('STOMP error: ', frame)
+      },
     })
 
+    stompClient.activate()
     return () => {
-      stompClient.disconnect(() => {
-        console.log('Disconnected')
-      })
+      stompClient.deactivate()
+      console.log('Disconnected')
     }
   }, [wallet, dispatch])
 

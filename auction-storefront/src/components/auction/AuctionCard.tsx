@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom'
 import { formatPrice, generateSlug } from '../../utils/format'
 import { Auction } from '../../models/auction.type'
 import DEFAULT_AVATAR from '../../assets/default-user-icon.png'
-import AuctionType from '../ui/AuctionType'
-import AuctionDate from '../ui/AuctionDate'
+import AuctionType from './AuctionType'
+import AuctionStatus from './AuctionStatus'
 
 function AuctionCard({ auction }: { auction: Auction }) {
   const auctionSlug = useMemo(
@@ -22,10 +22,7 @@ function AuctionCard({ auction }: { auction: Auction }) {
       key={auction.id}
       className="relative border space-y-4 pb-4 group transition-all duration-500 shadow-sm hover:shadow-md hover:-translate-y-2"
     >
-      <AuctionType
-        type={auction.auctionType}
-        className="absolute left-2 top-2"
-      />
+      <AuctionType type={auction.type} className="absolute left-2 top-2" />
 
       <div className="overflow-hidden">
         <img
@@ -58,7 +55,7 @@ function AuctionCard({ auction }: { auction: Auction }) {
             />
             <span>{auction.seller.name}</span>
           </p>
-          <AuctionDate
+          <AuctionStatus
             endingDate={auction.endingTime}
             startingDate={auction.startingTime}
           />

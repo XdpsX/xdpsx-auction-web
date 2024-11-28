@@ -1,6 +1,5 @@
 package com.xdpsx.auction.model;
 
-import com.xdpsx.auction.model.enums.PaymentMethod;
 import com.xdpsx.auction.model.enums.TransactionStatus;
 import com.xdpsx.auction.model.enums.TransactionType;
 import jakarta.persistence.*;
@@ -28,12 +27,12 @@ public class Transaction extends AbstractAuditEntity {
     @Enumerated(EnumType.STRING)
     private TransactionStatus status;
 
-    @Enumerated(EnumType.STRING)
-    private PaymentMethod paymentMethod;
-
     private String description;
 
     @ManyToOne
     private Wallet wallet;
 
+    public Transaction(Long id) {
+        this.id = id;
+    }
 }

@@ -1,6 +1,5 @@
 package com.xdpsx.auction.dto.transaction;
 
-import com.xdpsx.auction.model.enums.PaymentMethod;
 import com.xdpsx.auction.model.enums.TransactionStatus;
 import com.xdpsx.auction.model.enums.TransactionType;
 import lombok.Builder;
@@ -15,7 +14,6 @@ public class TransactionResponse {
     private TransactionType type;
     private BigDecimal amount;
     private TransactionStatus status;
-    private PaymentMethod paymentMethod;
     private String description;
     private ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;

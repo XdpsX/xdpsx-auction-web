@@ -1,4 +1,5 @@
 import { Bid } from './bid.type'
+import { UserInfo } from './user.type'
 
 export type Auction = {
   id: number
@@ -7,13 +8,9 @@ export type Auction = {
   startingPrice: number
   startingTime: string
   endingTime: string
-  auctionType: string
+  type: string
   published: boolean
-  seller: {
-    id: number
-    name: string
-    avatarUrl: string | null
-  }
+  seller: UserInfo
 }
 
 export type AuctionDetails = {
@@ -25,14 +22,17 @@ export type AuctionDetails = {
   stepPrice: number
   startingTime: string
   endingTime: string
-  auctionType: string
+  type: 'ENGLISH' | 'SEALED_BID'
   published: boolean
   category: string
   images: string[]
-  seller: {
-    id: number
-    name: string
-    avatarUrl: string | null
-  }
+  seller: UserInfo
   highestBid: Bid | null
+}
+
+export type AuctionInfo = {
+  id: number
+  name: string
+  mainImage: string
+  type: 'ENGLISH' | 'SEALED_BID'
 }

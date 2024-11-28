@@ -12,7 +12,7 @@ public record AuctionResponse (
         BigDecimal startingPrice,
         ZonedDateTime startingTime,
         ZonedDateTime endingTime,
-        AuctionType auctionType,
+        AuctionType type,
         String mainImage,
         UserInfo seller
 ) {

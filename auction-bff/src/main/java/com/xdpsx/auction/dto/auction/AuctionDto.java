@@ -11,7 +11,7 @@ public record AuctionDto(
     BigDecimal startingPrice,
     ZonedDateTime startingTime,
     ZonedDateTime endingTime,
-    AuctionType auctionType,
+    AuctionType type,
     boolean published,
     String mainImage,
     String category
