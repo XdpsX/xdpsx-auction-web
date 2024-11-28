@@ -46,4 +46,13 @@ public interface BidRepository extends JpaRepository<Bid, Long>, JpaSpecificatio
     Page<Bid> findUserBids(@Param("bidderId") Long bidderId,
                            @Param("status") BidStatus status,
                            Pageable pageable);
+
+    @Query("SELECT b FROM Bid b WHERE " +
+            "b.id = :id AND " +
+            "b.bidder.id = :bidderId AND " +
+            "b.status = :status" )
+    Optional<Bid> findByIdAndBidderAndStatus(
+            @Param("id") Long id,
+            @Param("bidderId") Long bidderId,
+            @Param("status") BidStatus status);
 }

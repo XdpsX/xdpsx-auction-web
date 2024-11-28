@@ -53,4 +53,10 @@ public class BidController {
         PageResponse<BidAuctionDto> response = bidService.getUserBids(userDetails.getId(), pageNum, pageSize, sort, status);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/storefront/bids/{id}/pay")
+    ResponseEntity<BidResponse> payBid(@PathVariable Long id) {
+        BidResponse response = bidService.payBid(id);
+        return ResponseEntity.ok(response);
+    }
 }

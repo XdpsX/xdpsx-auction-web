@@ -5,5 +5,6 @@ public enum TransactionType {
     DEPOSIT,
     SECURITY_FEE,
     REFUND,
-    BID_PAID
+    BID_PAID,
+    BID_SOLD
 }

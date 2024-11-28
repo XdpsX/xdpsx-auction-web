@@ -232,6 +232,59 @@ public class BidServiceImpl implements BidService {
         return PageMapper.toPageResponse(bidPage, this::mapToBidAuctionDto);
     }
 
+    @Override
+    @Transactional
+    public BidResponse payBid(Long id) {
+        CustomUserDetails userDetails = userContext.getLoggedUser();
+        Bid bid = bidRepository.findByIdAndBidderAndStatus(id, userDetails.getId(), BidStatus.WON)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.BID_NOT_FOUND, id));
+
+        BigDecimal amount = bid.getAmount().subtract(bid.getTransaction().getAmount());
+        walletService.validateWalletBalance(userDetails.getId(), amount);
+
+        handlePayForBidder(amount, userDetails.getId(), bid.getAuction().getName());
+        handlePayForSeller(amount, bid.getAuction().getSeller().getId(), bid.getAuction().getName());
+
+        bid.setStatus(BidStatus.PAID);
+        Bid savedBid = bidRepository.save(bid);
+        return BidMapper.INSTANCE.toResponse(savedBid);
+    }
+
+    private void handlePayForBidder(BigDecimal amount, Long bidderId, String auctionName) {
+        TransactionRequest transactionBidder = TransactionRequest.builder()
+                .amount(amount)
+                .type(TransactionType.BID_PAID)
+                .status(TransactionStatus.COMPLETED)
+                .description("Paid for auction: " + auctionName)
+                .userId(bidderId)
+                .build();
+        transactionService.createTransaction(transactionBidder);
+
+        NotificationRequest bidderNotification = NotificationRequest.builder()
+                .title("Paid Bid")
+                .message("You have paid for auction: " + auctionName)
+                .userId(bidderId)
+                .build();
+        notificationService.pushNotification(bidderNotification);
+    }
+
+    private void handlePayForSeller(BigDecimal amount, Long sellerId, String auctionName) {
+        TransactionRequest transactionSeller = TransactionRequest.builder()
+                .amount(amount)
+                .type(TransactionType.BID_SOLD)
+                .status(TransactionStatus.COMPLETED)
+                .description("Sold %s at the auction ".formatted(auctionName))
+                .userId(sellerId)
+                .build();
+        transactionService.createTransaction(transactionSeller);
+        NotificationRequest sellerNotification = NotificationRequest.builder()
+                .title("Sold Bid")
+                .message("Your auction %s has been sold".formatted(auctionName))
+                .userId(sellerId)
+                .build();
+        notificationService.pushNotification(sellerNotification);
+    }
+
     private BidAuctionDto mapToBidAuctionDto(Bid bid){
         BidAuctionDto dto = BidMapper.INSTANCE.toBidAuctionDto(bid);
         if (bid.getStatus().equals(BidStatus.ACTIVE)) {

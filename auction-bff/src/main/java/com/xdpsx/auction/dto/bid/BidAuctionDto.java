@@ -20,4 +20,5 @@ public class BidAuctionDto {
     private ZonedDateTime updatedAt;
     private AuctionInfoDto auction;
     private boolean canRefund;
+    private boolean canPaid;
 }
