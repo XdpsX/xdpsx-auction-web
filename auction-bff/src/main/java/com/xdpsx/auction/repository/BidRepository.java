@@ -19,6 +19,11 @@ public interface BidRepository extends JpaRepository<Bid, Long>, JpaSpecificatio
             "ORDER BY b.amount DESC LIMIT 1")
     Optional<Bid> findHighestBidByAuctionId(@Param("auctionId") Long auctionId);
 
+    default boolean isHighestBid(Long bidId, Long auctionId) {
+        Optional<Bid> highestBid = findHighestBidByAuctionId(auctionId);
+        return highestBid.isPresent() && highestBid.get().getId().equals(bidId);
+    }
+
     @Query("SELECT b FROM Bid b WHERE " +
             "b.auction.id = :auctionId AND " +
             "b.status = 'ACTIVE' " +

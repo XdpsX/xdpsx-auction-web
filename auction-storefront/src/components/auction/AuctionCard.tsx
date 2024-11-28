@@ -22,10 +22,7 @@ function AuctionCard({ auction }: { auction: Auction }) {
       key={auction.id}
       className="relative border space-y-4 pb-4 group transition-all duration-500 shadow-sm hover:shadow-md hover:-translate-y-2"
     >
-      <AuctionType
-        type={auction.auctionType}
-        className="absolute left-2 top-2"
-      />
+      <AuctionType type={auction.type} className="absolute left-2 top-2" />
 
       <div className="overflow-hidden">
         <img

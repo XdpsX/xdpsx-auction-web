@@ -1,4 +1,5 @@
 import * as yup from 'yup'
+import { AuctionInfo } from './auction.type'
 
 export type Bid = {
   id: number
@@ -23,8 +24,6 @@ export type BidInfo = {
   status: 'ACTIVE' | 'WON' | 'LOST'
   createdAt: string
   updatedAt: string
-  auction: {
-    name: string
-    mainImage: string
-  }
+  canRefund: boolean
+  auction: AuctionInfo
 }

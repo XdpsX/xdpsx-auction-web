@@ -33,7 +33,7 @@ public class Auction extends AbstractAuditEntity{
     private ZonedDateTime endingTime;
 
     @Enumerated(EnumType.STRING)
-    private AuctionType auctionType;
+    private AuctionType type;
 
     private boolean published;
 
@@ -59,5 +59,13 @@ public class Auction extends AbstractAuditEntity{
 
     public String getMainImage(){
         return mainImage.getUrl();
+    }
+
+    public boolean isEnglishAuction() {
+        return type.equals(AuctionType.ENGLISH);
+    }
+
+    public boolean isSealedBidAuction() {
+        return type.equals(AuctionType.SEALED_BID);
     }
 }

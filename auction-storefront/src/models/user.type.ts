@@ -22,3 +22,9 @@ export const profileSchema = yup.object().shape({
 })
 
 export type ProfilePayload = yup.InferType<typeof profileSchema>
+
+export type UserInfo = {
+  id: number
+  name: string
+  avatarUrl: string | null
+}

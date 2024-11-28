@@ -16,7 +16,7 @@ public record AuctionDetails (
         BigDecimal stepPrice,
         ZonedDateTime startingTime,
         ZonedDateTime endingTime,
-        AuctionType auctionType,
+        AuctionType type,
         String mainImage,
         List<String> images,
         String category,

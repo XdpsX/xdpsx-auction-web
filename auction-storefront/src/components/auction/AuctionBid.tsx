@@ -56,11 +56,7 @@ function AuctionBid({ isAuctionEnded, auction, highestBid }: AuctionBidProps) {
     )
   }
 
-  if (
-    auction.auctionType === 'SEALED_BID' &&
-    userBid &&
-    userBid.status === 'LOST'
-  ) {
+  if (auction.type === 'SEALED_BID' && userBid && userBid.status === 'LOST') {
     return (
       <p className="text-lg font-semibold text-red-500">You lost the auction</p>
     )

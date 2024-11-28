@@ -44,7 +44,7 @@ public class AuctionRequest {
     private ZonedDateTime endingTime;
 
     @NotNull
-    private AuctionType auctionType;
+    private AuctionType type;
 
     private boolean published;
 

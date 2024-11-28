@@ -10,7 +10,6 @@ import com.xdpsx.auction.exception.NotFoundException;
 import com.xdpsx.auction.mapper.AuctionMapper;
 import com.xdpsx.auction.mapper.PageMapper;
 import com.xdpsx.auction.model.*;
-import com.xdpsx.auction.model.enums.AuctionType;
 import com.xdpsx.auction.repository.AuctionRepository;
 import com.xdpsx.auction.repository.BidRepository;
 import com.xdpsx.auction.repository.CategoryRepository;
@@ -103,7 +102,7 @@ public class AuctionServiceImpl implements AuctionService {
         Auction auction = auctionRepository.findActiveAuctionById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.AUCTION_NOT_FOUND, id));
         Bid highestBid = null;
-        if (auction.getAuctionType().equals(AuctionType.ENGLISH)){
+        if (auction.isEnglishAuction()){
             highestBid = bidRepository.findHighestBidByAuctionId(auction.getId())
                     .orElse(null);
         }

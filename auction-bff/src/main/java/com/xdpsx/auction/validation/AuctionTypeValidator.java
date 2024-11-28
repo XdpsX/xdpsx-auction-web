@@ -15,7 +15,7 @@ public class AuctionTypeValidator implements ConstraintValidator<AuctionTypeCons
             return true;
         }
 
-        AuctionType auctionType = auctionRequest.getAuctionType();
+        AuctionType auctionType = auctionRequest.getType();
         BigDecimal stepPrice = auctionRequest.getStepPrice();
 
         if (auctionType == AuctionType.SEALED_BID && stepPrice != null) {

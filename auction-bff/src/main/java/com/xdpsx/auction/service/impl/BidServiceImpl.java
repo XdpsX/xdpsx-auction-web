@@ -15,7 +15,6 @@ import com.xdpsx.auction.exception.NotFoundException;
 import com.xdpsx.auction.mapper.BidMapper;
 import com.xdpsx.auction.mapper.PageMapper;
 import com.xdpsx.auction.model.*;
-import com.xdpsx.auction.model.enums.AuctionType;
 import com.xdpsx.auction.model.enums.BidStatus;
 import com.xdpsx.auction.model.enums.TransactionStatus;
 import com.xdpsx.auction.model.enums.TransactionType;
@@ -60,7 +59,7 @@ public class BidServiceImpl implements BidService {
         CustomUserDetails userDetails = userContext.getLoggedUser();
         Auction auction = auctionRepository.findLiveAuction(auctionId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.AUCTION_NOT_FOUND, auctionId));
-        if (auction.getAuctionType().equals(AuctionType.ENGLISH)) {
+        if (auction.isEnglishAuction()) {
             List<Bid> activeBids = bidRepository.findBidsWithStatusAndAuctionAndUser(auctionId, userDetails.getId(), BidStatus.ACTIVE);
             if (!activeBids.isEmpty()){
                 return BidMapper.INSTANCE.toResponse(activeBids.get(0));
@@ -85,10 +84,8 @@ public class BidServiceImpl implements BidService {
             throw new NotFoundException(ErrorCode.BID_NOT_FOUND, id);
         }
         Auction auction = bid.getAuction();
-        if (auction.getAuctionType().equals(AuctionType.ENGLISH)) {
-            Bid highestBid = bidRepository.findHighestBidByAuctionId(bid.getAuction().getId())
-                    .orElse(null);
-            if (highestBid != null && Objects.equals(highestBid.getId(), bid.getId())) {
+        if (auction.isEnglishAuction()) {
+            if (bidRepository.isHighestBid(bid.getId(), bid.getAuction().getId())){
                 throw new BadRequestException(ErrorCode.CAN_NOT_REFUND);
             }
             updateBidToLost(userDetails, bid);
@@ -134,7 +131,7 @@ public class BidServiceImpl implements BidService {
             throw new BadRequestException(ErrorCode.AUCTION_OWNER);
         }
 
-        if (auction.getAuctionType().equals(AuctionType.ENGLISH)) {
+        if (auction.isEnglishAuction()) {
             return placeBidForEnglishAuction(auction, bidRequest, userDetails.getId());
         } else {
             return placeBidForSealedAuction(auction, bidRequest, userDetails.getId());
@@ -232,7 +229,19 @@ public class BidServiceImpl implements BidService {
         Page<Bid> bidPage = bidRepository.findUserBids(
                 userId, status, PageRequest.of(pageNum - 1, pageSize, getSort(sort))
         );
-        return PageMapper.toPageResponse(bidPage, BidMapper.INSTANCE::toBidAuctionDto);
+        return PageMapper.toPageResponse(bidPage, this::mapToBidAuctionDto);
+    }
+
+    private BidAuctionDto mapToBidAuctionDto(Bid bid){
+        BidAuctionDto dto = BidMapper.INSTANCE.toBidAuctionDto(bid);
+        if (bid.getStatus().equals(BidStatus.ACTIVE)) {
+            dto.setCanRefund(true);
+            if (bid.getAuction().isEnglishAuction() &&
+                bidRepository.isHighestBid(bid.getId(), bid.getAuction().getId())){
+                dto.setCanRefund(false);
+            }
+        }
+        return dto;
     }
 
     private Sort getSort(String sortParam) {

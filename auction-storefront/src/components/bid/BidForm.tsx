@@ -39,17 +39,12 @@ function BidForm({
   const [openRefund, setOpenRefund] = useState(false)
 
   const defaultAmount = useMemo(() => {
-    return auction.auctionType === 'ENGLISH'
+    return auction.type === 'ENGLISH'
       ? highestBid
         ? highestBid.amount + auction.stepPrice
         : auction.startingPrice + auction.stepPrice
       : auction.startingPrice / 10
-  }, [
-    auction.auctionType,
-    auction.startingPrice,
-    auction.stepPrice,
-    highestBid,
-  ])
+  }, [auction.type, auction.startingPrice, auction.stepPrice, highestBid])
 
   const {
     control,
@@ -100,7 +95,7 @@ function BidForm({
   const increaseAmount = () => {
     clearErrors('amount')
     const amount = Number(getValues('amount'))
-    if (auction.auctionType === 'ENGLISH') {
+    if (auction.type === 'ENGLISH') {
       if (amount < defaultAmount) {
         setValue('amount', defaultAmount)
         return
@@ -115,7 +110,7 @@ function BidForm({
   const decreaseAmount = () => {
     clearErrors('amount')
     const amount = Number(getValues('amount'))
-    if (auction.auctionType === 'ENGLISH') {
+    if (auction.type === 'ENGLISH') {
       if (amount > defaultAmount) {
         setValue('amount', amount - auction.stepPrice)
       } else {
@@ -172,11 +167,7 @@ function BidForm({
     setShowAttentionAgain(true)
   }
 
-  if (
-    auction.auctionType === 'SEALED_BID' &&
-    userBid &&
-    userBid.status === 'ACTIVE'
-  ) {
+  if (auction.type === 'SEALED_BID' && userBid && userBid.status === 'ACTIVE') {
     return (
       <div>
         <p className="text-lg font-semibold text-green-500">

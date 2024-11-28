@@ -91,7 +91,7 @@ function AuctionDetailsPage() {
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-semibold">Auction Type:</span>
-                <AuctionType type={auctionDetails.auctionType} />
+                <AuctionType type={auctionDetails.type} />
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-semibold">Status:</span>
@@ -104,7 +104,7 @@ function AuctionDetailsPage() {
               <div></div>
               <div className="flex items-center gap-2">
                 <span className="font-semibold">
-                  {auctionDetails.auctionType === 'ENGLISH'
+                  {auctionDetails.type === 'ENGLISH'
                     ? 'Starting Bid'
                     : 'Buy Now'}
                   :
@@ -113,7 +113,7 @@ function AuctionDetailsPage() {
                   {formatPrice(auctionDetails.startingPrice)}
                 </span>
               </div>
-              {auctionDetails.auctionType === 'ENGLISH' && (
+              {auctionDetails.type === 'ENGLISH' && (
                 <div className="flex items-center gap-2">
                   <span className="font-semibold">Step Bid:</span>
                   <span className="text-yellow-500 font-bold">
@@ -121,7 +121,7 @@ function AuctionDetailsPage() {
                   </span>
                 </div>
               )}
-              {auctionDetails.auctionType === 'ENGLISH' && (
+              {auctionDetails.type === 'ENGLISH' && (
                 <div className="flex items-center gap-2">
                   <span className="font-semibold">Current Bid:</span>
                   <span
