@@ -24,7 +24,12 @@ export const getUserBidAPI = async (auctionId: number) => {
 }
 
 export const refundBidAPI = async (bidId: number) => {
-  const response = await api.put<Bid>(`/storefront/bids/${bidId}/refund`)
+  const response = await api.post<Bid>(`/storefront/bids/${bidId}/refund`)
+  return response.data
+}
+
+export const payBidAPI = async (bidId: number) => {
+  const response = await api.post<Bid>(`/storefront/bids/${bidId}/pay`)
   return response.data
 }
 

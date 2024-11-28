@@ -6,6 +6,7 @@ import { APIErrorDetails } from '../../models/error.type'
 import {
   fetchMyBidsAPI,
   getUserBidAPI,
+  payBidAPI,
   placeBidAPI,
   refundBidAPI,
 } from './service'
@@ -14,6 +15,7 @@ import { Page } from '../../models/page.type'
 export interface BidState {
   userBid: Bid | null
   userBids: Page<BidInfo> | null
+  currentBidId: number | null
   isLoading: boolean
   isProcessing: boolean
   error: APIErrorDetails | null
@@ -22,6 +24,7 @@ export interface BidState {
 const initialState: BidState = {
   userBid: null,
   userBids: null,
+  currentBidId: null,
   isLoading: false,
   isProcessing: false,
   error: null,
@@ -30,7 +33,11 @@ const initialState: BidState = {
 export const bidSlice = createSlice({
   name: 'bid',
   initialState,
-  reducers: {},
+  reducers: {
+    setCurrentBidId: (state, action) => {
+      state.currentBidId = action.payload
+    },
+  },
   extraReducers: (builder) => {
     // placeBidAsync
     builder.addCase(placeBidAsync.pending, (state) => {
@@ -63,8 +70,31 @@ export const bidSlice = createSlice({
     builder.addCase(refundBidAsync.fulfilled, (state, action) => {
       state.isProcessing = false
       state.userBid = action.payload
+      console.log(action.payload)
+      if (state.userBids && state.currentBidId) {
+        state.userBids.items = state.userBids.items.filter(
+          (bid) => bid.id !== state.currentBidId
+        )
+        state.userBids.totalItems -= 1
+      }
     })
     builder.addCase(refundBidAsync.rejected, (state) => {
+      state.isProcessing = false
+    })
+    // payBidAsync
+    builder.addCase(payBidAsync.pending, (state) => {
+      state.isProcessing = true
+    })
+    builder.addCase(payBidAsync.fulfilled, (state) => {
+      state.isProcessing = false
+      if (state.userBids && state.currentBidId) {
+        state.userBids.items = state.userBids.items.filter(
+          (bid) => bid.id !== state.currentBidId
+        )
+        state.userBids.totalItems -= 1
+      }
+    })
+    builder.addCase(payBidAsync.rejected, (state) => {
       state.isProcessing = false
     })
     // fetchMyBidsAsync
@@ -84,6 +114,7 @@ export const bidSlice = createSlice({
 const bidReducer = bidSlice.reducer
 export default bidReducer
 export const selectBid = (state: RootState) => state.bid
+export const { setCurrentBidId } = bidSlice.actions
 
 export const placeBidAsync = createAsyncThunk(
   'bid/placeBidAsync',
@@ -114,11 +145,28 @@ export const getUserBidAsync = createAsyncThunk(
 
 export const refundBidAsync = createAsyncThunk(
   'bid/refundBidAsync',
-  async (bidId: number) => {
-    const data = await refundBidAPI(bidId)
-    return data
+  async (bidId: number, thunkAPI) => {
+    try {
+      const data = await refundBidAPI(bidId)
+      return data
+    } catch (error) {
+      return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))
+    }
   }
 )
+
+export const payBidAsync = createAsyncThunk(
+  'bid/payBidAsync',
+  async (bidId: number, thunkAPI) => {
+    try {
+      const data = await payBidAPI(bidId)
+      return data
+    } catch (error) {
+      return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))
+    }
+  }
+)
+
 export const fetchMyBidsAsync = createAsyncThunk(
   'bid/fetchMyBidsAsync',
   async (

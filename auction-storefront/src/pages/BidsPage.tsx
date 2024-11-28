@@ -11,6 +11,7 @@ const tabs = [
   { name: 'Active', href: '?status=ACTIVE', id: 'ACTIVE' },
   { name: 'Won', href: '?status=WON', id: 'WON' },
   { name: 'Lost', href: '?status=LOST', id: 'LOST' },
+  { name: 'Paid', href: '?status=PAID', id: 'PAID' },
 ]
 
 function classNames(...classes: string[]) {
@@ -101,7 +102,7 @@ function BidsPage() {
             onChange={onSortChange}
           />
         </div>
-        <BidTable bidPage={userBids} isLoading={isLoading} />
+        <BidTable bidPage={userBids} isLoading={isLoading} status={status} />
       </div>
     </div>
   )
