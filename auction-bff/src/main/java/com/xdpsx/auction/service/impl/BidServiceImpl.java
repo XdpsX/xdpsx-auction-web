@@ -16,10 +16,12 @@ import com.xdpsx.auction.mapper.BidMapper;
 import com.xdpsx.auction.mapper.PageMapper;
 import com.xdpsx.auction.model.*;
 import com.xdpsx.auction.model.enums.BidStatus;
+import com.xdpsx.auction.model.enums.OrderStatus;
 import com.xdpsx.auction.model.enums.TransactionStatus;
 import com.xdpsx.auction.model.enums.TransactionType;
 import com.xdpsx.auction.repository.AuctionRepository;
 import com.xdpsx.auction.repository.BidRepository;
+import com.xdpsx.auction.repository.OrderRepository;
 import com.xdpsx.auction.security.CustomUserDetails;
 import com.xdpsx.auction.security.UserContext;
 import com.xdpsx.auction.service.BidService;
@@ -41,6 +43,7 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -49,6 +52,7 @@ public class BidServiceImpl implements BidService {
     private final UserContext userContext;
     private final BidRepository bidRepository;
     private final AuctionRepository auctionRepository;
+    private final OrderRepository orderRepository;
     private final WalletService walletService;
     private final TransactionService transactionService;
     private final NotificationService notificationService;
@@ -243,10 +247,23 @@ public class BidServiceImpl implements BidService {
         walletService.validateWalletBalance(userDetails.getId(), amount);
 
         handlePayForBidder(amount, userDetails.getId(), bid.getAuction().getName());
-        handlePayForSeller(amount, bid.getAuction().getSeller().getId(), bid.getAuction().getName());
+        handlePayForSeller(bid.getAuction().getSeller().getId(), bid.getAuction().getName());
 
         bid.setStatus(BidStatus.PAID);
         Bid savedBid = bidRepository.save(bid);
+
+        Order order = Order.builder()
+                .trackNumber(UUID.randomUUID().toString())
+                .auctionName(bid.getAuction().getName())
+                .auctionImage(bid.getAuction().getMainMedia())
+                .totalAmount(bid.getAmount())
+                .shippingAddress(userDetails.getAddress())
+                .status(OrderStatus.Pending)
+                .user(new User(userDetails.getId()))
+                .seller(bid.getAuction().getSeller())
+                .auction(bid.getAuction())
+                .build();
+        orderRepository.save(order);
         return BidMapper.INSTANCE.toResponse(savedBid);
     }
 
@@ -268,15 +285,7 @@ public class BidServiceImpl implements BidService {
         notificationService.pushNotification(bidderNotification);
     }
 
-    private void handlePayForSeller(BigDecimal amount, Long sellerId, String auctionName) {
-        TransactionRequest transactionSeller = TransactionRequest.builder()
-                .amount(amount)
-                .type(TransactionType.BID_SOLD)
-                .status(TransactionStatus.COMPLETED)
-                .description("Sold %s at the auction ".formatted(auctionName))
-                .userId(sellerId)
-                .build();
-        transactionService.createTransaction(transactionSeller);
+    private void handlePayForSeller(Long sellerId, String auctionName) {
         NotificationRequest sellerNotification = NotificationRequest.builder()
                 .title("Sold Bid")
                 .message("Your auction %s has been sold".formatted(auctionName))

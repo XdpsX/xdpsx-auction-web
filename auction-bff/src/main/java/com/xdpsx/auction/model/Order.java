@@ -1,0 +1,43 @@
+package com.xdpsx.auction.model;
+
+import com.xdpsx.auction.model.enums.OrderStatus;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.math.BigDecimal;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Entity
+@Table(name = "orders")
+public class Order extends AbstractAuditEntity{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String trackNumber;
+
+    private String auctionName;
+
+    @OneToOne
+    private Media auctionImage;
+
+    private BigDecimal totalAmount;
+
+    private String shippingAddress;
+
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
+
+    @ManyToOne
+    private User user;
+
+    @ManyToOne
+    private User seller;
+
+    @OneToOne
+    private Auction auction;
+}

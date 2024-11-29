@@ -20,6 +20,8 @@ import {
   setCurrentBidId,
 } from '../../features/bid/slice'
 import { toast } from 'react-toastify'
+import { selectUser } from '../../features/user/slice'
+import { selectWallet } from '../../features/wallet/wallet.slice'
 
 function BidTable({
   bidPage,
@@ -31,14 +33,22 @@ function BidTable({
   status: string
 }) {
   const dispatch = useAppDispatch()
+  const { userProfile } = useAppSelector(selectUser)
+  const { wallet } = useAppSelector(selectWallet)
   const { currentBidId } = useAppSelector(selectBid)
   const { setParams } = useQueryParams()
   const [openModal, setOpenModal] = useState(false)
+  const [amountToPay, setAmountToPay] = useState<number | null>(null)
   const [currentAction, setCurrentAction] = useState<'paid' | 'refund' | null>(
     null
   )
 
-  const handleOpenModal = (action: 'paid' | 'refund', bidId: number) => {
+  const handleOpenModal = (
+    action: 'paid' | 'refund',
+    bidId: number,
+    amountToPay: number
+  ) => {
+    setAmountToPay(amountToPay)
     setCurrentAction(action)
     dispatch(setCurrentBidId(bidId))
     setOpenModal(true)
@@ -46,6 +56,15 @@ function BidTable({
 
   const handleSubmit = () => {
     if (currentAction === 'paid' && currentBidId) {
+      if (!userProfile || !wallet || !amountToPay) return
+      if (wallet.balance < amountToPay) {
+        toast.error('Not enough balance')
+        return
+      }
+      if (!userProfile.address || !userProfile.mobileNumber) {
+        toast.error('Please update your profile with address or mobile number')
+        return
+      }
       dispatch(payBidAsync(currentBidId))
         .unwrap()
         .then(() => {
@@ -98,12 +117,37 @@ function BidTable({
                   >
                     Auction
                   </th>
-                  <th
-                    scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                  >
-                    Amount
-                  </th>
+                  {status === 'WON' ? (
+                    <>
+                      <th
+                        scope="col"
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      >
+                        Security Fee
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      >
+                        Amount to Pay
+                      </th>
+                    </>
+                  ) : (
+                    <>
+                      <th
+                        scope="col"
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      >
+                        Bid Amount
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      >
+                        Security Fee
+                      </th>
+                    </>
+                  )}
                   <th
                     scope="col"
                     className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
@@ -141,9 +185,26 @@ function BidTable({
                         </div>
                       </div>
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {formatPrice(item.amount)}
-                    </td>
+
+                    {status === 'WON' ? (
+                      <>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {formatPrice(item.amount / 10)}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {formatPrice(item.amount * 0.9)}
+                        </td>
+                      </>
+                    ) : (
+                      <>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {formatPrice(item.amount)}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {formatPrice(item.amount / 10)}
+                        </td>
+                      </>
+                    )}
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       {formatDateTime(item.updatedAt)}
                     </td>
@@ -153,7 +214,13 @@ function BidTable({
                         {status === 'WON' && (
                           <Button
                             className="bg-blue-600 hover:bg-blue-700"
-                            onClick={() => handleOpenModal('paid', item.id)}
+                            onClick={() =>
+                              handleOpenModal(
+                                'paid',
+                                item.id,
+                                item.amount * 0.9
+                              )
+                            }
                           >
                             Paid
                           </Button>
@@ -173,7 +240,7 @@ function BidTable({
                               <Button
                                 className="bg-red-600 hover:bg-red-700"
                                 onClick={() =>
-                                  handleOpenModal('refund', item.id)
+                                  handleOpenModal('refund', item.id, 0)
                                 }
                               >
                                 Refund

@@ -61,6 +61,10 @@ public class Auction extends AbstractAuditEntity{
         return mainImage.getUrl();
     }
 
+    public Media getMainMedia() {
+        return mainImage;
+    }
+
     public boolean isEnglishAuction() {
         return type.equals(AuctionType.ENGLISH);
     }
