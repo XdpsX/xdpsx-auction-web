@@ -16,3 +16,9 @@ export type SellerProfile = {
   avatarUrl: string
   status: 'PENDING' | 'APPROVED' | 'REJECTED'
 }
+
+export type SellerInfo = {
+  id: number
+  name: string
+  avatarUrl: string
+}

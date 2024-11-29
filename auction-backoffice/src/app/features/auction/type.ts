@@ -1,4 +1,5 @@
 import * as yup from 'yup'
+import { SellerInfo } from '../user/type'
 
 export type Auction = {
   id: number
@@ -10,6 +11,7 @@ export type Auction = {
   type: string
   published: boolean
   category: string
+  seller: SellerInfo
 }
 
 export const auctionSchema = yup.object().shape({
@@ -29,7 +31,6 @@ export const auctionSchema = yup.object().shape({
   }),
   startingTime: yup.string().required('Please select starting time'),
   endingTime: yup.string().required('Please select ending time'),
-  published: yup.boolean().required('Please select published status'),
   categoryId: yup.number().required('Please select category'),
   mainImageId: yup.number(),
   imageIds: yup.array().of(yup.number())

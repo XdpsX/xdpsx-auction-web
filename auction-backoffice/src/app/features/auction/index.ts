@@ -19,7 +19,7 @@ export const fetchAllAuctions = createAsyncThunk(
   ) => {
     try {
       const state = thunkAPI.getState() as RootState
-      const isAdmin = state.user.roles?.includes('ADMIN')
+      const isAdmin = state.user.userRole === 'ADMIN'
       if (isAdmin) {
         const data = await fetchAllAuctionsAPI(pageNum, pageSize, keyword, sort, published)
         return data

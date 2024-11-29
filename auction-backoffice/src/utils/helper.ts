@@ -76,3 +76,9 @@ export const getRolesFromToken = (accessToken: string): string[] => {
   const scope = decodedToken.scope
   return scope.split(' ')
 }
+
+export const getUserRole = (accessToken: string): string => {
+  const roles = getRolesFromToken(accessToken)
+  if (roles.includes('ADMIN')) return 'ADMIN'
+  return 'SELLER'
+}

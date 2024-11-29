@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useMemo, memo } from 'react'
 import { getLocalTimeZone, today, parseZonedDateTime, now } from '@internationalized/date'
 import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Button, Input, DatePicker, RadioGroup, Radio, Checkbox, Select, SelectItem } from '@nextui-org/react'
+import { Button, Input, DatePicker, RadioGroup, Radio, Select, SelectItem } from '@nextui-org/react'
 import Editor from '~/components/Editor'
 import FileInput from '~/components/FileInput'
 import useAppDispatch from '~/app/hooks/useAppDispatch'
@@ -40,8 +40,7 @@ const AuctionAdd = () => {
       // startingTime: '2024-11-20T09:28:30[Asia/Ho_Chi_Minh]',
       startingTime: now(getLocalTimeZone()).toString(),
       // endingTime: getDateTime(1),
-      endingTime: now(getLocalTimeZone()).add({ days: 1 }).toString(),
-      published: false
+      endingTime: now(getLocalTimeZone()).add({ days: 1 }).toString()
     }
   })
 
@@ -321,22 +320,6 @@ const AuctionAdd = () => {
               </div>
               {errors.endingTime && <p className='text-red-500 text-sm'>{errors.endingTime.message}</p>}
             </div>
-          </div>
-          <div className='input-box'>
-            <label htmlFor='published'>Published</label>
-            <Controller
-              name='published'
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <Checkbox
-                  aria-label='published'
-                  id='published'
-                  checked={value}
-                  onChange={onChange}
-                  className='cursor-pointer'
-                />
-              )}
-            />
           </div>
           <div>
             <div className='input-box'>

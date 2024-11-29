@@ -13,7 +13,7 @@ const MainHeader = React.memo(
   ({ isHidden, setIsHidden }: { isHidden: boolean; setIsHidden: (isHidden: boolean) => void }) => {
     const dispatch = useAppDispatch()
     const navigate = useNavigate()
-    const { profile, roles } = useAppSelector((state) => state.user)
+    const { profile, userRole } = useAppSelector((state) => state.user)
 
     const onLogout = useCallback(() => {
       dispatch(logout())
@@ -37,7 +37,7 @@ const MainHeader = React.memo(
           <Dropdown>
             <DropdownTrigger>
               <div className='flex items-center gap-2'>
-                {roles?.includes('SELLER') && profile.sellerDetails ? (
+                {userRole === 'SELLER' && profile.sellerDetails ? (
                   <User
                     name={profile.sellerDetails.name}
                     description={profile?.email}

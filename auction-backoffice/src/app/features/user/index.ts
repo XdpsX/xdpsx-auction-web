@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { jwtDecode } from 'jwt-decode'
 import { fetchUserProfileAPI } from '~/app/features/user/service'
 import { APIError } from '~/app/features/error/type'
 import { User } from '~/app/features/user/type'
+import { getUserRole } from '~/utils/helper'
 
 export const fetchUserProfile = createAsyncThunk('user/fetchUserProfile', async (_, thunkAPI) => {
   try {
@@ -15,14 +15,14 @@ export const fetchUserProfile = createAsyncThunk('user/fetchUserProfile', async 
 
 export interface UserState {
   profile: User | null
-  roles: string[] | null
+  userRole: string | null
   isLoading: boolean
   error: null | APIError
 }
 
 const initialState: UserState = {
   profile: null,
-  roles: null,
+  userRole: null,
   isLoading: false,
   error: null
 }
@@ -36,15 +36,10 @@ export const userSlice = createSlice({
     },
     setRoles: (state, { payload: accessToken }) => {
       if (!accessToken) {
-        state.roles = null
+        state.userRole = null
         return
       }
-      interface DecodedToken {
-        scope: string
-      }
-      const decodedToken = jwtDecode<DecodedToken>(accessToken)
-      const scope = decodedToken.scope
-      state.roles = scope.split(' ')
+      state.userRole = getUserRole(accessToken)
     }
   },
   extraReducers: (builder) => {
