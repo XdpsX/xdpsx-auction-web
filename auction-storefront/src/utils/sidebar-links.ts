@@ -6,8 +6,10 @@ import {
   RiWallet3Line,
 } from 'react-icons/ri'
 import { BiDish } from 'react-icons/bi'
+import { BsPersonPlus } from 'react-icons/bs'
+import { SidebarLinkType } from '../components/layout/UserSidebar'
 
-export const sidebarLinks = [
+export const sidebarLinks: SidebarLinkType[] = [
   {
     to: '/user/profile',
     icon: RiProfileLine,
@@ -38,4 +40,10 @@ export const sidebarLinks = [
     icon: BiDish,
     title: 'Bids',
   },
-] as const
+  {
+    to: '/user/seller-register',
+    icon: BsPersonPlus,
+    title: 'Seller Register',
+    exceptRole: 'SELLER',
+  },
+]

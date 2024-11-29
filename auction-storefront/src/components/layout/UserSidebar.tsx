@@ -4,13 +4,21 @@ import USER_ICON from '../../assets/default-user-icon.png'
 import { selectUser } from '../../features/user/user.slice'
 import cn from '../../utils/cn'
 
-import { sidebarLinks } from '../../utils/link'
+import { sidebarLinks } from '../../utils/sidebar-links'
 import { selectWallet } from '../../features/wallet/wallet.slice'
 import { formatPrice } from '../../utils/format'
 import DropDown from '../ui/DropDown'
+import { IconType } from 'react-icons/lib'
+
+export type SidebarLinkType = {
+  to: string
+  icon: IconType
+  title: string
+  exceptRole?: string
+}
 
 function UserSidebar() {
-  const { userProfile } = useAppSelector(selectUser)
+  const { userProfile, roles } = useAppSelector(selectUser)
   const { wallet } = useAppSelector(selectWallet)
 
   return (
@@ -36,21 +44,26 @@ function UserSidebar() {
         </div>
       </div>
       <div className="hidden md:block mt-4 space-y-2">
-        {sidebarLinks.map((link) => (
-          <NavLink
-            key={link.title}
-            to={link.to}
-            className={({ isActive }) =>
-              cn(
-                'flex px-2 py-1 rounded-sm items-center gap-2 capitalize transition-colors text-gray-600 hover:text-white hover:bg-blue-500',
-                isActive ? 'text-white bg-blue-500' : ''
-              )
-            }
-          >
-            <link.icon size={20} />
-            {link.title}
-          </NavLink>
-        ))}
+        {sidebarLinks.map((link) => {
+          if (link.exceptRole && roles.includes(link.exceptRole)) {
+            return null
+          }
+          return (
+            <NavLink
+              key={link.title}
+              to={link.to}
+              className={({ isActive }) =>
+                cn(
+                  'flex px-2 py-1 rounded-sm items-center gap-2 capitalize transition-colors text-gray-600 hover:text-white hover:bg-blue-500',
+                  isActive ? 'text-white bg-blue-500' : ''
+                )
+              }
+            >
+              <link.icon size={20} />
+              {link.title}
+            </NavLink>
+          )
+        })}
       </div>
       {/* Mobile */}
       <div className="block md:hidden">
@@ -58,21 +71,26 @@ function UserSidebar() {
           className="border"
           renderDropDown={
             <ul className="bg-white text-slate-600 font-medium">
-              {sidebarLinks.map((link) => (
-                <NavLink
-                  key={link.title}
-                  to={link.to}
-                  className={({ isActive }) =>
-                    cn(
-                      'flex px-2 py-2 rounded-sm items-center gap-2 capitalize transition-colors text-gray-600 hover:text-white hover:bg-blue-500',
-                      isActive ? 'text-white bg-blue-500' : ''
-                    )
-                  }
-                >
-                  <link.icon size={20} />
-                  {link.title}
-                </NavLink>
-              ))}
+              {sidebarLinks.map((link) => {
+                if (link.exceptRole && roles.includes(link.exceptRole)) {
+                  return null
+                }
+                return (
+                  <NavLink
+                    key={link.title}
+                    to={link.to}
+                    className={({ isActive }) =>
+                      cn(
+                        'flex px-2 py-2 rounded-sm items-center gap-2 capitalize transition-colors text-gray-600 hover:text-white hover:bg-blue-500',
+                        isActive ? 'text-white bg-blue-500' : ''
+                      )
+                    }
+                  >
+                    <link.icon size={20} />
+                    {link.title}
+                  </NavLink>
+                )
+              })}
             </ul>
           }
         >

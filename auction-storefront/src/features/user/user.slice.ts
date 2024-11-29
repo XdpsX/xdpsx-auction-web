@@ -2,15 +2,18 @@ import { createSlice } from '@reduxjs/toolkit'
 import { RootState } from '../../store/type'
 import { UserProfile } from '../../models/user.type'
 import { getUserProfile, updateUserProfile } from './user.thunk'
+import { getRolesFromToken } from '../../utils/helper'
 
 export interface UserState {
   userProfile: UserProfile | null
+  roles: string[]
   isFetching: boolean
   isLoading: boolean
 }
 
 const initialState: UserState = {
   userProfile: null,
+  roles: [],
   isFetching: false,
   isLoading: false,
 }
@@ -21,6 +24,14 @@ export const userSlice = createSlice({
   reducers: {
     setUserProfile(state, action) {
       state.userProfile = action.payload
+    },
+    setRoles(state, action) {
+      if (action.payload) {
+        state.roles = getRolesFromToken(action.payload)
+        console.log(state.roles)
+      } else {
+        state.roles = []
+      }
     },
   },
   extraReducers: (builder) => {
@@ -53,4 +64,4 @@ export const userSlice = createSlice({
 const userReducer = userSlice.reducer
 export default userReducer
 export const selectUser = (state: RootState) => state.user
-export const { setUserProfile } = userSlice.actions
+export const { setUserProfile, setRoles } = userSlice.actions

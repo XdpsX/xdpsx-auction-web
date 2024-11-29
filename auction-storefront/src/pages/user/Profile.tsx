@@ -1,22 +1,22 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import Button from '../components/ui/Button'
-import Input from '../components/ui/Input'
-import { selectUser } from '../features/user/user.slice'
-import { ProfilePayload, profileSchema } from '../models/user.type'
-import { useAppDispatch, useAppSelector } from '../store/hooks'
+import Button from '../../components/ui/Button'
+import Input from '../../components/ui/Input'
+import { selectUser } from '../../features/user/user.slice'
+import { ProfilePayload, profileSchema } from '../../models/user.type'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { useForm } from 'react-hook-form'
 import { useMemo, useState } from 'react'
-import DEFAULT_AVATAR from '../assets/default-user-icon.png'
-import FileInput from '../components/ui/FileInput'
+import DEFAULT_AVATAR from '../../assets/default-user-icon.png'
+import FileInput from '../../components/ui/FileInput'
 import {
   ALLOWED_IMAGE_TYPES,
   MAX_AVATAR_SIZE,
   MIN_AVATAR_WIDTH,
-} from '../constants/files'
-import { uploadUserAvatarAPI } from '../features/user/user.service'
+} from '../../constants/files'
+import { uploadUserAvatarAPI } from '../../features/user/user.service'
 import { toast } from 'react-toastify'
-import { APIError } from '../models/error.type'
-import { updateUserProfile } from '../features/user/user.thunk'
+import { APIError } from '../../models/error.type'
+import { updateUserProfile } from '../../features/user/user.thunk'
 
 function Profile() {
   const dispatch = useAppDispatch()

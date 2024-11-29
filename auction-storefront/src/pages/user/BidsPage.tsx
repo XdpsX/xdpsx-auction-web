@@ -1,11 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { useAppDispatch, useAppSelector } from '../store/hooks'
-import useQueryParams from '../hooks/useQueryParams'
-import { fetchMyBidsAsync, selectBid } from '../features/bid/slice'
-import { bidSortOptions } from '../utils/data'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
+import useQueryParams from '../../hooks/useQueryParams'
+import { fetchMyBidsAsync, selectBid } from '../../features/bid/slice'
+import { bidSortOptions } from '../../utils/data'
 import { useEffect } from 'react'
-import BidTable from '../components/bid/BidTable'
-import Select from '../components/ui/Select'
+import BidTable from '../../components/bid/BidTable'
+import Select from '../../components/ui/Select'
 
 const tabs = [
   { name: 'Active', href: '?status=ACTIVE', id: 'ACTIVE' },

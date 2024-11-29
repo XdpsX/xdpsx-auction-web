@@ -3,6 +3,7 @@ import PageTitle from '../components/layout/PageTitle'
 import AuthLayout from '../layouts/AuthLayout'
 import Login from '../pages/auth/Login'
 import Register from '../pages/auth/Register'
+import OAuth2RedirectHandler from '../pages/redirect/OAuth2RedirectHandler'
 
 const authRoutes = [
   {
@@ -31,6 +32,14 @@ const authRoutes = [
         ),
       },
     ],
+  },
+  {
+    path: '/oauth2/redirect',
+    element: (
+      <AuthRoute>
+        <OAuth2RedirectHandler />
+      </AuthRoute>
+    ),
   },
 ]
 
