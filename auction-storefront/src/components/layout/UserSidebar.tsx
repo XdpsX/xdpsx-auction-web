@@ -1,7 +1,7 @@
 import { Link, NavLink } from 'react-router-dom'
 import { useAppSelector } from '../../store/hooks'
 import USER_ICON from '../../assets/default-user-icon.png'
-import { selectUser } from '../../features/user/user.slice'
+import { selectUser } from '../../features/user/slice'
 import cn from '../../utils/cn'
 
 import { sidebarLinks } from '../../utils/sidebar-links'

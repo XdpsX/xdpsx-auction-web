@@ -10,7 +10,7 @@ import {
 import { useSelector } from 'react-redux'
 import { Notification } from '../../models/notification.type'
 import { Client } from '@stomp/stompjs'
-import { selectUser } from '../../features/user/user.slice'
+import { selectUser } from '../../features/user/slice'
 import NotificationContent from './NotificationContent'
 import socketUrl from '../../utils/socket'
 import SockJS from 'sockjs-client'

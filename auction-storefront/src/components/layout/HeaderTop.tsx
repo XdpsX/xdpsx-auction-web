@@ -11,7 +11,7 @@ import {
 } from 'react-icons/fa'
 import USER_ICON from '../../assets/default-user-icon.png'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { selectUser } from '../../features/user/user.slice'
+import { selectUser } from '../../features/user/slice'
 import Popover from '../ui/Popover'
 
 import { toast } from 'react-toastify'

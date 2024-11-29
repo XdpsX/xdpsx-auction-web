@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { selectUser } from '../../features/user/user.slice'
+import { selectUser } from '../../features/user/slice'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { AuctionDetails } from '../../models/auction.type'
 import { Bid } from '../../models/bid.type'

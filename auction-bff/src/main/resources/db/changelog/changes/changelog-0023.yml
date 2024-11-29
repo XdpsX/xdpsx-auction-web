@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: 23
+      author: XdpsX
+      comment: 'Update seller_details table'
+      changes:
+        - sqlFile:
+            path: db/changelog/sql/changelog-0023.sql

@@ -61,6 +61,9 @@ public class User extends AbstractAuditEntity {
     @OneToMany
     private List<Notification> notifications;
 
+    @OneToOne(mappedBy = "user")
+    private SellerDetails sellerDetails;
+
     public User(Long id) {
         this.id = id;
     }

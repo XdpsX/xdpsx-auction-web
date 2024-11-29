@@ -2,8 +2,8 @@ import Login from '../pages/auth/Login'
 import Register from '../pages/auth/Register'
 import BidsPage from '../pages/user/BidsPage'
 import ChangePasswordPage from '../pages/user/ChangePasswordPage'
-import Deposit from '../pages/user/Deposit'
-import Profile from '../pages/user/Profile'
+import DepositPage from '../pages/user/DepositPage'
+import ProfilePage from '../pages/user/ProfilePage'
 import SellerRegisterPage from '../pages/user/SellerRegisterPage'
 import LinkRouteType from '../routes/type'
 
@@ -24,7 +24,7 @@ export const userLinks = [
   {
     title: 'Profile',
     path: '/user/profile',
-    element: Profile,
+    element: ProfilePage,
   },
   {
     title: 'Change Password',
@@ -34,7 +34,7 @@ export const userLinks = [
   {
     title: 'Wallet | Deposite',
     path: '/wallet/deposit',
-    element: Deposit,
+    element: DepositPage,
   },
   {
     title: 'My Bids',

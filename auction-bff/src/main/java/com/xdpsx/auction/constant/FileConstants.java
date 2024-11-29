@@ -11,4 +11,7 @@ public class FileConstants {
 
     public static final String USER_IMAGE_FOLDER = "users";
     public static final int USER_IMAGE_MIN_WIDTH = 80;
+
+    public static final String SELLER_IMAGE_FOLDER = "users";
+    public static final int SELLER_IMAGE_MIN_WIDTH = 80;
 }

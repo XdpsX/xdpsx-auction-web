@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom'
 import { useAppSelector } from '../../store/hooks'
-import { selectUser } from '../../features/user/user.slice'
+import { selectUser } from '../../features/user/slice'
 import { ReactNode } from 'react'
 
 const NonRoleProtected = ({

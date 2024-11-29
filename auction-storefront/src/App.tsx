@@ -3,12 +3,12 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from './store/hooks'
 import { selectAuth } from './features/auth/slice'
-import { getUserProfile } from './features/user/user.thunk'
 import {
+  fetchUserProfileAsync,
   selectUser,
   setRoles,
   setUserProfile,
-} from './features/user/user.slice'
+} from './features/user/slice'
 import LoadingOverlay from './components/ui/LoadingOverlay'
 import {
   getUserWallet,
@@ -35,7 +35,7 @@ function App() {
 
   useEffect(() => {
     if (accessToken) {
-      dispatch(getUserProfile())
+      dispatch(fetchUserProfileAsync())
       dispatch(setRoles(accessToken))
       dispatch(getUserWallet())
     } else {
