@@ -40,4 +40,8 @@ public class Order extends AbstractAuditEntity{
 
     @OneToOne
     private Auction auction;
+
+    public String getAuctionImageUrl() {
+        return auctionImage.getUrl();
+    }
 }
