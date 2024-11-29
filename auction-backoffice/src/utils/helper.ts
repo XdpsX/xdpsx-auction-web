@@ -1,4 +1,5 @@
 import { AxiosError } from 'axios'
+import { jwtDecode } from 'jwt-decode'
 import { APIError } from '~/app/features/error/type'
 import { ALLOWED_IMAGE_TYPES, MAX_IMAGE_SIZE, MIN_WIDTH } from '~/constants'
 
@@ -65,4 +66,13 @@ export function getDateTime(n: number = 0) {
 
   // Trả về định dạng YYYY-MM-DDTHH:mm:ss
   return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`
+}
+
+interface DecodedToken {
+  scope: string
+}
+export const getRolesFromToken = (accessToken: string): string[] => {
+  const decodedToken = jwtDecode<DecodedToken>(accessToken)
+  const scope = decodedToken.scope
+  return scope.split(' ')
 }

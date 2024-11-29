@@ -23,18 +23,20 @@ const AuctionAdd = () => {
   const { categories, isLoading } = useAppSelector((state) => state.category)
   const [image, setImage] = useState<File | null>(null)
   const [extraImages, setExtraImages] = useState<File[]>([])
+  const [minEndingTime, setMinEndingTime] = useState<string>('')
 
   const {
     control,
     handleSubmit,
     watch,
     setError,
+    setValue,
     formState: { errors }
   } = useForm({
     resolver: yupResolver(auctionSchema),
     defaultValues: {
       name: '',
-      auctionType: 'ENGLISH',
+      type: 'ENGLISH',
       // startingTime: '2024-11-20T09:28:30[Asia/Ho_Chi_Minh]',
       startingTime: now(getLocalTimeZone()).toString(),
       // endingTime: getDateTime(1),
@@ -43,7 +45,15 @@ const AuctionAdd = () => {
     }
   })
 
-  const auctionType = watch('auctionType')
+  const type = watch('type')
+  const startingTime = watch('startingTime')
+
+  useEffect(() => {
+    if (startingTime) {
+      setValue('endingTime', parseZonedDateTime(startingTime).add({ days: 1 }).toString())
+      setMinEndingTime(parseZonedDateTime(startingTime).add({ days: 1 }).toString())
+    }
+  }, [startingTime, setValue])
 
   const categoryOptions = useMemo(() => {
     return categories.map((cat) => <SelectItem key={cat.id}>{cat.name}</SelectItem>)
@@ -188,7 +198,7 @@ const AuctionAdd = () => {
             <div className='input-box'>
               <label htmlFor='type'>Auction Type</label>
               <Controller
-                name='auctionType'
+                name='type'
                 control={control}
                 render={({ field }) => (
                   <RadioGroup aria-label='auction-type' orientation='horizontal' id='type' {...field}>
@@ -198,7 +208,7 @@ const AuctionAdd = () => {
                 )}
               />
             </div>
-            {errors.auctionType && <p className='text-red-500 text-sm'>{errors.auctionType.message}</p>}
+            {errors.type && <p className='text-red-500 text-sm'>{errors.type.message}</p>}
           </div>
 
           <div className='flex sm:flex-col md:flex-row md:w-full xl:w-1/2 gap-2'>
@@ -230,7 +240,7 @@ const AuctionAdd = () => {
               </div>
               {errors.startingPrice && <p className='text-red-500 text-sm'>{errors.startingPrice.message}</p>}
             </div>
-            {auctionType === 'ENGLISH' && (
+            {type === 'ENGLISH' && (
               <div>
                 <div className='input-box w-full'>
                   <label htmlFor='stepPrice'>Step Price</label>
@@ -297,7 +307,7 @@ const AuctionAdd = () => {
                       aria-label='ending-time'
                       id='endingTime'
                       variant='bordered'
-                      minValue={today(getLocalTimeZone()).add({ days: 1 })}
+                      minValue={minEndingTime ? parseZonedDateTime(minEndingTime) : today(getLocalTimeZone())}
                       hideTimeZone
                       showMonthAndYearPickers
                       className='max-w-xs'

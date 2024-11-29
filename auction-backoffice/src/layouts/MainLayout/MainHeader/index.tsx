@@ -13,7 +13,7 @@ const MainHeader = React.memo(
   ({ isHidden, setIsHidden }: { isHidden: boolean; setIsHidden: (isHidden: boolean) => void }) => {
     const dispatch = useAppDispatch()
     const navigate = useNavigate()
-    const { profile } = useAppSelector((state) => state.user)
+    const { profile, roles } = useAppSelector((state) => state.user)
 
     const onLogout = useCallback(() => {
       dispatch(logout())
@@ -37,16 +37,29 @@ const MainHeader = React.memo(
           <Dropdown>
             <DropdownTrigger>
               <div className='flex items-center gap-2'>
-                <User
-                  name={profile?.name}
-                  description={profile?.email}
-                  avatarProps={{
-                    isBordered: true,
-                    src: profile?.avatarUrl || 'https://i.pravatar.cc/150?u=a04258114e29026702d'
-                  }}
-                  as='button'
-                  className='transition-transform'
-                />
+                {roles?.includes('SELLER') && profile.sellerDetails ? (
+                  <User
+                    name={profile.sellerDetails.name}
+                    description={profile?.email}
+                    avatarProps={{
+                      isBordered: true,
+                      src: profile.sellerDetails.avatarUrl || 'https://i.pravatar.cc/150?u=a04258114e29026702d'
+                    }}
+                    as='button'
+                    className='transition-transform'
+                  />
+                ) : (
+                  <User
+                    name={profile?.name}
+                    description={profile?.email}
+                    avatarProps={{
+                      isBordered: true,
+                      src: profile?.avatarUrl || 'https://i.pravatar.cc/150?u=a04258114e29026702d'
+                    }}
+                    as='button'
+                    className='transition-transform'
+                  />
+                )}
                 <Icon className='text-default-500' icon='solar:alt-arrow-down-outline' />
               </div>
             </DropdownTrigger>

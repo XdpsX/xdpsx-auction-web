@@ -160,11 +160,11 @@ function AuctionsList() {
         }
       }
       case 'type':
-        return auction.auctionType === 'ENGLISH' ? (
-          <Chip className='bg-green-500/90'>{capitalize(auction.auctionType)}</Chip>
+        return auction.type === 'ENGLISH' ? (
+          <Chip className='bg-green-500/90'>{capitalize(auction.type)}</Chip>
         ) : (
           <Chip color='warning' className='dark:text-white'>
-            {capitalize(auction.auctionType)}
+            {capitalize(auction.type)}
           </Chip>
         )
       case 'category':

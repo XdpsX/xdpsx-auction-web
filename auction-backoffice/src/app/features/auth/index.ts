@@ -2,10 +2,15 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { loginAPI, logoutAPI } from './service'
 import { LoginPayload } from '~/app/features/auth/type'
 import { APIError } from '~/app/features/error/type'
+import { getRolesFromToken } from '~/utils/helper'
 
 export const login = createAsyncThunk('auth/login', async (payload: LoginPayload, thunkAPI) => {
   try {
     const data = await loginAPI(payload)
+    const roles = getRolesFromToken(data.accessToken)
+    if (!roles.includes('SELLER') && !roles.includes('ADMIN')) {
+      return thunkAPI.rejectWithValue({ status: 403, message: 'You are not authorized to access this page' })
+    }
     return data
   } catch (error) {
     return thunkAPI.rejectWithValue(error)
