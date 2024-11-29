@@ -3,20 +3,24 @@ import { NavLink, useLocation } from 'react-router-dom'
 import { Icon } from '@iconify/react'
 import SidebarLinkGroup from './SidebarLinkGroup'
 import { SidebarItem } from './type'
+import useAppSelector from '~/app/hooks/useAppSelector'
 
 const Sidebar = ({ sidebarItems }: { sidebarItems: SidebarItem[] }) => {
   const location = useLocation()
   const { pathname } = location
+  const { userRole } = useAppSelector((state) => state.user)
 
   const renderGroupItem = useMemo(
     () => (item: SidebarItem) => {
+      if (item.roles && userRole && !item.roles.includes(userRole)) return null
       return <SidebarLinkGroup key={item.key} activeCondition={pathname === item.key} item={item} />
     },
-    [pathname]
+    [pathname, userRole]
   )
 
   const renderItem = useMemo(
     () => (item: SidebarItem) => {
+      if (item.roles && userRole && !item.roles.includes(userRole)) return null
       return (
         <NavLink
           to={item.path ?? '#'}
@@ -29,7 +33,7 @@ const Sidebar = ({ sidebarItems }: { sidebarItems: SidebarItem[] }) => {
         </NavLink>
       )
     },
-    [pathname]
+    [pathname, userRole]
   )
 
   return (

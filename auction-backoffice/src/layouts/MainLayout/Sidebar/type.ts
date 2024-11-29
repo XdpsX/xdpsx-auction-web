@@ -6,4 +6,5 @@ export type SidebarItem = {
   group?: boolean | false
   index?: boolean | false
   children?: SidebarItem[]
+  roles?: string[]
 }

@@ -2,10 +2,12 @@ import { useRef, useState, useCallback, memo } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { SidebarItem } from '../type'
 import { Icon } from '@iconify/react'
+import useAppSelector from '~/app/hooks/useAppSelector'
 
 const SidebarLinkGroup = memo(({ activeCondition, item }: { activeCondition: boolean; item: SidebarItem }) => {
   const location = useLocation()
   const { pathname } = location
+  const { userRole } = useAppSelector((state) => state.user)
   const [open, setOpen] = useState<boolean>(activeCondition)
   const storedSidebarExpanded = localStorage.getItem('sidebar-expanded')
   const [sidebarExpanded, setSidebarExpanded] = useState(
@@ -24,6 +26,8 @@ const SidebarLinkGroup = memo(({ activeCondition, item }: { activeCondition: boo
     },
     [sidebarExpanded, open]
   )
+
+  if (item.roles && userRole && !item.roles.includes(userRole)) return null
 
   return (
     <div>
@@ -48,20 +52,23 @@ const SidebarLinkGroup = memo(({ activeCondition, item }: { activeCondition: boo
           style={{ height: open ? `${groupRef.current && groupRef.current.scrollHeight}px` : '0px' }}
         >
           <ul className='mt-1.5 mb-5.5 ml-2 flex flex-col gap-1.5 pl-5 border-l-1 border-gray-400'>
-            {item.children.map((child) => (
-              <li key={child.key}>
-                <NavLink
-                  to={child.index ? (item.path ?? '#') : (child.path ?? '#')}
-                  className={() =>
-                    'group  text-sm  rounded-md px-4 font-medium text-slate-300 duration-300 ease-in-out hover:text-white ' +
-                    ((child.index ? pathname === item.path : pathname === child.path) &&
-                      '!text-yellow-400 cursor-default')
-                  }
-                >
-                  {child.title}
-                </NavLink>
-              </li>
-            ))}
+            {item.children.map((child) => {
+              if (child.roles && userRole && !child.roles.includes(userRole)) return null
+              return (
+                <li key={child.key}>
+                  <NavLink
+                    to={child.index ? (item.path ?? '#') : (child.path ?? '#')}
+                    className={() =>
+                      'group  text-sm  rounded-md px-4 font-medium text-slate-300 duration-300 ease-in-out hover:text-white ' +
+                      ((child.index ? pathname === item.path : pathname === child.path) &&
+                        '!text-yellow-400 cursor-default')
+                    }
+                  >
+                    {child.title}
+                  </NavLink>
+                </li>
+              )
+            })}
           </ul>
         </div>
       )}

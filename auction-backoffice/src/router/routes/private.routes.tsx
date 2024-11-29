@@ -4,6 +4,7 @@ import PrivateRoute from '../guards/PrivateRoute'
 import { Navigate } from 'react-router-dom'
 import LoadingOverlay from '~/components/LoadingOverlay'
 import { Helmet } from 'react-helmet'
+import RoleProtected from '../guards/RoleProtected'
 
 const CategoriesList = lazy(() => import('~/pages/category/CategoriesList'))
 const Dashboard = lazy(() => import('~/pages/Dashboard'))
@@ -38,12 +39,12 @@ const privateRoutes = [
       {
         path: '/categories',
         element: (
-          <>
+          <RoleProtected roles={['ADMIN']}>
             <Helmet>
               <title>Manage Categories | Auction Backoffice</title>
             </Helmet>
             <CategoriesList />
-          </>
+          </RoleProtected>
         )
       },
       {
@@ -60,12 +61,12 @@ const privateRoutes = [
       {
         path: '/auctions/add',
         element: (
-          <>
+          <RoleProtected roles={['SELLER']}>
             <Helmet>
               <title>Create New Auction | Auction Backoffice</title>
             </Helmet>
             <AuctionAdd />
-          </>
+          </RoleProtected>
         )
       }
     ]

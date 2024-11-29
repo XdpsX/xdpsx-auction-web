@@ -5,7 +5,8 @@ const sidebarItems: SidebarItem[] = [
     key: 'dashboard',
     title: 'Dashboard',
     path: '/dashboard',
-    icon: 'solar:chat-square-2-linear'
+    icon: 'solar:chat-square-2-linear',
+    roles: ['ADMIN', 'SELLER']
   },
   {
     key: 'categories',
@@ -13,6 +14,7 @@ const sidebarItems: SidebarItem[] = [
     icon: 'solar:widget-outline',
     path: '/categories',
     group: true,
+    roles: ['ADMIN'],
     children: [
       {
         key: 'categories-list',
@@ -32,12 +34,14 @@ const sidebarItems: SidebarItem[] = [
         key: 'auctions-list',
         title: 'List',
         path: '/',
-        index: true
+        index: true,
+        roles: ['ADMIN', 'SELLER']
       },
       {
         key: 'auctions-add',
         title: 'Add New Auction',
-        path: '/auctions/add'
+        path: '/auctions/add',
+        roles: ['SELLER']
       }
     ]
   }

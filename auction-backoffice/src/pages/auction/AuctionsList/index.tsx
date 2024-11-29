@@ -25,6 +25,7 @@ function AuctionsList() {
     deleteAllParams
   } = useQueryParams()
   const { auctionPage, isLoading } = useAppSelector((state) => state.auction)
+  const { userRole } = useAppSelector((state) => state.user)
 
   const filteredPublished = useMemo(() => publishedOptions.find((option) => option.key === published), [published])
   const filteredSort = useMemo(() => sortOptions.find((option) => option.key === sort), [sort])
@@ -86,7 +87,7 @@ function AuctionsList() {
     <section className='flex flex-col gap-4'>
       <div className='flex items-center justify-between gap-2'>
         <h1 className='page-heading'>Auctions</h1>
-        <AddButton />
+        {userRole === 'SELLER' && <AddButton />}
       </div>
 
       <div className='flex flex-col gap-4'>
