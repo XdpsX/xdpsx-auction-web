@@ -6,14 +6,16 @@ import com.xdpsx.auction.model.enums.AuctionType;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
-public record AuctionResponse (
+public record AuctionSellerInfo (
         Long id,
         String name,
         BigDecimal startingPrice,
         ZonedDateTime startingTime,
         ZonedDateTime endingTime,
+        boolean published,
         AuctionType type,
         String mainImage,
-        SellerInfo seller
+        SellerInfo seller,
+        String category
 ) {
 }

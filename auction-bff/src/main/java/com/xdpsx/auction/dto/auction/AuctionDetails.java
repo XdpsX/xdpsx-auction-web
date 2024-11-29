@@ -1,7 +1,7 @@
 package com.xdpsx.auction.dto.auction;
 
 import com.xdpsx.auction.dto.bid.BidResponse;
-import com.xdpsx.auction.dto.user.UserInfo;
+import com.xdpsx.auction.dto.seller.SellerInfo;
 import com.xdpsx.auction.model.enums.AuctionType;
 
 import java.math.BigDecimal;
@@ -20,7 +20,7 @@ public record AuctionDetails (
         String mainImage,
         List<String> images,
         String category,
-        UserInfo seller,
+        SellerInfo seller,
         BidResponse highestBid
 ) {
 }

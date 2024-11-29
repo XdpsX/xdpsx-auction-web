@@ -12,7 +12,6 @@ public record AuctionDto(
     ZonedDateTime startingTime,
     ZonedDateTime endingTime,
     AuctionType type,
-    boolean published,
     String mainImage,
     String category
 ) {

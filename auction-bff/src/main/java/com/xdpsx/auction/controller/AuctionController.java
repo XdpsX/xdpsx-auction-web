@@ -1,10 +1,7 @@
 package com.xdpsx.auction.controller;
 
 import com.xdpsx.auction.dto.PageResponse;
-import com.xdpsx.auction.dto.auction.AuctionDetails;
-import com.xdpsx.auction.dto.auction.AuctionRequest;
-import com.xdpsx.auction.dto.auction.AuctionDto;
-import com.xdpsx.auction.dto.auction.AuctionResponse;
+import com.xdpsx.auction.dto.auction.*;
 import com.xdpsx.auction.dto.error.ErrorDetailsDto;
 import com.xdpsx.auction.model.Media;
 import com.xdpsx.auction.service.AuctionService;
@@ -36,14 +33,14 @@ public class AuctionController {
     private final MediaService mediaService;
 
     @GetMapping("/backoffice/auctions/all")
-    ResponseEntity<PageResponse<AuctionDto>> getAllPageAuctions(
+    ResponseEntity<PageResponse<AuctionSellerInfo>> getAllPageAuctions(
             @RequestParam(defaultValue = PAGE_NUM, required = false) int pageNum,
             @RequestParam(defaultValue = PAGE_SIZE, required = false) @Max(MAX_PAGE_SIZE) int pageSize,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String sort,
             @RequestParam(required = false) Boolean published
     ) {
-        PageResponse<AuctionDto> response = auctionService.getAllPageAuctions(pageNum, pageSize,
+        PageResponse<AuctionSellerInfo> response = auctionService.getAllPageAuctions(pageNum, pageSize,
                 keyword, sort, published);
         return ResponseEntity.ok(response);
     }

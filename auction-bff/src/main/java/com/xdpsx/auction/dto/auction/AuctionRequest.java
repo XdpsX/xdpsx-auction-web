@@ -46,8 +46,6 @@ public class AuctionRequest {
     @NotNull
     private AuctionType type;
 
-    private boolean published;
-
     @NotNull
     private Integer categoryId;
 

@@ -2,10 +2,7 @@ package com.xdpsx.auction.service.impl;
 
 import com.xdpsx.auction.constant.ErrorCode;
 import com.xdpsx.auction.dto.PageResponse;
-import com.xdpsx.auction.dto.auction.AuctionDetails;
-import com.xdpsx.auction.dto.auction.AuctionRequest;
-import com.xdpsx.auction.dto.auction.AuctionDto;
-import com.xdpsx.auction.dto.auction.AuctionResponse;
+import com.xdpsx.auction.dto.auction.*;
 import com.xdpsx.auction.exception.NotFoundException;
 import com.xdpsx.auction.mapper.AuctionMapper;
 import com.xdpsx.auction.mapper.PageMapper;
@@ -38,13 +35,13 @@ public class AuctionServiceImpl implements AuctionService {
 
     @PreAuthorize("hasRole('ADMIN')")
     @Override
-    public PageResponse<AuctionDto> getAllPageAuctions(int pageNum, int pageSize, String keyword,
-                                                       String sort, Boolean published) {
+    public PageResponse<AuctionSellerInfo> getAllPageAuctions(int pageNum, int pageSize, String keyword,
+                                                              String sort, Boolean published) {
         Page<Auction> auctionPage = auctionRepository.findAll(
                 specification.getAllAuctionsSpec(keyword, sort, published),
                 PageRequest.of(pageNum - 1, pageSize)
         );
-        return PageMapper.toPageResponse(auctionPage, AuctionMapper.INSTANCE::toDto);
+        return PageMapper.toPageResponse(auctionPage, AuctionMapper.INSTANCE::toAuctionSellerInfo);
     }
 
     @Override
@@ -82,6 +79,7 @@ public class AuctionServiceImpl implements AuctionService {
                 .id(userContext.getLoggedUser().getId())
                 .build();
         auction.setSeller(seller);
+        auction.setPublished(true);
 
         Auction savedAuction = auctionRepository.save(auction);
         return AuctionMapper.INSTANCE.toDto(savedAuction);
