@@ -1,5 +1,5 @@
 import { Media } from '../../models/media.type'
-import { SellerProfile, SellerProfilePayload } from '../../models/seller.type'
+import { SellerInfo, SellerProfilePayload } from '../../models/seller.type'
 import { ProfilePayload, UserProfile } from '../../models/user.type'
 import api from '../../utils/api'
 import { fromAxiosErrorToAPIError } from '../../utils/error.helper'
@@ -62,7 +62,7 @@ export const uploadSellerAvatarAPI = async (file: File): Promise<Media> => {
 
 export const registerSellerAPI = async (payload: SellerProfilePayload) => {
   try {
-    const response = await api.post<SellerProfile>(
+    const response = await api.post<SellerInfo>(
       '/storefront/sellers/register',
       payload
     )

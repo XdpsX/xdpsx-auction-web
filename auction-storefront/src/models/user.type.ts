@@ -1,5 +1,5 @@
 import * as yup from 'yup'
-import { SellerProfile } from './seller.type'
+import { SellerInfo } from './seller.type'
 
 export type UserProfile = {
   id: number
@@ -8,7 +8,7 @@ export type UserProfile = {
   avatarUrl: string | null
   mobileNumber: string | null
   address: string | null
-  sellerDetails: SellerProfile | null
+  sellerDetails: SellerInfo | null
 }
 
 export const profileSchema = yup.object().shape({

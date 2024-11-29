@@ -40,7 +40,8 @@ export default function useQueryParams() {
       pageSize: params.pageSize || DEFAULT_PAGE_SIZE,
       keyword: params.keyword || null,
       published: params.published || DEFAULT_PUBLISHED.key,
-      sort: params.sort || DEFAULT_SORT.key
+      sort: params.sort || DEFAULT_SORT.key,
+      sellerStatus: params.sellerStatus || 'all'
     },
     setParams,
     deleteParam,

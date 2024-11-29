@@ -24,3 +24,14 @@ export const auctionColumns = [
   { name: 'PUBLISHED', uid: 'published', roles: ['ADMIN'] },
   { name: 'ACTIONS', uid: 'actions', roles: ['ADMIN', 'SELLER'] }
 ]
+
+export const sellerColumns = [
+  { name: 'ID', uid: 'id' },
+  { name: 'USER', uid: 'user' },
+  { name: 'SHOP', uid: 'shop' },
+  { name: 'ADDRESS', uid: 'address' },
+  { name: 'MOBILE PHONE', uid: 'mobilePhone' },
+  { name: 'REGISTERED AT', uid: 'registeredAt' },
+  { name: 'STATUS', uid: 'status' },
+  { name: 'ACTIONS', uid: 'actions' }
+]

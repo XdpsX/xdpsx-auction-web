@@ -1,18 +1,17 @@
 package com.xdpsx.auction.dto.seller;
 
+import com.xdpsx.auction.dto.user.UserInfo;
 import com.xdpsx.auction.model.enums.SellerRegisterStatus;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
 
-@Builder
-@Getter
-@Setter
-public class SellerResponse {
-    private Long id;
-    private String name;
-    private String address;
-    private String mobilePhone;
-    private String avatarUrl;
-    private SellerRegisterStatus status;
-}
+import java.time.ZonedDateTime;
+
+public record SellerResponse(
+        Long id,
+        String name,
+        String address,
+        String mobilePhone,
+        String avatarUrl,
+        SellerRegisterStatus status,
+        ZonedDateTime createdAt,
+        UserInfo user
+) {}

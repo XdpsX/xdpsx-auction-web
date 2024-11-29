@@ -1,5 +1,5 @@
 import * as yup from 'yup'
-export type SellerProfile = {
+export type SellerInfo = {
   id: number
   name: string
   address: string

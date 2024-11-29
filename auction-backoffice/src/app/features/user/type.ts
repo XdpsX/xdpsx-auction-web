@@ -1,3 +1,5 @@
+import { SellerProfile } from '../seller/type'
+
 export type User = {
   id: number
   name: string
@@ -8,17 +10,9 @@ export type User = {
   sellerDetails: SellerProfile | null
 }
 
-export type SellerProfile = {
+export type UserInfo = {
   id: number
   name: string
-  address: string
-  mobilePhone: string
-  avatarUrl: string
-  status: 'PENDING' | 'APPROVED' | 'REJECTED'
-}
-
-export type SellerInfo = {
-  id: number
-  name: string
-  avatarUrl: string
+  email: string
+  avatarUrl: string | null
 }

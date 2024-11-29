@@ -44,6 +44,13 @@ const sidebarItems: SidebarItem[] = [
         roles: ['SELLER']
       }
     ]
+  },
+  {
+    key: 'sellers',
+    title: 'Sellers',
+    path: '/sellers',
+    icon: 'material-symbols:person-outline',
+    roles: ['ADMIN']
   }
 ]
 export default sidebarItems

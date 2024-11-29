@@ -1,12 +1,13 @@
 package com.xdpsx.auction.dto.seller;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.xdpsx.auction.model.enums.SellerRegisterStatus;
 
-@Getter
-@Setter
-public class SellerInfo {
-    private Long id;
-    private String name;
-    private String avatarUrl;
+public record SellerInfo (
+      Long id,
+      String name,
+      String address,
+      String mobilePhone,
+      String avatarUrl,
+      SellerRegisterStatus status
+) {
 }

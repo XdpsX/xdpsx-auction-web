@@ -13,10 +13,10 @@ import {
 } from '@nextui-org/react'
 import { Icon } from '@iconify/react'
 import React, { Key } from 'react'
-import { CopyText } from '../CopyText'
+import { CopyText } from '../../CopyText'
 import { Auction } from '~/app/features/auction/type'
 import { formatDateTime, formatPrice } from '~/utils/format'
-import { Status } from '../Status'
+import { Status } from '../../Status'
 import { capitalize } from '~/utils/helper'
 import { Page } from '~/app/features/page/type'
 import useAppSelector from '~/app/hooks/useAppSelector'
@@ -82,7 +82,7 @@ function AuctionTable({ auctionPage, isLoading }: { auctionPage: Page<Auction>; 
           <User
             avatarProps={{ radius: 'lg', src: auction.seller.avatarUrl }}
             // description={auction[columnKey].name}
-            name={auction[columnKey].name}
+            name={auction[columnKey]?.name}
           >
             {auction.seller.name}
           </User>

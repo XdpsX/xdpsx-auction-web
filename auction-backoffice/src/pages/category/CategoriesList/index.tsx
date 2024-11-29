@@ -19,7 +19,7 @@ import useQueryParams from '~/app/hooks/useQueryParams'
 import { Category } from '~/app/features/category/type'
 
 import AddButton from '~/components/AddButton'
-import TableBottom from '~/components/TableBottom'
+import TableBottom from '~/components/Table/TableBottom'
 import Search from '~/components/Search'
 import Sort from '~/components/Sort'
 import Filter from '~/components/Filter'

@@ -3,13 +3,15 @@ import auctionReducer from './features/auction'
 import authReducer from './features/auth'
 import categoryReducer from './features/category'
 import userReducer from './features/user'
+import sellerReducer from './features/seller'
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     user: userReducer,
     category: categoryReducer,
-    auction: auctionReducer
+    auction: auctionReducer,
+    seller: sellerReducer
   }
 })
 

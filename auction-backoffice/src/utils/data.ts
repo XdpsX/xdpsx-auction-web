@@ -27,3 +27,10 @@ export const statusColorMap: Record<StatusOptions, string> = {
   Ended: '#F31260'
   // Vacation: '#F5A524'
 }
+
+export const sellerStatus: SelectItemType[] = [
+  { key: 'all', title: 'All' },
+  { key: 'PENDING', title: 'Pending' },
+  { key: 'APPROVED', title: 'Approved' },
+  { key: 'REJECTED', title: 'Rejected' }
+]

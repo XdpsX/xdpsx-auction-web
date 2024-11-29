@@ -90,6 +90,12 @@ function SellerRegisterPage() {
           Your seller request is rejected. Please contact the admin for support
         </div>
       )
+    } else {
+      return (
+        <div className="flex items-center justify-center w-full h-full font-bold text-xl text-green-500">
+          You are already a seller
+        </div>
+      )
     }
   }
   return (

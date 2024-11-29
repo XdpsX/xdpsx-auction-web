@@ -10,6 +10,7 @@ const CategoriesList = lazy(() => import('~/pages/category/CategoriesList'))
 const Dashboard = lazy(() => import('~/pages/Dashboard'))
 const AuctionsList = lazy(() => import('~/pages/auction/AuctionsList'))
 const AuctionAdd = lazy(() => import('~/pages/auction/AuctionAdd'))
+const SellerList = lazy(() => import('~/pages/seller/SellerList'))
 
 const privateRoutes = [
   {
@@ -66,6 +67,17 @@ const privateRoutes = [
               <title>Create New Auction | Auction Backoffice</title>
             </Helmet>
             <AuctionAdd />
+          </RoleProtected>
+        )
+      },
+      {
+        path: '/sellers',
+        element: (
+          <RoleProtected roles={['ADMIN']}>
+            <Helmet>
+              <title>Manage Sellers | Auction Backoffice</title>
+            </Helmet>
+            <SellerList />
           </RoleProtected>
         )
       }

@@ -1,5 +1,5 @@
 import * as yup from 'yup'
-import { SellerInfo } from '../user/type'
+import { SellerInfo } from '../seller/type'
 
 export type Auction = {
   id: number
@@ -11,7 +11,7 @@ export type Auction = {
   type: string
   published: boolean
   category: string
-  seller: SellerInfo
+  seller: SellerInfo | null
 }
 
 export const auctionSchema = yup.object().shape({
