@@ -6,6 +6,7 @@ import bidReducer from '../features/bid/slice'
 import walletReducer from '../features/wallet/wallet.slice'
 import notificationReducer from '../features/notification/slice'
 import auctionReducer from '../features/auction/slice'
+import orderReducer from '../features/order/slice'
 
 const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ const store = configureStore({
     wallet: walletReducer,
     notification: notificationReducer,
     auction: auctionReducer,
+    order: orderReducer,
   },
 })
 

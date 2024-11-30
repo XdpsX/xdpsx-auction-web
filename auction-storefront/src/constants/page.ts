@@ -5,3 +5,4 @@ export const DEFAULT_SORT = {
   key: '-date',
 }
 export const DEFAULT_BID_STATUS = 'ACTIVE'
+export const DEFAULT_ORDER_STATUS = 'Pending'

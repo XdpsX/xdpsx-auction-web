@@ -43,8 +43,8 @@ public class OrderServiceImpl implements OrderService {
         }
 
         return switch (sortParam) {
-            case "amount" -> Sort.by("amount").ascending();
-            case "-amount" -> Sort.by("amount").descending();
+            case "amount" -> Sort.by("totalAmount").ascending();
+            case "-amount" -> Sort.by("totalAmount").descending();
             case "date" -> Sort.by("updatedAt").ascending();
             default -> Sort.by("updatedAt").descending();
         };

@@ -4,6 +4,7 @@ import {
   RiBankLine,
   RiProfileLine,
   RiWallet3Line,
+  RiShoppingCartLine,
 } from 'react-icons/ri'
 import { BiDish } from 'react-icons/bi'
 import { BsPersonPlus } from 'react-icons/bs'
@@ -45,5 +46,37 @@ export const sidebarLinks: SidebarLinkType[] = [
     icon: BsPersonPlus,
     title: 'Seller Register',
     exceptRole: 'SELLER',
+  },
+  {
+    to: '/user/orders',
+    icon: RiShoppingCartLine,
+    title: 'Orders',
+    group: true,
+    children: [
+      {
+        to: '/user/orders?status=Pending',
+        title: 'Pending Orders',
+      },
+      {
+        to: '/user/orders?status=Confirmed',
+        title: 'Confirmed Orders',
+      },
+      {
+        to: '/user/orders?status=Shipped',
+        title: 'Shipped Orders',
+      },
+      {
+        to: '/user/orders?status=Delivered',
+        title: 'Delivered Orders',
+      },
+      {
+        to: '/user/orders?status=Cancelled',
+        title: 'Cancelled Orders',
+      },
+      {
+        to: '/user/orders?status=Returned',
+        title: 'Returned Orders',
+      },
+    ],
   },
 ]

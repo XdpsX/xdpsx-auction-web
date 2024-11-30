@@ -22,7 +22,7 @@ function DropDown({
     <>
       {showDropDown && (
         <div
-          className="absolute top-0 left-0 z-[10] w-full h-full"
+          className="absolute z-[10] w-full h-full"
           onClick={() => setShowDropDown(false)}
         ></div>
       )}

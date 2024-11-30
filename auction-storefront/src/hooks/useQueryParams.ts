@@ -1,6 +1,7 @@
 import { useSearchParams } from 'react-router-dom'
 import {
   DEFAULT_BID_STATUS,
+  DEFAULT_ORDER_STATUS,
   DEFAULT_PAGE_NUM,
   DEFAULT_PAGE_SIZE,
   DEFAULT_SORT,
@@ -50,7 +51,9 @@ export default function useQueryParams() {
       pageNum: params.pageNum || DEFAULT_PAGE_NUM,
       pageSize: params.pageSize || DEFAULT_PAGE_SIZE,
       sort: params.sort || DEFAULT_SORT.key,
+      keyword: params.keyword || null,
       status: params.status || DEFAULT_BID_STATUS,
+      orderStatus: params.status || DEFAULT_ORDER_STATUS,
     },
     setParams,
     // deleteParam,

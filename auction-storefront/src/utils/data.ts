@@ -22,6 +22,7 @@ export const bidSortOptions: SelectOptionType[] = [
   { title: 'Amount 9-0', key: '-amount' },
   { title: 'Amount 0-9', key: 'amount' },
 ]
+export const orderSortOptions: SelectOptionType[] = bidSortOptions
 
 export const pageNumOptions: SelectOptionType[] = [
   { key: '5', title: '5' },

@@ -3,6 +3,7 @@ import Register from '../pages/auth/Register'
 import BidsPage from '../pages/user/BidsPage'
 import ChangePasswordPage from '../pages/user/ChangePasswordPage'
 import DepositPage from '../pages/user/DepositPage'
+import OrdersPage from '../pages/user/OrdersPage'
 import ProfilePage from '../pages/user/ProfilePage'
 import SellerRegisterPage from '../pages/user/SellerRegisterPage'
 import LinkRouteType from '../routes/type'
@@ -46,5 +47,10 @@ export const userLinks = [
     path: '/user/seller-register',
     element: SellerRegisterPage,
     exceptRole: 'SELLER',
+  },
+  {
+    title: 'Ordres',
+    path: '/user/orders',
+    element: OrdersPage,
   },
 ]
