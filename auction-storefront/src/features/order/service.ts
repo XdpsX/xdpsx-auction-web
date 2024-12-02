@@ -20,3 +20,8 @@ export const fetchMyOrdersAPI = async (
   })
   return response.data
 }
+
+export const cancelOrderAPI = async (orderId: number) => {
+  const response = await api.put<Order>(`/storefront/orders/${orderId}/cancel`)
+  return response.data
+}

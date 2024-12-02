@@ -6,9 +6,10 @@ interface ConfirmModalProps {
   open: boolean
   onClose: () => void
   onSubmit: () => void
+  content?: string
 }
 
-function ConfirmModal({ open, onClose, onSubmit }: ConfirmModalProps) {
+function ConfirmModal({ open, onClose, onSubmit, content }: ConfirmModalProps) {
   return (
     <Modal open={open} onClose={onClose}>
       <div className="p-2">
@@ -16,7 +17,7 @@ function ConfirmModal({ open, onClose, onSubmit }: ConfirmModalProps) {
           <RiQuestionMark className=" h-8 w-8" />
         </div>
         <p className="mt-2 text-black text-lg mb-2">
-          Do you want to continue with this action?
+          {content ? content : 'Do you want to continue with this action?'}
         </p>
         <div className="mt-6 flex items-center gap-4">
           <Button

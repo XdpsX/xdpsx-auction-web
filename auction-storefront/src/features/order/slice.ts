@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { RootState } from '../../store/type'
 import { fromAxiosErrorToAPIErrorDetails } from '../../utils/error.helper'
-import { fetchMyOrdersAPI } from './service'
+import { cancelOrderAPI, fetchMyOrdersAPI } from './service'
 import { Page } from '../../models/page.type'
 import { Order, OrderStatus } from '../../models/order.type'
 
@@ -29,6 +29,21 @@ export const orderSlice = createSlice({
       state.userOrder = action.payload
     })
     builder.addCase(fetchMyOrdersAsync.rejected, (state) => {
+      state.isLoading = false
+    })
+    // cancelOrderAsync
+    builder.addCase(cancelOrderAsync.pending, (state) => {
+      state.isLoading = true
+    })
+    builder.addCase(cancelOrderAsync.fulfilled, (state, action) => {
+      state.isLoading = false
+      if (state.userOrder) {
+        state.userOrder.items = state.userOrder.items.filter(
+          (order) => order.id !== action.payload.id
+        )
+      }
+    })
+    builder.addCase(cancelOrderAsync.rejected, (state) => {
       state.isLoading = false
     })
   },
@@ -64,6 +79,18 @@ export const fetchMyOrdersAsync = createAsyncThunk(
         sort,
         status
       )
+      return data
+    } catch (error) {
+      return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))
+    }
+  }
+)
+
+export const cancelOrderAsync = createAsyncThunk(
+  'order/cancelOrderAsync',
+  async (orderId: number, thunkAPI) => {
+    try {
+      const data = await cancelOrderAPI(orderId)
       return data
     } catch (error) {
       return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))
