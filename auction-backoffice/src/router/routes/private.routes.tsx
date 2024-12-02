@@ -3,7 +3,6 @@ import MainLayout from '~/layouts/MainLayout'
 import PrivateRoute from '../guards/PrivateRoute'
 import { Navigate } from 'react-router-dom'
 import LoadingOverlay from '~/components/LoadingOverlay'
-import { Helmet } from 'react-helmet'
 import RoleProtected from '../guards/RoleProtected'
 
 const CategoriesList = lazy(() => import('~/pages/category/CategoriesList'))
@@ -28,44 +27,24 @@ const privateRoutes = [
     children: [
       {
         path: '/dashboard',
-        element: (
-          <>
-            <Helmet>
-              <title>Dashboard | Auction Backoffice</title>
-            </Helmet>
-            <Dashboard />
-          </>
-        )
+        element: <Dashboard />
       },
       {
         path: '/categories',
         element: (
           <RoleProtected roles={['ADMIN']}>
-            <Helmet>
-              <title>Manage Categories | Auction Backoffice</title>
-            </Helmet>
             <CategoriesList />
           </RoleProtected>
         )
       },
       {
         path: '/auctions',
-        element: (
-          <>
-            <Helmet>
-              <title>Manage Auctions | Auction Backoffice</title>
-            </Helmet>
-            <AuctionsList />
-          </>
-        )
+        element: <AuctionsList />
       },
       {
         path: '/auctions/add',
         element: (
           <RoleProtected roles={['SELLER']}>
-            <Helmet>
-              <title>Create New Auction | Auction Backoffice</title>
-            </Helmet>
             <AuctionAdd />
           </RoleProtected>
         )
@@ -74,9 +53,6 @@ const privateRoutes = [
         path: '/sellers',
         element: (
           <RoleProtected roles={['ADMIN']}>
-            <Helmet>
-              <title>Manage Sellers | Auction Backoffice</title>
-            </Helmet>
             <SellerList />
           </RoleProtected>
         )
