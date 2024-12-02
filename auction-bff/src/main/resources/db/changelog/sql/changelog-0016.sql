@@ -1,2 +1,2 @@
-ALTER TABLE transactions
-    MODIFY COLUMN type ENUM('WITHDRAW', 'DEPOSIT', 'SECURITY_FEE','REFUND','BID_PAID');
+ALTER TABLE auctions
+    CHANGE auction_type type VARCHAR(20);

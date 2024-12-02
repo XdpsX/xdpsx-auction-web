@@ -2,7 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: 22
       author: XdpsX
-      comment: 'Add seller_details table'
+      comment: 'Add created_at and updated_at columns to orders table'
       changes:
         - sqlFile:
             path: db/changelog/sql/changelog-0022.sql

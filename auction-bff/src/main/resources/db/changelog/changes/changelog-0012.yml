@@ -2,7 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: 12
       author: XdpsX
-      comment: 'Add notifications table'
+      comment: 'Remove payment_method column to transactions table'
       changes:
         - sqlFile:
             path: db/changelog/sql/changelog-0012.sql

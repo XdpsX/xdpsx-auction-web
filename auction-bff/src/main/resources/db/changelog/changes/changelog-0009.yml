@@ -2,7 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: 9
       author: XdpsX
-      comment: 'Add wallet for first admin user'
+      comment: 'Add notifications table'
       changes:
         - sqlFile:
             path: db/changelog/sql/changelog-0009.sql

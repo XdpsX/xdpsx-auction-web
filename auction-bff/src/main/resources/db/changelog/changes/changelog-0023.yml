@@ -2,7 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: 23
       author: XdpsX
-      comment: 'Update seller_details table'
+      comment: 'Remove is_end column and add status column in auctions table'
       changes:
         - sqlFile:
             path: db/changelog/sql/changelog-0023.sql

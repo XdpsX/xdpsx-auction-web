@@ -1,11 +1,3 @@
-CREATE TABLE seller_details (
-    id BIGINT PRIMARY KEY,
-    name VARCHAR(255),
-    address VARCHAR(255),
-    mobile_phone VARCHAR(20),
-    avatar_id BIGINT,
-    status ENUM('PENDING', 'APPROVED', 'REJECTED'),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (id) REFERENCES users(id),
-    FOREIGN KEY (avatar_id) REFERENCES medias(id)
-);
+ALTER TABLE orders
+    ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;

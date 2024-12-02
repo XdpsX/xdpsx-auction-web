@@ -2,7 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: 4
       author: XdpsX
-      comment: 'Insert into roles table'
+      comment: 'Create auctions, auction_images tables'
       changes:
         - sqlFile:
             path: db/changelog/sql/changelog-0004.sql

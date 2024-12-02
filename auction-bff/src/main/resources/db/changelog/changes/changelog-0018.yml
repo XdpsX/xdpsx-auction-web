@@ -2,7 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: 18
       author: XdpsX
-      comment: 'Update bids columns'
+      comment: 'Change type of type column in transactions'
       changes:
         - sqlFile:
             path: db/changelog/sql/changelog-0018.sql

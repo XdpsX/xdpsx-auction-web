@@ -1,7 +1,6 @@
-ALTER TABLE bids
-    ADD COLUMN payment_status ENUM('DEPOSIT', 'PAID', 'REFUND', 'NOT_PAID') NOT NULL DEFAULT 'DEPOSIT',
-    ADD COLUMN status ENUM('ACTIVE', 'WON', 'LOST') NOT NULL DEFAULT 'ACTIVE';
+ALTER TABLE notifications
+    ADD COLUMN title VARCHAR(255),
+    ADD COLUMN href VARCHAR(128);
 
-ALTER TABLE bids
-    DROP COLUMN is_refund,
-    DROP COLUMN is_winner;
+ALTER TABLE notifications
+    DROP COLUMN `type`;

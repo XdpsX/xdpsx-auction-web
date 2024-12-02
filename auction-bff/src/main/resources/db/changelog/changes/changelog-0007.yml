@@ -2,7 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: 7
       author: XdpsX
-      comment: 'Add address, mobile phone to users table'
+      comment: 'Add bids table'
       changes:
         - sqlFile:
             path: db/changelog/sql/changelog-0007.sql

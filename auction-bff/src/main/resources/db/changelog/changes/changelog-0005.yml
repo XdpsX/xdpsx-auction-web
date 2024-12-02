@@ -2,7 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: 5
       author: XdpsX
-      comment: 'Insert admin user into users table'
+      comment: 'Add address, mobile phone to users table'
       changes:
         - sqlFile:
             path: db/changelog/sql/changelog-0005.sql
