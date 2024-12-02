@@ -7,6 +7,7 @@ import com.xdpsx.auction.exception.NotFoundException;
 import com.xdpsx.auction.mapper.AuctionMapper;
 import com.xdpsx.auction.mapper.PageMapper;
 import com.xdpsx.auction.model.*;
+import com.xdpsx.auction.model.enums.AuctionStatus;
 import com.xdpsx.auction.repository.AuctionRepository;
 import com.xdpsx.auction.repository.BidRepository;
 import com.xdpsx.auction.repository.CategoryRepository;
@@ -80,6 +81,7 @@ public class AuctionServiceImpl implements AuctionService {
                 .build();
         auction.setSeller(seller);
         auction.setPublished(true);
+        auction.setStatus(AuctionStatus.LIVE);
 
         Auction savedAuction = auctionRepository.save(auction);
         return AuctionMapper.INSTANCE.toDto(savedAuction);

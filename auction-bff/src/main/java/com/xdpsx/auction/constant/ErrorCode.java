@@ -9,6 +9,7 @@ public class ErrorCode {
     public static final String TRANSACTION_NOT_FOUND="TRANSACTION_NOT_FOUND";
     public static final String AUCTION_NOT_FOUND="AUCTION_NOT_FOUND";
     public static final String BID_NOT_FOUND="BID_NOT_FOUND";
+    public static final String ORDER_NOT_FOUND="ORDER_NOT_FOUND";
 
     public static final String NAME_DUPLICATED="NAME_DUPLICATED";
     public static final String SLUG_DUPLICATED="SLUG_DUPLICATED";

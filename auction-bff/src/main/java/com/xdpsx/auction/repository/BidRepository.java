@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,4 +56,12 @@ public interface BidRepository extends JpaRepository<Bid, Long>, JpaSpecificatio
             @Param("id") Long id,
             @Param("bidderId") Long bidderId,
             @Param("status") BidStatus status);
+
+    @Query("SELECT b FROM Bid b WHERE " +
+            "b.status = :status AND " +
+            "b.updatedAt < :timeAgo")
+    List<Bid> findBidsOlderThanAndWithStatus(
+            @Param("status") BidStatus status,
+            @Param("timeAgo") ZonedDateTime timeAgo
+    );
 }

@@ -32,6 +32,8 @@ public class Order extends AbstractAuditEntity{
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
+    private String note;
+
     @ManyToOne
     private User user;
 
@@ -43,5 +45,9 @@ public class Order extends AbstractAuditEntity{
 
     public String getAuctionImageUrl() {
         return auctionImage.getUrl();
+    }
+
+    public boolean isCanCancel() {
+        return (status.equals(OrderStatus.Pending)) || (status.equals(OrderStatus.Cancelled));
     }
 }

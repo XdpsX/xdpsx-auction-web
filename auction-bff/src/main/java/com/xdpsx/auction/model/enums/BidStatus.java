@@ -1,5 +1,5 @@
 package com.xdpsx.auction.model.enums;
 
 public enum BidStatus {
-    ACTIVE, WON, LOST, PAID
+    ACTIVE, WON, LOST, PAID, NO_PAID
 }

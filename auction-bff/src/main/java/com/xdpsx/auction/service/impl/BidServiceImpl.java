@@ -15,10 +15,7 @@ import com.xdpsx.auction.exception.NotFoundException;
 import com.xdpsx.auction.mapper.BidMapper;
 import com.xdpsx.auction.mapper.PageMapper;
 import com.xdpsx.auction.model.*;
-import com.xdpsx.auction.model.enums.BidStatus;
-import com.xdpsx.auction.model.enums.OrderStatus;
-import com.xdpsx.auction.model.enums.TransactionStatus;
-import com.xdpsx.auction.model.enums.TransactionType;
+import com.xdpsx.auction.model.enums.*;
 import com.xdpsx.auction.repository.AuctionRepository;
 import com.xdpsx.auction.repository.BidRepository;
 import com.xdpsx.auction.repository.OrderRepository;
@@ -250,6 +247,7 @@ public class BidServiceImpl implements BidService {
         handlePayForSeller(bid.getAuction().getSeller().getId(), bid.getAuction().getName());
 
         bid.setStatus(BidStatus.PAID);
+        bid.getAuction().setStatus(AuctionStatus.COMPLETED);
         Bid savedBid = bidRepository.save(bid);
 
         Order order = Order.builder()

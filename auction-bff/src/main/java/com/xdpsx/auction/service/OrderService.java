@@ -10,4 +10,6 @@ public interface OrderService {
                                                String keyword, String sort, OrderStatus status);
     PageResponse<OrderUserDto> getSellerOrders(Long sellerId, int pageNum, int pageSize,
                                                String keyword, String sort, OrderStatus status);
+
+    OrderSellerDto cancelOrder(Long orderId, Long userId);
 }

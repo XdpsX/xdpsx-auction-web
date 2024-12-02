@@ -29,6 +29,6 @@ public class Bid extends AbstractAuditEntity{
     @ManyToOne
     private User bidder;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE)
     private Auction auction;
 }

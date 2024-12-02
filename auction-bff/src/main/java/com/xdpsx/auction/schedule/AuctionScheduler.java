@@ -4,6 +4,7 @@ import com.xdpsx.auction.dto.notification.NotificationRequest;
 import com.xdpsx.auction.dto.transaction.TransactionRequest;
 import com.xdpsx.auction.model.Auction;
 import com.xdpsx.auction.model.Bid;
+import com.xdpsx.auction.model.enums.AuctionStatus;
 import com.xdpsx.auction.model.enums.BidStatus;
 import com.xdpsx.auction.model.enums.TransactionStatus;
 import com.xdpsx.auction.model.enums.TransactionType;
@@ -13,7 +14,6 @@ import com.xdpsx.auction.service.NotificationService;
 import com.xdpsx.auction.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,7 +59,7 @@ public class AuctionScheduler {
                     .build();
             notificationService.pushNotification(sellerNotification);
 
-            auction.setEnd(true);
+            auction.setStatus(AuctionStatus.END);
             auctionRepository.save(auction);
         }
     }

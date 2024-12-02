@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT o FROM Order o WHERE " +
             "o.user.id = :userId AND " +
@@ -19,6 +21,16 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("status") OrderStatus status,
             Pageable pageable);
 
+//    @Query("SELECT o FROM Order o WHERE " +
+//            "o.user.id = :userId AND " +
+//            "(:number IS NULL OR o.trackNumber LIKE %:number%) AND " +
+//            "(:statuses IS NULL OR o.status IN :statuses)")
+//    Page<Order> findUserOrders(
+//            @Param("userId") Long userId,
+//            @Param("number") String number,
+//            @Param("statuses") List<OrderStatus> statuses,
+//            Pageable pageable);
+
     @Query("SELECT o FROM Order o WHERE " +
             "o.seller.id = :sellerId AND " +
             "(:number IS NULL OR o.trackNumber LIKE %:number%) AND " +
@@ -29,4 +41,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("status") OrderStatus status,
             Pageable pageable
     );
+
+    Optional<Order> findByIdAndUserId(Long orderId, Long userId);
 }

@@ -1,5 +1,6 @@
 package com.xdpsx.auction.model;
 
+import com.xdpsx.auction.model.enums.AuctionStatus;
 import com.xdpsx.auction.model.enums.AuctionType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -39,7 +40,8 @@ public class Auction extends AbstractAuditEntity{
 
     private boolean trashed;
 
-    private boolean isEnd;
+    @Enumerated(EnumType.STRING)
+    private AuctionStatus status;
 
     @OneToOne
     @JoinColumn(name = "main_image_id")

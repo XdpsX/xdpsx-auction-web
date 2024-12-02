@@ -31,7 +31,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long>,
     Optional<Auction> findLiveAuction(@Param("id") Long id);
 
     @Query("SELECT a FROM Auction a " +
-            "WHERE a.isEnd = false " +
+            "WHERE a.status = 'LIVE' " +
             "AND a.endingTime < CURRENT_TIMESTAMP")
     List<Auction> findEndingAuction();
 }
