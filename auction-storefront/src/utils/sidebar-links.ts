@@ -6,8 +6,8 @@ import {
   RiWallet3Line,
   RiShoppingCartLine,
 } from 'react-icons/ri'
-import { BiDish } from 'react-icons/bi'
 import { BsPersonPlus } from 'react-icons/bs'
+import { AiOutlineTransaction } from 'react-icons/ai'
 import { SidebarLinkType } from '../components/layout/UserSidebar'
 
 export const sidebarLinks: SidebarLinkType[] = [
@@ -22,9 +22,14 @@ export const sidebarLinks: SidebarLinkType[] = [
     title: 'Password',
   },
   {
+    to: '/wallet/transactions',
+    icon: AiOutlineTransaction,
+    title: 'Transactions',
+  },
+  {
     to: '/wallet/deposit',
     icon: RiWallet3Line,
-    title: 'Deposite',
+    title: 'Deposit',
   },
   {
     to: '/wallet/withdraw',
@@ -32,13 +37,8 @@ export const sidebarLinks: SidebarLinkType[] = [
     title: 'Withdraw',
   },
   {
-    to: '/user/auctions',
-    icon: RiAuctionLine,
-    title: 'Auctions',
-  },
-  {
     to: '/user/bids',
-    icon: BiDish,
+    icon: RiAuctionLine,
     title: 'Bids',
   },
   {

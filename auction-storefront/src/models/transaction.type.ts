@@ -6,8 +6,8 @@ export type Transaction = {
   amount: number
   status: 'PENDING' | 'COMPLETED' | 'FAILED'
   description: string
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
 }
 
 export const depositSchema = yup.object().shape({

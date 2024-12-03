@@ -6,6 +6,7 @@ import DepositPage from '../pages/user/DepositPage'
 import OrdersPage from '../pages/user/OrdersPage'
 import ProfilePage from '../pages/user/ProfilePage'
 import SellerRegisterPage from '../pages/user/SellerRegisterPage'
+import TransactionsPage from '../pages/user/TransactionsPage'
 import LinkRouteType from '../routes/type'
 
 export const authLinks: LinkRouteType[] = [
@@ -31,6 +32,11 @@ export const userLinks = [
     title: 'Change Password',
     path: '/user/change-password',
     element: ChangePasswordPage,
+  },
+  {
+    title: 'Wallet | Transactions',
+    path: '/wallet/transactions',
+    element: TransactionsPage,
   },
   {
     title: 'Wallet | Deposite',

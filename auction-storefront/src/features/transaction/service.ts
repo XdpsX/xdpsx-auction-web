@@ -1,3 +1,4 @@
+import { Page } from '../../models/page.type'
 import { DepositPayload, Transaction } from '../../models/transaction.type'
 import api from '../../utils/api'
 import { fromAxiosErrorToAPIError } from '../../utils/error.helper'
@@ -22,4 +23,24 @@ export const depositCallbackAPI = async (
   } catch (error) {
     throw fromAxiosErrorToAPIError(error)
   }
+}
+
+export const fetchMyTransactionsAPI = async (
+  pageNum: number,
+  pageSize: number,
+  sort: string,
+  type: string | null
+) => {
+  const response = await api.get<Page<Transaction>>(
+    `/storefront/users/me/transactions`,
+    {
+      params: {
+        pageNum,
+        pageSize,
+        sort,
+        type,
+      },
+    }
+  )
+  return response.data
 }

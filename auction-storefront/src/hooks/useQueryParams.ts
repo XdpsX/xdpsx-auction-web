@@ -54,6 +54,7 @@ export default function useQueryParams() {
       keyword: params.keyword || null,
       status: params.status || DEFAULT_BID_STATUS,
       orderStatus: params.status || DEFAULT_ORDER_STATUS,
+      transactionType: params.type || 'all',
     },
     setParams,
     // deleteParam,
