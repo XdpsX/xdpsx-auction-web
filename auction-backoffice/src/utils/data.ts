@@ -30,7 +30,6 @@ export const statusColorMap: Record<StatusOptions, string> = {
 
 export const sellerStatus: SelectItemType[] = [
   { key: 'all', title: 'All' },
-  { key: 'PENDING', title: 'Pending' },
   { key: 'APPROVED', title: 'Approved' },
   { key: 'REJECTED', title: 'Rejected' }
 ]

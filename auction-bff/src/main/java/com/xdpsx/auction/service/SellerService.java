@@ -12,4 +12,6 @@ public interface SellerService {
     PageResponse<SellerResponse> getPageSeller(int pageNum, int pageSize, String keyword, String sort,
                                                SellerRegisterStatus status);
     SellerResponse updateStatus(Long id, SellerRegisterStatus status);
+
+    PageResponse<SellerResponse> getPageSellerRegisterList(int pageNum, int pageSize, String keyword, String sort);
 }

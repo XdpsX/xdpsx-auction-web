@@ -51,6 +51,18 @@ public class SellerController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/backoffice/sellers/register-list")
+    ResponseEntity<PageResponse<SellerResponse>> getPageSellerRegisterList(
+            @RequestParam(defaultValue = PAGE_NUM, required = false) int pageNum,
+            @RequestParam(defaultValue = PAGE_SIZE, required = false) @Max(MAX_PAGE_SIZE) int pageSize,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String sort){
+        PageResponse<SellerResponse> response = sellerService.getPageSellerRegisterList(
+                pageNum, pageSize, keyword, sort
+        );
+        return ResponseEntity.ok(response);
+    }
+
     @PutMapping("/backoffice/sellers/{id}/status/{status}")
     ResponseEntity<SellerResponse> updateSellerStatus(@PathVariable("id") Long id,
                                                       @PathVariable("status") SellerRegisterStatus status) {

@@ -16,6 +16,7 @@ public interface SellerDetailsRepository extends JpaRepository<SellerDetails, Lo
 
     @Query("SELECT s FROM SellerDetails s " +
             "JOIN FETCH s.user u WHERE " +
+            "s.status <> 'PENDING' AND" +
             "(:name IS NULL OR s.name LIKE %:name%) AND " +
             "(:status IS NULL OR s.status = :status)")
     Page<SellerDetails> searchSellers(
@@ -25,4 +26,10 @@ public interface SellerDetailsRepository extends JpaRepository<SellerDetails, Lo
 
     @Query("SELECT sd FROM SellerDetails sd JOIN FETCH sd.user WHERE sd.id = :id")
     Optional<SellerDetails> findByIdWithUser(Long id);
+
+    @Query("SELECT s FROM SellerDetails s " +
+            "JOIN FETCH s.user u WHERE " +
+            "s.status = 'PENDING' AND" +
+            "(:name IS NULL OR s.name LIKE %:name%)")
+    Page<SellerDetails> searchSellerRegister(@Param("name") String name, Pageable pageable);
 }

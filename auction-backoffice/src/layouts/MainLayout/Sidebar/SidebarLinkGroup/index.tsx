@@ -9,22 +9,14 @@ const SidebarLinkGroup = memo(({ activeCondition, item }: { activeCondition: boo
   const { pathname } = location
   const { userRole } = useAppSelector((state) => state.user)
   const [open, setOpen] = useState<boolean>(activeCondition)
-  const storedSidebarExpanded = localStorage.getItem('sidebar-expanded')
-  const [sidebarExpanded, setSidebarExpanded] = useState(
-    storedSidebarExpanded === null ? false : storedSidebarExpanded === 'true'
-  )
   const groupRef = useRef<HTMLDivElement>(null)
 
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
       e.preventDefault()
-      if (sidebarExpanded) {
-        setOpen(!open)
-      } else {
-        setSidebarExpanded(true)
-      }
+      setOpen(!open)
     },
-    [sidebarExpanded, open]
+    [open]
   )
 
   if (item.roles && userRole && !item.roles.includes(userRole)) return null

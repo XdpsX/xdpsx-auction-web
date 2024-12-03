@@ -16,7 +16,7 @@ import {
   useDisclosure,
   User
 } from '@nextui-org/react'
-import { Key, useCallback, useState } from 'react'
+import { Key, useCallback, useMemo, useState } from 'react'
 import { toast } from 'react-toastify'
 import { Page } from '~/app/features/page/type'
 import { updateSellerStatusAsync } from '~/app/features/seller'
@@ -27,11 +27,24 @@ import { sellerColumns } from '~/utils/columns'
 import { formatDateTime } from '~/utils/format'
 import { capitalize } from '~/utils/helper'
 
-function SellerTable({ sellerPage, isLoading }: { sellerPage: Page<SellerProfile>; isLoading: boolean }) {
+function SellerTable({
+  sellerPage,
+  isLoading,
+  page = 'list'
+}: {
+  sellerPage: Page<SellerProfile>
+  isLoading: boolean
+  page?: 'list' | 'register-list'
+}) {
   const dispatch = useAppDispatch()
   const { isOpen, onOpen, onOpenChange } = useDisclosure()
   const [status, setStatus] = useState('')
   const [sellerId, setSellerId] = useState<number | null>(null)
+
+  const filteredColumns = useMemo(
+    () => sellerColumns.filter((column) => (column.showIn ? column.showIn.includes(page) : true)),
+    [page]
+  )
 
   const handleOpen = (state: string, sellerId: number) => {
     setStatus(state)
@@ -120,7 +133,7 @@ function SellerTable({ sellerPage, isLoading }: { sellerPage: Page<SellerProfile
   return (
     <>
       <Table aria-label='Sellers Table'>
-        <TableHeader columns={sellerColumns}>
+        <TableHeader columns={filteredColumns}>
           {(column) => (
             <TableColumn
               key={column.uid}

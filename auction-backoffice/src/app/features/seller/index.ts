@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { Page } from '../page/type'
 import { SellerProfile } from './type'
-import { fetchSellersAPI, updateSellerStatusAPI } from './service'
+import { fetchSellerRegistersAPI, fetchSellersAPI, updateSellerStatusAPI } from './service'
 
 export interface SellerState {
   sellerPage: Page<SellerProfile> | null
@@ -30,13 +30,24 @@ export const sellerSlice = createSlice({
       .addCase(fetchSellersAsync.rejected, (state) => {
         state.isLoading = false
       })
+      //fetchSellerRegistersAsync
+      .addCase(fetchSellerRegistersAsync.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(fetchSellerRegistersAsync.fulfilled, (state, { payload }) => {
+        state.sellerPage = payload
+        state.isLoading = false
+      })
+      .addCase(fetchSellerRegistersAsync.rejected, (state) => {
+        state.isLoading = false
+      })
       //updateSellerStatusAsync
       .addCase(updateSellerStatusAsync.pending, (state) => {
         state.isLoading = true
       })
       .addCase(updateSellerStatusAsync.fulfilled, (state, { payload }) => {
         if (state.sellerPage && state.sellerPage.items) {
-          state.sellerPage.items = state.sellerPage.items.map((seller) => (seller.id === payload.id ? payload : seller))
+          state.sellerPage.items = state.sellerPage.items.filter((seller) => seller.id !== payload.id)
         }
         state.isLoading = false
       })
@@ -69,6 +80,31 @@ export const fetchSellersAsync = createAsyncThunk(
   ) => {
     try {
       const data = await fetchSellersAPI(pageNum, pageSize, keyword, sort, status)
+      return data
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error)
+    }
+  }
+)
+
+export const fetchSellerRegistersAsync = createAsyncThunk(
+  'seller/fetchSellerRegistersAsync',
+  async (
+    {
+      pageNum,
+      pageSize,
+      keyword,
+      sort
+    }: {
+      pageNum: number
+      pageSize: number
+      keyword: string | null
+      sort: string
+    },
+    thunkAPI
+  ) => {
+    try {
+      const data = await fetchSellerRegistersAPI(pageNum, pageSize, keyword, sort)
       return data
     } catch (error) {
       return thunkAPI.rejectWithValue(error)

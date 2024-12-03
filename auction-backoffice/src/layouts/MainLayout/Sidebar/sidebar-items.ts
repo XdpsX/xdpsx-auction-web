@@ -45,12 +45,32 @@ const sidebarItems: SidebarItem[] = [
       }
     ]
   },
+  // {
+  //   key: 'sellers',
+  //   title: 'Sellers',
+  //   path: '/sellers',
+  //   icon: 'material-symbols:person-outline',
+  //   roles: ['ADMIN']
+  // },
   {
     key: 'sellers',
     title: 'Sellers',
     path: '/sellers',
     icon: 'material-symbols:person-outline',
-    roles: ['ADMIN']
+    group: true,
+    roles: ['ADMIN'],
+    children: [
+      {
+        key: 'sellers-list',
+        title: 'List',
+        index: true
+      },
+      {
+        key: 'sellers-register',
+        title: 'Register List',
+        path: '/sellers/register-list'
+      }
+    ]
   }
 ]
 export default sidebarItems

@@ -21,6 +21,23 @@ export const fetchSellersAPI = async (
   return response.data
 }
 
+export const fetchSellerRegistersAPI = async (
+  pageNum: number,
+  pageSize: number,
+  keyword: string | null,
+  sort: string
+) => {
+  const response = await api.get<Page<SellerProfile>>(`/backoffice/sellers/register-list`, {
+    params: {
+      pageNum,
+      pageSize,
+      keyword,
+      sort
+    }
+  })
+  return response.data
+}
+
 export const updateSellerStatusAPI = async (sellerId: number, status: string) => {
   const response = await api.put<SellerProfile>(`/backoffice/sellers/${sellerId}/status/${status}`)
   return response.data

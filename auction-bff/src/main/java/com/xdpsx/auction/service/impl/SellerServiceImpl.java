@@ -112,6 +112,14 @@ public class SellerServiceImpl implements SellerService {
         return SellerMapper.INSTANCE.toResponse(savedSellerDetails);
     }
 
+    @Override
+    public PageResponse<SellerResponse> getPageSellerRegisterList(int pageNum, int pageSize, String keyword, String sort) {
+        Page<SellerDetails> sellerPage = sellerDetailsRepository.searchSellerRegister(
+                keyword, PageRequest.of(pageNum - 1, pageSize, getSort(sort))
+        );
+        return PageMapper.toPageResponse(sellerPage, SellerMapper.INSTANCE::toResponse);
+    }
+
     private Sort getSort(String sortParam) {
         if (sortParam == null) {
             return Sort.by("createdAt").descending();

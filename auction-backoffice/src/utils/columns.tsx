@@ -32,6 +32,6 @@ export const sellerColumns = [
   { name: 'ADDRESS', uid: 'address' },
   { name: 'MOBILE PHONE', uid: 'mobilePhone' },
   { name: 'REGISTERED AT', uid: 'registeredAt' },
-  { name: 'STATUS', uid: 'status' },
-  { name: 'ACTIONS', uid: 'actions' }
+  { name: 'STATUS', uid: 'status', showIn: ['list'] },
+  { name: 'ACTIONS', uid: 'actions', showIn: ['register-list'] }
 ]

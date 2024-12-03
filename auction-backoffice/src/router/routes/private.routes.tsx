@@ -56,6 +56,14 @@ const privateRoutes = [
             <SellerList />
           </RoleProtected>
         )
+      },
+      {
+        path: '/sellers/register-list',
+        element: (
+          <RoleProtected roles={['ADMIN']}>
+            <SellerList page='register-list' />
+          </RoleProtected>
+        )
       }
     ]
   }
