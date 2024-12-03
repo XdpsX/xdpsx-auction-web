@@ -71,6 +71,45 @@ const sidebarItems: SidebarItem[] = [
         path: '/sellers/register-list'
       }
     ]
+  },
+  {
+    key: 'orders',
+    title: 'Orders',
+    path: '/orders',
+    icon: 'solar:box-linear',
+    group: true,
+    children: [
+      {
+        key: 'list-orders',
+        title: 'List',
+        index: true,
+        roles: ['ADMIN']
+      },
+      {
+        key: 'pending-orders',
+        title: 'Pending Orders',
+        path: '/orders/Pending',
+        roles: ['SELLER']
+      },
+      {
+        key: 'confirmed-orders',
+        title: 'Confirmed Orders',
+        path: '/orders/Confirmed',
+        roles: ['SELLER']
+      },
+      {
+        key: 'shipped-orders',
+        title: 'Shipped Orders',
+        path: '/orders/Shipped',
+        roles: ['SELLER']
+      },
+      {
+        key: 'delivered-orders',
+        title: 'Delivered Orders',
+        path: '/orders/Delivered',
+        roles: ['SELLER']
+      }
+    ]
   }
 ]
 export default sidebarItems

@@ -57,4 +57,12 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/backoffice/orders/{id}/update-status")
+    ResponseEntity<OrderUserDto> updateOrderStatus(
+            @PathVariable Long id
+    ){
+        OrderUserDto response = orderService.updateOrderStatus(id, userContext.getLoggedUser().getId());
+        return ResponseEntity.ok(response);
+    }
+
 }

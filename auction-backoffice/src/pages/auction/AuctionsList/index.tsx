@@ -1,4 +1,4 @@
-import React, { Key, useCallback } from 'react'
+import React, { Key } from 'react'
 import { useEffect, useMemo } from 'react'
 
 import useQueryParams from '~/app/hooks/useQueryParams'
@@ -42,46 +42,31 @@ function AuctionsList() {
     )
   }, [dispatch, published, keyword, pageNum, pageSize, sort])
 
-  const onClear = useCallback(() => {
+  const onClear = () => {
     setParams({ keyword: '', pageNum: 1 })
-  }, [setParams])
+  }
 
-  const onPageChange = useCallback(
-    (newPageNum: number) => {
-      setParams({ pageNum: newPageNum })
-    },
-    [setParams]
-  )
+  const onPageChange = (newPageNum: number) => {
+    setParams({ pageNum: newPageNum })
+  }
 
-  const onPageSizeChange = useCallback(
-    (newPageSize: number) => {
-      setParams({ pageSize: newPageSize })
-    },
-    [setParams]
-  )
+  const onPageSizeChange = (newPageSize: number) => {
+    setParams({ pageSize: newPageSize })
+  }
 
-  const onFilterChange = useCallback(
-    (selectedValues: Record<string, string>) => {
-      setParams({
-        published: selectedValues['published'] === 'all' ? '' : String(selectedValues['published'])
-      })
-    },
-    [setParams]
-  )
+  const onFilterChange = (selectedValues: Record<string, string>) => {
+    setParams({
+      published: selectedValues['published'] === 'all' ? '' : String(selectedValues['published'])
+    })
+  }
 
-  const onSortChange = useCallback(
-    (value: Key) => {
-      setParams({ sort: String(value) })
-    },
-    [setParams]
-  )
+  const onSortChange = (value: Key) => {
+    setParams({ sort: String(value) })
+  }
 
-  const onSearchChange = useCallback(
-    (value: string) => {
-      setParams({ keyword: value, pageNum: 1 })
-    },
-    [setParams]
-  )
+  const onSearchChange = (value: string) => {
+    setParams({ keyword: value, pageNum: 1 })
+  }
 
   return (
     <section className='flex flex-col gap-4'>

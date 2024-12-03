@@ -13,7 +13,13 @@ const Sidebar = ({ sidebarItems }: { sidebarItems: SidebarItem[] }) => {
   const renderGroupItem = useMemo(
     () => (item: SidebarItem) => {
       if (item.roles && userRole && !item.roles.includes(userRole)) return null
-      return <SidebarLinkGroup key={item.key} activeCondition={pathname === item.key} item={item} />
+      return (
+        <SidebarLinkGroup
+          key={item.key}
+          activeCondition={item.path ? pathname.includes(item.path) : false}
+          item={item}
+        />
+      )
     },
     [pathname, userRole]
   )

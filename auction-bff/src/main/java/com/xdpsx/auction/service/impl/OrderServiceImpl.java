@@ -92,6 +92,26 @@ public class OrderServiceImpl implements OrderService {
         return OrderMapper.INSTANCE.toOrderSellerDto(savedOrder);
     }
 
+    @Override
+    public OrderUserDto updateOrderStatus(Long orderId, Long sellerId) {
+        Order order = orderRepository.findByIdAndSellerId(orderId, sellerId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND, orderId));
+        if (!order.isLowerDelivered()) {
+            throw new BadRequestException("You could just update lower delivered order");
+        }
+        order.setStatus(order.getStatus().next());
+        Order savedOrder = orderRepository.save(order);
+        if (savedOrder.getStatus().equals(OrderStatus.Delivered)) {
+            NotificationRequest notificationSeller = NotificationRequest.builder()
+                    .userId(order.getUser().getId())
+                    .title("Your Order has been delivered")
+                    .message("Order %s has been delivered. Please check it".formatted(order.getTrackNumber()))
+                    .build();
+            notificationService.pushNotification(notificationSeller);
+        }
+        return OrderMapper.INSTANCE.toOrderUserDto(savedOrder);
+    }
+
     private Sort getSort(String sortParam) {
         if (sortParam == null) {
             return Sort.by("updatedAt").descending();

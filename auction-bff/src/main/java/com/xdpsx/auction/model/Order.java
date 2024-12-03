@@ -50,4 +50,8 @@ public class Order extends AbstractAuditEntity{
     public boolean isCanCancel() {
         return (status.equals(OrderStatus.Pending)) || (status.equals(OrderStatus.Cancelled));
     }
+
+    public boolean isLowerDelivered() {
+        return status.ordinal() < OrderStatus.Delivered.ordinal();
+    }
 }

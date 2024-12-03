@@ -1,3 +1,4 @@
+import { Icon } from '@iconify/react'
 import {
   Button,
   Chip,
@@ -115,11 +116,16 @@ function SellerTable({
         if (seller.status === 'PENDING') {
           return (
             <div className='flex items-center justify-center gap-2'>
-              <Button color='success' size='sm' onClick={handleOpen.bind(null, 'APPROVED', seller.id)}>
-                Approved
+              <Button
+                color='success'
+                title='Approved'
+                isIconOnly
+                onClick={handleOpen.bind(null, 'APPROVED', seller.id)}
+              >
+                <Icon icon='mdi:tick' width={24} color='white' />
               </Button>
-              <Button color='danger' size='sm' onClick={handleOpen.bind(null, 'REJECTED', seller.id)}>
-                Reject
+              <Button color='danger' title='Rejected' isIconOnly onClick={handleOpen.bind(null, 'REJECTED', seller.id)}>
+                <Icon icon='mdi:close' width={24} />
               </Button>
             </div>
           )

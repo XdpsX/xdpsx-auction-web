@@ -43,4 +43,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     );
 
     Optional<Order> findByIdAndUserId(Long orderId, Long userId);
+
+    Optional<Order> findByIdAndSellerId(Long orderId, Long sellerId);
 }

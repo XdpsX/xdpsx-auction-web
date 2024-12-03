@@ -1,3 +1,4 @@
+import { OrderStatus } from '~/app/features/order/type'
 import { SelectItemType } from '~/components/Selection/type'
 
 export const publishedOptions: SelectItemType[] = [
@@ -11,6 +12,13 @@ export const sortOptions = [
   { title: 'Oldest', key: 'date' },
   { title: 'Name Z-A', key: '-name' },
   { title: 'Name A-Z', key: 'name' }
+]
+
+export const orderSortOptions = [
+  { title: 'Newest', key: '-date' },
+  { title: 'Oldest', key: 'date' },
+  { title: 'Amount 9-0', key: '-amount' },
+  { title: 'Amount 0-9', key: 'amount' }
 ]
 
 export const statusOptions = [
@@ -33,3 +41,22 @@ export const sellerStatus: SelectItemType[] = [
   { key: 'APPROVED', title: 'Approved' },
   { key: 'REJECTED', title: 'Rejected' }
 ]
+
+export const orderActions: { [key in OrderStatus]: string[] } = {
+  Pending: ['View', 'Update', 'Cancel'],
+  Confirmed: ['View', 'Update', 'Cancel'],
+  Shipped: ['View', 'Update', 'Cancel'],
+  Delivered: ['View'],
+  Cancelled: ['View'],
+  Returned: ['View']
+}
+
+const orderStatusList: OrderStatus[] = ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled', 'Returned']
+
+export function getNextStatus(currentStatus: OrderStatus): OrderStatus | null {
+  const currentIndex = orderStatusList.indexOf(currentStatus)
+  if (currentIndex === -1 || currentIndex === orderStatusList.length - 1) {
+    return null // Trả về null nếu không tìm thấy trạng thái hoặc đã là trạng thái cuối
+  }
+  return orderStatusList[currentIndex + 1] // Trả về trạng thái tiếp theo
+}

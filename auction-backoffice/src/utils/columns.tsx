@@ -35,3 +35,16 @@ export const sellerColumns = [
   { name: 'STATUS', uid: 'status', showIn: ['list'] },
   { name: 'ACTIONS', uid: 'actions', showIn: ['register-list'] }
 ]
+
+export const orderColumns = [
+  { name: 'TRACKING NUMBER', uid: 'trackNumber', roles: ['ADMIN', 'SELLER'] },
+  { name: 'AUCTION', uid: 'auction', roles: ['ADMIN', 'SELLER'] },
+  {
+    name: 'TOTAL AMOUNT',
+    uid: 'totalAmount',
+    roles: ['ADMIN', 'SELLER']
+  },
+  { name: 'SHIPPING ADDRESS', uid: 'shippingAddress', roles: ['ADMIN', 'SELLER'] },
+  { name: 'UPDATED AT', uid: 'updatedAt', roles: ['ADMIN', 'SELLER'] },
+  { name: 'ACTIONS', uid: 'actions', roles: ['ADMIN', 'SELLER'] }
+]
