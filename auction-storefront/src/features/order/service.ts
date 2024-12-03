@@ -25,3 +25,8 @@ export const cancelOrderAPI = async (orderId: number) => {
   const response = await api.put<Order>(`/storefront/orders/${orderId}/cancel`)
   return response.data
 }
+
+export const confirmOrderAPI = async (orderId: number) => {
+  const response = await api.put<Order>(`/storefront/orders/${orderId}/confirm`)
+  return response.data
+}

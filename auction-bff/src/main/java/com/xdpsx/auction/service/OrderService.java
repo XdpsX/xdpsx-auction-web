@@ -12,4 +12,5 @@ public interface OrderService {
                                                String keyword, String sort, OrderStatus status);
     OrderSellerDto cancelOrder(Long orderId, Long userId);
     OrderUserDto updateOrderStatus(Long orderId, Long sellerId);
+    OrderSellerDto confirmOrderDelivered(Long orderId, Long userId);
 }

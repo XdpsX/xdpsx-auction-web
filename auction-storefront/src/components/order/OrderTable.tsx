@@ -9,7 +9,7 @@ import useQueryParams from '../../hooks/useQueryParams'
 import { pageNumOptions } from '../../utils/data'
 import Button from '../ui/Button'
 import { useAppDispatch } from '../../store/hooks'
-import { cancelOrderAsync } from '../../features/order/slice'
+import { cancelOrderAsync, confirmOrderAsync } from '../../features/order/slice'
 import ConfirmModal from '../ui/ConfirmModal'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
@@ -38,7 +38,7 @@ function OrderTable({
     setParams({ pageSize: pageSize, pageNum: '1', sort: null })
   }
 
-  const handleOpenModal = (action: 'cancel', orderId: number) => {
+  const handleOpenModal = (action: string, orderId: number) => {
     setOrderId(orderId)
     setAction(action)
     setOpenModal(true)
@@ -51,6 +51,12 @@ function OrderTable({
         .then(() => {
           toast.success('Order has been canceled')
         })
+    } else if (action === 'confirm' && orderId) {
+      dispatch(confirmOrderAsync(orderId))
+        .unwrap()
+        .then(() => {
+          toast.success('Order has been confirmed')
+        })
     }
     setOpenModal(false)
   }
@@ -58,6 +64,12 @@ function OrderTable({
   if (!orderPage) return null
 
   const { items, pageNum, pageSize, totalPages } = orderPage
+
+  if (items.length === 0) {
+    return (
+      <p className="text-center py-12 font-bold text-xl">No orders found</p>
+    )
+  }
 
   return (
     <>
@@ -152,6 +164,18 @@ function OrderTable({
                           )}
                         >
                           Cancel
+                        </Button>
+                      )}
+                      {status === 'Delivered' && (
+                        <Button
+                          className="bg-blue-600 hover:bg-blue-700"
+                          onClick={handleOpenModal.bind(
+                            null,
+                            'confirm',
+                            item.id
+                          )}
+                        >
+                          Confirm
                         </Button>
                       )}
                       {/* {status === 'ACTIVE' && (

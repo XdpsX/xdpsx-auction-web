@@ -65,4 +65,12 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/storefront/orders/{id}/confirm")
+    ResponseEntity<OrderSellerDto> confirmOrderDelivered(
+            @PathVariable Long id
+    ){
+        OrderSellerDto response = orderService.confirmOrderDelivered(id, userContext.getLoggedUser().getId());
+        return ResponseEntity.ok(response);
+    }
+
 }

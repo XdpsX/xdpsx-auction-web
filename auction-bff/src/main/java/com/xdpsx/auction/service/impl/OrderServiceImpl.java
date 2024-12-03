@@ -112,6 +112,34 @@ public class OrderServiceImpl implements OrderService {
         return OrderMapper.INSTANCE.toOrderUserDto(savedOrder);
     }
 
+    @Override
+    public OrderSellerDto confirmOrderDelivered(Long orderId, Long userId) {
+        Order order = orderRepository.findByIdAndUserId(orderId, userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND, orderId));
+        if (!order.getStatus().equals(OrderStatus.Delivered)) {
+            throw new BadRequestException("You could just confirm order delivered");
+        }
+        order.setStatus(OrderStatus.Completed);
+        Order savedOrder = orderRepository.save(order);
+
+        TransactionRequest transactionSeller = TransactionRequest.builder()
+                .userId(savedOrder.getSeller().getId())
+                .type(TransactionType.DEPOSIT)
+                .amount(savedOrder.getTotalAmount().multiply(BigDecimal.valueOf(1).subtract(SECURITY_FEE_RATE)))
+                .description("Payment for auction " + order.getAuction().getName())
+                .status(TransactionStatus.COMPLETED)
+                .build();
+        transactionService.createTransaction(transactionSeller);
+
+        NotificationRequest notificationSeller = NotificationRequest.builder()
+                .userId(order.getSeller().getId())
+                .title("Your Order has been confirmed")
+                .message("Order %s has been confirmed".formatted(order.getTrackNumber()))
+                .build();
+        notificationService.pushNotification(notificationSeller);
+        return OrderMapper.INSTANCE.toOrderSellerDto(savedOrder);
+    }
+
     private Sort getSort(String sortParam) {
         if (sortParam == null) {
             return Sort.by("updatedAt").descending();
