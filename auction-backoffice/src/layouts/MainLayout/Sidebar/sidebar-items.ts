@@ -110,6 +110,26 @@ const sidebarItems: SidebarItem[] = [
         roles: ['SELLER']
       }
     ]
+  },
+  {
+    key: 'withdrawal',
+    title: 'Withdrawal',
+    path: '/withdrawal',
+    icon: 'ph:hand-withdraw',
+    group: true,
+    roles: ['ADMIN'],
+    children: [
+      {
+        key: 'withdrawal-list',
+        title: 'List',
+        index: true
+      },
+      {
+        key: 'withdrawal-request',
+        title: 'Request List',
+        path: '/withdrawal/request-list'
+      }
+    ]
   }
 ]
 export default sidebarItems

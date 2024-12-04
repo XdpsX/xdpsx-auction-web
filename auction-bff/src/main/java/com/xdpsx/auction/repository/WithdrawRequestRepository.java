@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface WithdrawRequestRepository extends JpaRepository<WithdrawRequest, Long> {
@@ -19,4 +20,10 @@ public interface WithdrawRequestRepository extends JpaRepository<WithdrawRequest
                                                         Pageable pageable);
 
     Optional<WithdrawRequest> findByIdAndUserId(Long id, Long userId);
+
+    @Query("SELECT wr FROM WithdrawRequest wr WHERE wr.status IN :statuses")
+    Page<WithdrawRequest> findByStatusIn(
+            @Param("statuses") List<WithdrawStatus> statuses,
+            Pageable pageable
+    );
 }

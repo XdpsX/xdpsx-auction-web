@@ -5,6 +5,7 @@ import { Navigate } from 'react-router-dom'
 import LoadingOverlay from '~/components/LoadingOverlay'
 import RoleProtected from '../guards/RoleProtected'
 import OrderList from '~/pages/order/OrderList'
+import WithdrawalList from '~/pages/withdrawal/WithdrawalList'
 
 const CategoriesList = lazy(() => import('~/pages/category/CategoriesList'))
 const Dashboard = lazy(() => import('~/pages/Dashboard'))
@@ -71,6 +72,22 @@ const privateRoutes = [
         element: (
           <RoleProtected roles={['SELLER']}>
             <OrderList />
+          </RoleProtected>
+        )
+      },
+      {
+        path: '/withdrawal',
+        element: (
+          <RoleProtected roles={['ADMIN']}>
+            <WithdrawalList page='list' />
+          </RoleProtected>
+        )
+      },
+      {
+        path: '/withdrawal/request-list',
+        element: (
+          <RoleProtected roles={['ADMIN']}>
+            <WithdrawalList page='request-list' />
           </RoleProtected>
         )
       }

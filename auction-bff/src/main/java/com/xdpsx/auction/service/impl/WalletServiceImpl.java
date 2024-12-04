@@ -24,10 +24,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -81,7 +83,7 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     public PageResponse<WithdrawRequestDto> getUserWithdrawRequests(Long userId, int pageNum, int pageSize, String sort, Integer status) {
-        PageRequest pageRequest = PageRequest.of(pageNum-1, pageSize, getUserSort(sort));
+        PageRequest pageRequest = PageRequest.of(pageNum-1, pageSize, getSort(sort));
         WithdrawStatus withdrawStatus = (status != null) ? WithdrawStatus.fromValue(status) : null;
         Page<WithdrawRequest> withdrawRequestsPage = withdrawRequestRepository.findByUserIdAndOptionalStatus(userId, withdrawStatus, pageRequest);
         return PageMapper.toPageResponse(withdrawRequestsPage, WithdrawRequestDto::fromWithdrawRequest);
@@ -107,7 +109,16 @@ public class WalletServiceImpl implements WalletService {
         transactionService.createTransaction(transactionRequest);
     }
 
-    private Sort getUserSort(String sortParam) {
+    @PreAuthorize("hasRole('ADMIN')")
+    @Override
+    public PageResponse<WithdrawRequestDto> getAllWithdrawRequests(int pageNum, int pageSize, String sort, List<Integer> statuses) {
+        Page<WithdrawRequest> withdrawRequestPage = withdrawRequestRepository.findByStatusIn(
+                WithdrawStatus.fromValues(statuses), PageRequest.of(pageNum - 1, pageSize, getSort(sort))
+        );
+        return PageMapper.toPageResponse(withdrawRequestPage, WithdrawRequestDto::fromWithdrawRequest);
+    }
+
+    private Sort getSort(String sortParam) {
         if (sortParam == null) {
             return Sort.by("updatedAt").descending();
         }

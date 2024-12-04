@@ -41,7 +41,8 @@ export default function useQueryParams() {
       keyword: params.keyword || null,
       published: params.published || DEFAULT_PUBLISHED.key,
       sort: params.sort || DEFAULT_SORT.key,
-      sellerStatus: params.sellerStatus || 'APPROVED'
+      sellerStatus: params.sellerStatus || 'APPROVED',
+      withdrawalStatuses: params.statuses || 'all'
     },
     setParams,
     deleteParam,

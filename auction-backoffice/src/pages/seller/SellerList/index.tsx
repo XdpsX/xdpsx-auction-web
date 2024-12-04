@@ -49,7 +49,7 @@ function SellerList({ page = 'list' }: { page?: 'list' | 'register-list' }) {
 
   const onFilterChange = (selectedValues: Record<string, string>) => {
     setParams({
-      sellerStatus: selectedValues['status'] === 'all' ? '' : String(selectedValues['status'])
+      sellerStatus: selectedValues['status'] === 'all' ? 'all' : String(selectedValues['status'])
     })
   }
 
@@ -115,10 +115,10 @@ function SellerList({ page = 'list' }: { page?: 'list' | 'register-list' }) {
                 onClear: () => setParams({ keyword: '' })
               },
               {
-                key: filteredStatus?.key || 'all',
-                title: filteredStatus?.title || 'All',
-                exceptKey: 'all',
-                onClear: () => setParams({ sellerStatus: 'all' })
+                key: filteredStatus?.key || 'APPROVED',
+                title: filteredStatus?.title || 'Approved',
+                exceptKey: 'APPROVED',
+                onClear: () => setParams({ sellerStatus: 'APPROVED' })
               },
               {
                 key: filteredSort?.key || DEFAULT_SORT.key,

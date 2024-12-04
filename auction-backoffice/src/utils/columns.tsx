@@ -48,3 +48,16 @@ export const orderColumns = [
   { name: 'UPDATED AT', uid: 'updatedAt', roles: ['ADMIN', 'SELLER'] },
   { name: 'ACTIONS', uid: 'actions', roles: ['ADMIN', 'SELLER'] }
 ]
+
+export const withdrawlsColumns = [
+  { name: 'BANK NAME', uid: 'bankName' },
+  { name: 'ACCOUNT NUMBER', uid: 'accountNumber' },
+  {
+    name: 'HOLDER NAME',
+    uid: 'holderName'
+  },
+  { name: 'AMOUNT', uid: 'amount' },
+  { name: 'STATUS', uid: 'status' },
+  { name: 'UPDATED AT', uid: 'updatedAt' },
+  { name: 'ACTIONS', uid: 'actions' }
+]

@@ -20,6 +20,7 @@ export const orderSortOptions = [
   { title: 'Amount 9-0', key: '-amount' },
   { title: 'Amount 0-9', key: 'amount' }
 ]
+export const withdrawalSortOptions = orderSortOptions
 
 export const statusOptions = [
   { name: 'Upcoming', uid: 'upcoming' },
@@ -60,3 +61,16 @@ export function getNextStatus(currentStatus: OrderStatus): OrderStatus | null {
   }
   return orderStatusList[currentIndex + 1] // Trả về trạng thái tiếp theo
 }
+
+export const withdrawalRequestStatus: SelectItemType[] = [
+  { key: '0,1', title: 'All' },
+  { key: '0', title: 'Pending' },
+  { key: '1', title: 'Confirmed' }
+]
+
+export const withdrawalListStatus: SelectItemType[] = [
+  { key: '2,3,4', title: 'All' },
+  { key: '2', title: 'Completed' },
+  { key: '3', title: 'Rejected' },
+  { key: '4', title: 'Cancelled' }
+]
