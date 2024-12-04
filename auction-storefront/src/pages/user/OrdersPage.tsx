@@ -44,7 +44,7 @@ function OrdersPage() {
   }
 
   return (
-    <div className="rounded-sm bg-white px-2 pb-10 shadow md:px-7 md:pb-12 space-y-4">
+    <div className="rounded-sm bg-white border px-2 pb-10 shadow md:px-7 md:pb-12 space-y-4">
       <div className="border-b border-b-gray-200 py-3">
         <h1 className="text-lg font-medium capitalize text-gray-900">
           {status} Orders

@@ -9,7 +9,7 @@ import {
 } from '../../features/category/slice'
 
 import { formatPrice } from '../../utils/format'
-import { selectWallet, setWallet } from '../../features/wallet/wallet.slice'
+import { selectWallet, setWallet } from '../../features/wallet/slice'
 import { Client } from '@stomp/stompjs'
 import { Wallet } from '../../models/wallet.type'
 import SockJS from 'sockjs-client'

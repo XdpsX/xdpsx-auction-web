@@ -38,13 +38,13 @@ export default function useQueryParams() {
   //   updateSearchParams(updatedParams)
   // }
 
-  // const deleteAllParams = () => {
-  //   const { pageNum, pageSize } = params
-  //   const updatedParams: Record<string, string | number | boolean | null> = {}
-  //   if (pageNum !== undefined) updatedParams.pageNum = pageNum
-  //   if (pageSize !== undefined) updatedParams.pageSize = pageSize
-  //   updateSearchParams(updatedParams)
-  // }
+  const deleteAllParams = () => {
+    const { pageSize } = params
+    const updatedParams: Record<string, string | number | boolean | null> = {}
+    // if (pageNum !== undefined) updatedParams.pageNum = pageNum
+    if (pageSize !== undefined) updatedParams.pageSize = pageSize
+    updateSearchParams(updatedParams)
+  }
 
   return {
     params: {
@@ -55,9 +55,10 @@ export default function useQueryParams() {
       status: params.status || DEFAULT_BID_STATUS,
       orderStatus: params.status || DEFAULT_ORDER_STATUS,
       transactionType: params.type || 'all',
+      withdrawStatus: params.status || 'all',
     },
     setParams,
     // deleteParam,
-    // deleteAllParams,
+    deleteAllParams,
   }
 }

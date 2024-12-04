@@ -5,7 +5,7 @@ import { selectUser } from '../../features/user/slice'
 import cn from '../../utils/cn'
 
 import { sidebarLinks } from '../../utils/sidebar-links'
-import { selectWallet } from '../../features/wallet/wallet.slice'
+import { selectWallet } from '../../features/wallet/slice'
 import { formatPrice } from '../../utils/format'
 import DropDown from '../ui/DropDown'
 import { IconType } from 'react-icons/lib'

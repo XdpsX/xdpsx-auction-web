@@ -21,7 +21,7 @@ import {
 } from '../../features/bid/slice'
 import { toast } from 'react-toastify'
 import { selectUser } from '../../features/user/slice'
-import { selectWallet } from '../../features/wallet/wallet.slice'
+import { selectWallet } from '../../features/wallet/slice'
 
 function BidTable({
   bidPage,

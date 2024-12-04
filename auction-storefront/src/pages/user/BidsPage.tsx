@@ -46,7 +46,7 @@ function BidsPage() {
   }
 
   return (
-    <div className="rounded-sm bg-white px-2 pb-10 shadow md:px-7 md:pb-12 space-y-4">
+    <div className="rounded-sm bg-white border px-2 pb-10 shadow md:px-7 md:pb-12 space-y-4">
       <div>
         <div className="sm:hidden">
           <label htmlFor="tabs" className="sr-only">

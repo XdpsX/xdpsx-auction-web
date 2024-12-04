@@ -1,33 +1,30 @@
 import PulseLoader from 'react-spinners/PulseLoader'
-import { Order, OrderStatus } from '../../models/order.type'
-import { Page } from '../../models/page.type'
-import cn from '../../utils/cn'
-import { formatDateTime, formatPrice } from '../../utils/format'
-import Pagination from '../ui/Pagination'
-import Select from '../ui/Select'
 import useQueryParams from '../../hooks/useQueryParams'
+import { Page } from '../../models/page.type'
+import { Withdraw } from '../../models/wallet.type'
+import Select from '../ui/Select'
 import { pageNumOptions } from '../../utils/data'
-import Button from '../ui/Button'
-import { useAppDispatch } from '../../store/hooks'
-import { cancelOrderAsync, confirmOrderAsync } from '../../features/order/slice'
+import Pagination from '../ui/Pagination'
+import cn from '../../utils/cn'
+import { formatPrice } from '../../utils/format'
 import ConfirmModal from '../ui/ConfirmModal'
 import { useState } from 'react'
+import { useAppDispatch } from '../../store/hooks'
+import { cancelWithdrawAsync } from '../../features/wallet/slice'
 import { toast } from 'react-toastify'
+import Button from '../ui/Button'
 
-function OrderTable({
-  orderPage,
+function WithdrawTable({
+  withdrawPage,
   isLoading,
-  status,
 }: {
-  orderPage: Page<Order> | null
+  withdrawPage: Page<Withdraw> | null
   isLoading: boolean
-  status: OrderStatus
 }) {
   const dispatch = useAppDispatch()
   const { setParams } = useQueryParams()
   const [openModal, setOpenModal] = useState(false)
-  const [orderId, setOrderId] = useState<number | null>(null)
-  const [action, setAction] = useState<string | null>(null)
+  const [withdrawId, setWithdrawId] = useState<number | null>(null)
 
   const onPageChange = (pageNum: number) => {
     setParams({ pageNum: pageNum })
@@ -38,36 +35,31 @@ function OrderTable({
     setParams({ pageSize: pageSize, pageNum: '1', sort: null })
   }
 
-  const handleOpenModal = (action: string, orderId: number) => {
-    setOrderId(orderId)
-    setAction(action)
+  const handleOpenModal = (withdrawId: number) => {
+    setWithdrawId(withdrawId)
     setOpenModal(true)
   }
 
   const handleSubmit = () => {
-    if (action === 'cancel' && orderId) {
-      dispatch(cancelOrderAsync(orderId))
+    if (withdrawId) {
+      dispatch(cancelWithdrawAsync(withdrawId))
         .unwrap()
         .then(() => {
-          toast.success('Order has been canceled')
-        })
-    } else if (action === 'confirm' && orderId) {
-      dispatch(confirmOrderAsync(orderId))
-        .unwrap()
-        .then(() => {
-          toast.success('Order has been confirmed')
+          setOpenModal(false)
+          toast.success('Withdraw request has been canceled')
         })
     }
-    setOpenModal(false)
   }
 
-  if (!orderPage) return null
+  if (!withdrawPage) return null
 
-  const { items, pageNum, pageSize, totalPages } = orderPage
+  const { items, pageNum, pageSize, totalPages } = withdrawPage
 
   if (items.length === 0) {
     return (
-      <p className="text-center py-12 font-bold text-xl">No orders found</p>
+      <p className="text-center py-12 font-bold text-xl">
+        No withdraw requests found
+      </p>
     )
   }
 
@@ -87,32 +79,38 @@ function OrderTable({
                     scope="col"
                     className="py-3.5 pl-4 pr-1 text-left text-sm font-semibold text-gray-900 sm:pl-0"
                   >
-                    Auction
+                    Id
                   </th>
                   <th
                     scope="col"
                     className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
-                    Tracking Number
+                    Amount
                   </th>
                   <th
                     scope="col"
                     className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
-                    Total Amount
+                    Bank Name
                   </th>
                   <th
                     scope="col"
                     className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
-                    Shipping Address
+                    Account Number
                   </th>
 
                   <th
                     scope="col"
                     className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
-                    Updated At
+                    Holder Name
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  >
+                    Status
                   </th>
                   <th
                     scope="col"
@@ -126,59 +124,34 @@ function OrderTable({
                 {items.map((item) => (
                   <tr key={item.id}>
                     <td className=" whitespace-nowrap py-4 pl-4  font-medium text-gray-900 sm:pl-0">
-                      <div className="flex items-center gap-2">
-                        <div className="w-12 h-12">
-                          <img
-                            src={item.auctionImageUrl}
-                            alt="Auction image"
-                            className="w-full h-full object-contain"
-                          />
-                        </div>
-                        <div className="max-w-[220px]">
-                          <p className="truncate">{item.auctionName}</p>
-                        </div>
-                      </div>
+                      {item.id}
                     </td>
 
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {item.trackNumber}
+                      {formatPrice(item.amount)}
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {formatPrice(item.totalAmount)}
+                      {item.bankName}
                     </td>
                     <td className="whitespace-wrap px-3 py-4 text-sm text-gray-500">
-                      {item.shippingAddress}
+                      {item.accountNumber}
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {formatDateTime(item.updatedAt)}
+                      {item.holderName}
                     </td>
-
-                    <td className="whitespace-nowrap text-left py-4 pl-3  text-sm font-medium">
-                      {(status === 'Pending' || status === 'Confirmed') && (
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      {item.status}
+                    </td>
+                    {item.status === 'PENDING' && (
+                      <td className="whitespace-nowrap text-left py-4 pl-3  text-sm font-medium">
                         <Button
                           className="bg-red-600 hover:bg-red-700"
-                          onClick={handleOpenModal.bind(
-                            null,
-                            'cancel',
-                            item.id
-                          )}
+                          onClick={handleOpenModal.bind(null, item.id)}
                         >
                           Cancel
                         </Button>
-                      )}
-                      {status === 'Delivered' && (
-                        <Button
-                          className="bg-blue-600 hover:bg-blue-700"
-                          onClick={handleOpenModal.bind(
-                            null,
-                            'confirm',
-                            item.id
-                          )}
-                        >
-                          Confirm
-                        </Button>
-                      )}
-                    </td>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -212,9 +185,9 @@ function OrderTable({
         open={openModal}
         onClose={() => setOpenModal(false)}
         onSubmit={handleSubmit}
-        content={`Do you want to ${action} this order?`}
+        content={`Do you want to cancel this withdraw request?`}
       />
     </>
   )
 }
-export default OrderTable
+export default WithdrawTable

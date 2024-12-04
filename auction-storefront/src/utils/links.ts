@@ -7,6 +7,7 @@ import OrdersPage from '../pages/user/OrdersPage'
 import ProfilePage from '../pages/user/ProfilePage'
 import SellerRegisterPage from '../pages/user/SellerRegisterPage'
 import TransactionsPage from '../pages/user/TransactionsPage'
+import WithdrawPage from '../pages/user/WithdrawPage'
 import LinkRouteType from '../routes/type'
 
 export const authLinks: LinkRouteType[] = [
@@ -42,6 +43,11 @@ export const userLinks = [
     title: 'Wallet | Deposite',
     path: '/wallet/deposit',
     element: DepositPage,
+  },
+  {
+    title: 'Wallet | Withdraw',
+    path: '/wallet/withdraw',
+    element: WithdrawPage,
   },
   {
     title: 'My Bids',

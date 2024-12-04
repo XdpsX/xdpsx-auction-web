@@ -1,8 +1,8 @@
 databaseChangeLog:
   - changeSet:
-      id: 22
+      id: 23
       author: XdpsX
-      comment: 'Remove is_end column and add status column in auctions table'
+      comment: 'Add withdraw_requests table'
       changes:
         - sqlFile:
-            path: db/changelog/sql/changelog-0022.sql
+            path: db/changelog/sql/changelog-0023.sql

@@ -4,7 +4,7 @@ import { depositCallbackAPI } from '../../features/transaction/service'
 import { useAppDispatch } from '../../store/hooks'
 
 import { toast } from 'react-toastify'
-import { addBalance } from '../../features/wallet/wallet.slice'
+import { addBalance } from '../../features/wallet/slice'
 
 function PaymentHandler() {
   const location = useLocation()

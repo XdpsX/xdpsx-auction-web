@@ -9,14 +9,13 @@ import Input from '../../components/ui/Input'
 import { depositAPI } from '../../features/transaction/service'
 import { toast } from 'react-toastify'
 import { getErrorMessage } from '../../utils/error.helper'
-import { selectWallet } from '../../features/wallet/wallet.slice'
+import { selectWallet } from '../../features/wallet/slice'
 
 function Deposit() {
   const { wallet } = useAppSelector(selectWallet)
   const {
     control,
     handleSubmit,
-    watch,
     setValue,
     formState: { errors },
   } = useForm({
@@ -25,8 +24,6 @@ function Deposit() {
       amount: 50_000,
     },
   })
-
-  const amount = watch('amount')
 
   const onChangePaymentMethod = (method: string) => {
     setValue('paymentMethod', method)
@@ -42,7 +39,7 @@ function Deposit() {
   }
 
   return (
-    <div className="rounded-sm bg-white px-2 pb-10 shadow md:px-7 md:pb-20">
+    <div className="rounded-sm bg-white border px-2 pb-10 shadow md:px-7 md:pb-20">
       <div className="border-b border-b-gray-200 py-6">
         <h1 className="text-lg font-medium capitalize text-gray-900">
           Deposit
@@ -81,9 +78,6 @@ function Deposit() {
                 error={errors.amount}
                 control={control}
               />
-              <p className="mt-5 ext-gray-700">
-                You will receive: {formatPrice(amount)}
-              </p>
             </div>
           </div>
           <div className="mt-8 flex flex-col flex-wrap sm:flex-row">

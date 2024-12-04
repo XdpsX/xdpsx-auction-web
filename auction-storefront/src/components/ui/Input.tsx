@@ -39,6 +39,10 @@ const Input: React.FC<InputProps> = ({
               onChange={(e) => {
                 if (type === 'number') {
                   const unformattedValue = unformatNumber(e.target.value)
+                  if (rest.max && Number(unformattedValue) > Number(rest.max)) {
+                    onChange(rest.max)
+                    return
+                  }
                   if (!isNaN(Number(unformattedValue))) {
                     onChange(unformattedValue)
                   }

@@ -11,10 +11,10 @@ import {
 } from './features/user/slice'
 import LoadingOverlay from './components/ui/LoadingOverlay'
 import {
-  getUserWallet,
+  fetchMyWalletAsync,
   selectWallet,
   setWallet,
-} from './features/wallet/wallet.slice'
+} from './features/wallet/slice'
 import errorRoutes from './routes/errorRoutes'
 import mainRoutes from './routes/mainRoutes'
 import authRoutes from './routes/authRoutes'
@@ -37,7 +37,7 @@ function App() {
     if (accessToken) {
       dispatch(fetchUserProfileAsync())
       dispatch(setRoles(accessToken))
-      dispatch(getUserWallet())
+      dispatch(fetchMyWalletAsync())
     } else {
       dispatch(setUserProfile(null))
       dispatch(setRoles(null))

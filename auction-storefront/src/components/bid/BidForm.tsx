@@ -14,7 +14,7 @@ import {
 } from '../../features/bid/slice'
 import BidAttention from './BidAttention'
 import { formatPrice } from '../../utils/format'
-import { selectWallet } from '../../features/wallet/wallet.slice'
+import { selectWallet } from '../../features/wallet/slice'
 import BidRefundModal from './BidRefundModal'
 
 function BidForm({
