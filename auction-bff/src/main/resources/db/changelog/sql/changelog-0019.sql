@@ -1,11 +1,5 @@
-CREATE TABLE seller_details (
-    id BIGINT PRIMARY KEY,
-    name VARCHAR(255),
-    address VARCHAR(255),
-    mobile_phone VARCHAR(20),
-    avatar_id BIGINT,
-    status ENUM('PENDING', 'APPROVED', 'REJECTED'),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (id) REFERENCES users(id),
-    FOREIGN KEY (avatar_id) REFERENCES medias(id)
-);
+ALTER TABLE auctions
+    DROP COLUMN is_end;
+
+ALTER TABLE auctions
+    ADD COLUMN status ENUM('LIVE', 'END', 'COMPLETED', 'NO_PAYMENT', 'NO_BID') DEFAULT 'LIVE';

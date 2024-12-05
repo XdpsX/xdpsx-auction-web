@@ -2,7 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: 15
       author: XdpsX
-      comment: 'Update bids columns'
+      comment: 'Change type of status column in bids'
       changes:
         - sqlFile:
             path: db/changelog/sql/changelog-0015.sql

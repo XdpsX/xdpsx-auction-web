@@ -1,6 +1,2 @@
-ALTER TABLE notifications
-    ADD COLUMN title VARCHAR(255),
-    ADD COLUMN href VARCHAR(128);
-
-ALTER TABLE notifications
-    DROP COLUMN `type`;
+ALTER TABLE auctions
+    CHANGE auction_type type VARCHAR(20);
