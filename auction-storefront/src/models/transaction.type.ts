@@ -2,9 +2,8 @@ import * as yup from 'yup'
 
 export type Transaction = {
   id: number
-  type: 'DEPOSIT' | 'WITHDRAW' | 'SECURITY_FEE' | 'REFUND' | 'BID_PAID'
+  type: 'DEPOSIT' | 'WITHDRAW'
   amount: number
-  status: 'PENDING' | 'COMPLETED' | 'FAILED'
   description: string
   createdAt: string
   updatedAt: string

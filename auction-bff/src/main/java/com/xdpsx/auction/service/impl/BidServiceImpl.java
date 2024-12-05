@@ -104,9 +104,8 @@ public class BidServiceImpl implements BidService {
 
         TransactionRequest transactionRequest = TransactionRequest.builder()
                 .amount(savedBid.getTransaction().getAmount())
-                .type(TransactionType.REFUND)
+                .type(TransactionType.DEPOSIT)
                 .description("Refund for bid in auction: " + bid.getAuction().getName())
-                .status(TransactionStatus.COMPLETED)
                 .userId(userDetails.getId())
                 .build();
         transactionService.createTransaction(transactionRequest);
@@ -172,9 +171,8 @@ public class BidServiceImpl implements BidService {
 
         TransactionRequest transactionRequest = TransactionRequest.builder()
                 .amount(securityFee)
-                .type(TransactionType.SECURITY_FEE)
+                .type(TransactionType.WITHDRAW)
                 .description("Security Fee for auction: " + auction.getName())
-                .status(TransactionStatus.COMPLETED)
                 .userId(userId)
                 .build();
         TransactionResponse transactionResponse = transactionService.createTransaction(transactionRequest);
@@ -268,8 +266,7 @@ public class BidServiceImpl implements BidService {
     private void handlePayForBidder(BigDecimal amount, Long bidderId, String auctionName) {
         TransactionRequest transactionBidder = TransactionRequest.builder()
                 .amount(amount)
-                .type(TransactionType.BID_PAID)
-                .status(TransactionStatus.COMPLETED)
+                .type(TransactionType.WITHDRAW)
                 .description("Paid for auction: " + auctionName)
                 .userId(bidderId)
                 .build();

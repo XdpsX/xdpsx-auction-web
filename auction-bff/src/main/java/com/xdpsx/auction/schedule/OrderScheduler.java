@@ -41,7 +41,6 @@ public class OrderScheduler {
                     .type(TransactionType.DEPOSIT)
                     .amount(savedOrder.getTotalAmount().multiply(BigDecimal.valueOf(1).subtract(SECURITY_FEE_RATE)))
                     .description("Payment for auction " + order.getAuction().getName())
-                    .status(TransactionStatus.COMPLETED)
                     .build();
             transactionService.createTransaction(transactionSeller);
 

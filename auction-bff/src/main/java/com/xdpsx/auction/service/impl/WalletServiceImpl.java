@@ -1,5 +1,6 @@
 package com.xdpsx.auction.service.impl;
 
+import com.xdpsx.auction.constant.CacheKey;
 import com.xdpsx.auction.constant.ErrorCode;
 import com.xdpsx.auction.dto.transaction.TransactionRequest;
 import com.xdpsx.auction.dto.wallet.CreateWithdrawRequest;
@@ -11,14 +12,16 @@ import com.xdpsx.auction.mapper.WalletMapper;
 import com.xdpsx.auction.model.User;
 import com.xdpsx.auction.model.Wallet;
 import com.xdpsx.auction.model.WithdrawRequest;
-import com.xdpsx.auction.model.enums.TransactionStatus;
 import com.xdpsx.auction.model.enums.TransactionType;
 import com.xdpsx.auction.model.enums.WithdrawStatus;
 import com.xdpsx.auction.repository.WalletRepository;
 import com.xdpsx.auction.repository.WithdrawRequestRepository;
+import com.xdpsx.auction.security.CustomUserDetails;
+import com.xdpsx.auction.security.UserContext;
 import com.xdpsx.auction.service.TransactionService;
 import com.xdpsx.auction.service.WalletService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +33,8 @@ public class WalletServiceImpl implements WalletService {
     private final WalletRepository walletRepository;
     private final WithdrawRequestRepository withdrawRequestRepository;
     private final TransactionService transactionService;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final UserContext userContext;
 
     @Override
     public WalletDto getWalletByOwnerId(Long ownerId) {
@@ -46,6 +51,29 @@ public class WalletServiceImpl implements WalletService {
             throw new BadRequestException(ErrorCode.WALLET_NOT_ENOUGH);
         }
     }
+
+    @Transactional
+    @Override
+    public void deposit(String transactionId) {
+        Wallet wallet = getUserWallet();
+
+        String amountStr = redisTemplate.opsForValue().get(CacheKey.getTransactionKey(transactionId));
+        if (amountStr == null) {
+            throw new NotFoundException(ErrorCode.TRANSACTION_NOT_FOUND, transactionId);
+        }
+        BigDecimal amount = BigDecimal.valueOf(Double.parseDouble(amountStr));
+
+        TransactionRequest transactionRequest = TransactionRequest.builder()
+                .type(TransactionType.DEPOSIT)
+                .amount(amount)
+                .userId(wallet.getOwner().getId())
+                .description("Deposit  money to the wallet")
+                .build();
+
+        transactionService.createTransaction(transactionRequest);
+        redisTemplate.delete(CacheKey.getTransactionKey(transactionId));
+    }
+
 
     @Override
     @Transactional
@@ -66,12 +94,17 @@ public class WalletServiceImpl implements WalletService {
                 .type(TransactionType.WITHDRAW)
                 .amount(savedWithdrawRequest.getAmount())
                 .description("Withdraw")
-                .status(TransactionStatus.COMPLETED)
                 .userId(userId)
                 .build();
         transactionService.createTransaction(transactionRequest);
 
         return WithdrawRequestDto.fromWithdrawRequest(savedWithdrawRequest);
+    }
+
+    private Wallet getUserWallet() {
+        CustomUserDetails userDetails = userContext.getLoggedUser();
+        return walletRepository.findByOwnerId(userDetails.getId())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.WALLET_NOT_FOUND, userDetails.getId()));
     }
 
 }

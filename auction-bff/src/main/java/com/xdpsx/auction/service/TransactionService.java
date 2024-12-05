@@ -7,7 +7,6 @@ import com.xdpsx.auction.dto.transaction.UpdateTransactionDto;
 import com.xdpsx.auction.model.enums.TransactionType;
 
 public interface TransactionService {
-    TransactionResponse deposit(String transactionId, String responseCode);
     TransactionResponse createTransaction(TransactionRequest request);
     TransactionResponse updateTransaction(Long transactionId, UpdateTransactionDto request);
     PageResponse<TransactionResponse> getUserTransactions(Long userId, int pageNum, int pageSize, String sort, TransactionType type);

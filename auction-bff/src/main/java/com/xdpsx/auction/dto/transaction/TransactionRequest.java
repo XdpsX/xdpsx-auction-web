@@ -1,6 +1,5 @@
 package com.xdpsx.auction.dto.transaction;
 
-import com.xdpsx.auction.model.enums.TransactionStatus;
 import com.xdpsx.auction.model.enums.TransactionType;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +13,6 @@ import java.math.BigDecimal;
 public class TransactionRequest {
     private BigDecimal amount;
     private TransactionType type;
-    private TransactionStatus status;
     private String description;
     private Long userId;
 }

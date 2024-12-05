@@ -9,5 +9,6 @@ import java.math.BigDecimal;
 public interface WalletService {
     WalletDto getWalletByOwnerId(Long ownerId);
     void validateWalletBalance(Long userId, BigDecimal checkBalance);
+    void deposit(String transactionId);
     WithdrawRequestDto createWithdrawRequest(Long userId, CreateWithdrawRequest request);
 }

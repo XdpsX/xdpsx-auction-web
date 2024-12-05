@@ -32,7 +32,8 @@ function Deposit() {
   const onSubmit = async (data: DepositPayload) => {
     try {
       const paymentUrl = await depositAPI(data)
-      window.location.replace(paymentUrl)
+      // window.location.replace(paymentUrl)
+      window.open(paymentUrl, '_blank')
     } catch (error) {
       toast.error(getErrorMessage(error))
     }
