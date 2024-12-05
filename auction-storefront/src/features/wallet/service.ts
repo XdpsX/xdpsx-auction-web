@@ -41,6 +41,6 @@ export const createWithdrawAPI = async (payload: WithdrawPayload) => {
 }
 
 export const cancelWithdrawAPI = async (id: number) => {
-  await api.delete<void>(`/storefront/withdraw/${id}/cancel`)
+  await api.put<void>(`/storefront/withdraw/${id}/cancel`)
   return id
 }

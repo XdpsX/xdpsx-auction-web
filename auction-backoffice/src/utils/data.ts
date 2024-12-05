@@ -63,14 +63,18 @@ export function getNextStatus(currentStatus: OrderStatus): OrderStatus | null {
 }
 
 export const withdrawalRequestStatus: SelectItemType[] = [
-  { key: '0,1', title: 'All' },
+  { key: 'all', title: 'All' },
   { key: '0', title: 'Pending' },
   { key: '1', title: 'Confirmed' }
 ]
 
 export const withdrawalListStatus: SelectItemType[] = [
-  { key: '2,3,4', title: 'All' },
+  { key: 'all', title: 'All' },
   { key: '2', title: 'Completed' },
   { key: '3', title: 'Rejected' },
   { key: '4', title: 'Cancelled' }
 ]
+
+export const getWithdrawalStatus = (page: 'list' | 'request-list'): SelectItemType[] => {
+  return page === 'list' ? withdrawalListStatus : withdrawalRequestStatus
+}

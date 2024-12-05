@@ -13,6 +13,8 @@ import {
   fetchMyWithdrawalsAPI,
 } from './service'
 import { Page } from '../../models/page.type'
+import { fromAxiosErrorToAPIError } from '../../utils/error.helper'
+import { toast } from 'react-toastify'
 
 export interface WalletState {
   wallet: Wallet | null
@@ -139,8 +141,14 @@ export const createWithdrawAsync = createAsyncThunk(
 
 export const cancelWithdrawAsync = createAsyncThunk(
   'wallet/cancelWithdrawAsync',
-  async (id: number) => {
-    await cancelWithdrawAPI(id)
-    return id
+  async (id: number, thunkAPI) => {
+    try {
+      await cancelWithdrawAPI(id)
+      return id
+    } catch (error) {
+      const err = fromAxiosErrorToAPIError(error)
+      toast.error(err.message)
+      return thunkAPI.rejectWithValue(err)
+    }
   }
 )

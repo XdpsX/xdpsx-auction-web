@@ -48,6 +48,7 @@ function WithdrawTable({
           setOpenModal(false)
           toast.success('Withdraw request has been canceled')
         })
+        .catch()
     }
   }
 

@@ -1,15 +1,42 @@
 import api from '~/utils/api'
-import { Withdraw } from './type'
+import { UpdateWithdrawStatusPayload, Withdraw, WithdrawStatusParam } from './type'
 import { Page } from '../page/type'
 
-export const fetchWithdrawalsAPI = async (pageNum: number, pageSize: number, sort: string, statuses: string) => {
-  const response = await api.get<Page<Withdraw>>('/backoffice/withdraw', {
+export const fetchListWithdrawalsAPI = async (
+  pageNum: number,
+  pageSize: number,
+  sort: string,
+  status: WithdrawStatusParam | null
+) => {
+  const response = await api.get<Page<Withdraw>>('/backoffice/withdraw/list', {
     params: {
       pageNum,
       pageSize,
       sort,
-      statuses
+      status
     }
   })
+  return response.data
+}
+
+export const fetchRequestWithdrawalsAPI = async (
+  pageNum: number,
+  pageSize: number,
+  sort: string,
+  status: WithdrawStatusParam | null
+) => {
+  const response = await api.get<Page<Withdraw>>('/backoffice/withdraw/request-list', {
+    params: {
+      pageNum,
+      pageSize,
+      sort,
+      status
+    }
+  })
+  return response.data
+}
+
+export const updateWithdrawStatusAPI = async (withdrawId: number, payload: UpdateWithdrawStatusPayload) => {
+  const response = await api.put<Withdraw>(`/backoffice/withdraw/${withdrawId}/status`, payload)
   return response.data
 }

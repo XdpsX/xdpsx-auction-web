@@ -1,14 +1,12 @@
 package com.xdpsx.auction.service.impl;
 
 import com.xdpsx.auction.constant.ErrorCode;
-import com.xdpsx.auction.dto.PageResponse;
 import com.xdpsx.auction.dto.transaction.TransactionRequest;
 import com.xdpsx.auction.dto.wallet.CreateWithdrawRequest;
 import com.xdpsx.auction.dto.wallet.WalletDto;
 import com.xdpsx.auction.dto.wallet.WithdrawRequestDto;
 import com.xdpsx.auction.exception.BadRequestException;
 import com.xdpsx.auction.exception.NotFoundException;
-import com.xdpsx.auction.mapper.PageMapper;
 import com.xdpsx.auction.mapper.WalletMapper;
 import com.xdpsx.auction.model.User;
 import com.xdpsx.auction.model.Wallet;
@@ -21,15 +19,10 @@ import com.xdpsx.auction.repository.WithdrawRequestRepository;
 import com.xdpsx.auction.service.TransactionService;
 import com.xdpsx.auction.service.WalletService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -81,53 +74,4 @@ public class WalletServiceImpl implements WalletService {
         return WithdrawRequestDto.fromWithdrawRequest(savedWithdrawRequest);
     }
 
-    @Override
-    public PageResponse<WithdrawRequestDto> getUserWithdrawRequests(Long userId, int pageNum, int pageSize, String sort, Integer status) {
-        PageRequest pageRequest = PageRequest.of(pageNum-1, pageSize, getSort(sort));
-        WithdrawStatus withdrawStatus = (status != null) ? WithdrawStatus.fromValue(status) : null;
-        Page<WithdrawRequest> withdrawRequestsPage = withdrawRequestRepository.findByUserIdAndOptionalStatus(userId, withdrawStatus, pageRequest);
-        return PageMapper.toPageResponse(withdrawRequestsPage, WithdrawRequestDto::fromWithdrawRequest);
-    }
-
-    @Override
-    @Transactional
-    public void cancelWithdraw(Long userId, Long withdrawId) {
-        WithdrawRequest withdrawRequest = withdrawRequestRepository.findByIdAndUserId(withdrawId, userId)
-                .orElseThrow(() -> new NotFoundException("Withdraw request is not found"));
-        if (!withdrawRequest.getStatus().equals(WithdrawStatus.PENDING)){
-            throw new BadRequestException("Withdraw request is not pending");
-        }
-        withdrawRequest.setStatus(WithdrawStatus.CANCELLED);
-        withdrawRequestRepository.save(withdrawRequest);
-
-        TransactionRequest transactionRequest = TransactionRequest.builder()
-                .userId(userId)
-                .status(TransactionStatus.COMPLETED)
-                .amount(withdrawRequest.getAmount())
-                .description("Cancel withdraw")
-                .type(TransactionType.DEPOSIT).build();
-        transactionService.createTransaction(transactionRequest);
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @Override
-    public PageResponse<WithdrawRequestDto> getAllWithdrawRequests(int pageNum, int pageSize, String sort, List<Integer> statuses) {
-        Page<WithdrawRequest> withdrawRequestPage = withdrawRequestRepository.findByStatusIn(
-                WithdrawStatus.fromValues(statuses), PageRequest.of(pageNum - 1, pageSize, getSort(sort))
-        );
-        return PageMapper.toPageResponse(withdrawRequestPage, WithdrawRequestDto::fromWithdrawRequest);
-    }
-
-    private Sort getSort(String sortParam) {
-        if (sortParam == null) {
-            return Sort.by("updatedAt").descending();
-        }
-
-        return switch (sortParam) {
-            case "amount" -> Sort.by("amount").ascending();
-            case "-amount" -> Sort.by("amount").descending();
-            case "date" -> Sort.by("updatedAt").ascending();
-            default -> Sort.by("updatedAt").descending();
-        };
-    }
 }

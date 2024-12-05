@@ -16,3 +16,8 @@ export enum WithdrawStatusParam {
   REJECTED = 3,
   CANCELLED = 4
 }
+
+export type UpdateWithdrawStatusPayload = {
+  status: WithdrawStatus
+  reason?: string
+}

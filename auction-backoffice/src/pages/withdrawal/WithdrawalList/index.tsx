@@ -1,5 +1,6 @@
 import { Key, useEffect, useMemo } from 'react'
 import { fetchWithdrawalsAsync } from '~/app/features/withdrawal/slice'
+import { WithdrawStatusParam } from '~/app/features/withdrawal/type'
 import useAppDispatch from '~/app/hooks/useAppDispatch'
 import useAppSelector from '~/app/hooks/useAppSelector'
 import useQueryParams from '~/app/hooks/useQueryParams'
@@ -9,42 +10,41 @@ import Sort from '~/components/Sort'
 import TableBottom from '~/components/Table/TableBottom'
 import WithdrawalTable from '~/components/Table/WithdrawalTable'
 import { DEFAULT_SORT } from '~/constants'
-import { withdrawalListStatus, withdrawalRequestStatus, withdrawalSortOptions } from '~/utils/data'
+import { getWithdrawalStatus, withdrawalSortOptions } from '~/utils/data'
 
 function WithdrawalList({ page }: { page: 'list' | 'request-list' }) {
   const dispatch = useAppDispatch()
   const { withdrawals, isLoading } = useAppSelector((state) => state.withdrawal)
   const {
-    params: { pageNum, pageSize, sort, withdrawalStatuses: statuses },
+    params: { pageNum, pageSize, sort, withdrawalStatuses: status },
     setParams,
     deleteAllParams
   } = useQueryParams()
+
+  const withdrawStatuses = getWithdrawalStatus(page)
+
   const filteredSort = useMemo(() => withdrawalSortOptions.find((option) => option.key === sort), [sort])
-  const filteredStatus = useMemo(() => {
-    const status = page === 'list' ? withdrawalListStatus : withdrawalRequestStatus
-    return status.find((option) => option.key === statuses)
-  }, [page, statuses])
+  const filteredStatus = useMemo(
+    () => withdrawStatuses.find((option) => option.key === status),
+    [status, withdrawStatuses]
+  )
 
   useEffect(() => {
     dispatch(
       fetchWithdrawalsAsync({
+        page,
         pageNum: Number(pageNum),
         pageSize: Number(pageSize),
         sort: sort,
-        statuses:
-          statuses === 'all'
-            ? page === 'list'
-              ? withdrawalListStatus[0].key
-              : withdrawalRequestStatus[0].key
-            : statuses
+        status: status === 'all' ? null : (Number(status) as WithdrawStatusParam)
       })
     )
-  }, [dispatch, pageNum, pageSize, sort, statuses, page])
+  }, [dispatch, page, pageNum, pageSize, sort, status])
 
   const onFilterChange = (selectedValues: Record<string, string>) => {
-    console.log(selectedValues['statuses'])
+    console.log(selectedValues['status'])
     setParams({
-      statuses: selectedValues['statuses']
+      status: selectedValues['status']
     })
   }
 
@@ -74,15 +74,10 @@ function WithdrawalList({ page }: { page: 'list' | 'request-list' }) {
             <Filter
               items={[
                 {
-                  key: 'statuses',
+                  key: 'status',
                   label: 'Status',
-                  allOptions: page === 'list' ? withdrawalListStatus : withdrawalRequestStatus,
-                  value:
-                    statuses === 'all'
-                      ? page === 'list'
-                        ? withdrawalListStatus[0].key
-                        : withdrawalRequestStatus[0].key
-                      : statuses
+                  allOptions: withdrawStatuses,
+                  value: status === 'all' ? withdrawStatuses[0].key : status
                 }
               ]}
               onFilterChange={onFilterChange}
@@ -95,14 +90,10 @@ function WithdrawalList({ page }: { page: 'list' | 'request-list' }) {
         <FilterResult
           items={[
             {
-              key:
-                filteredStatus?.key || (page === 'list' ? withdrawalListStatus[0].key : withdrawalRequestStatus[0].key),
-              title:
-                filteredStatus?.title ||
-                (page === 'list' ? withdrawalListStatus[0].title : withdrawalRequestStatus[0].title),
-              exceptKey: page === 'list' ? withdrawalListStatus[0].key : withdrawalRequestStatus[0].key,
-              onClear: () =>
-                setParams({ statuses: page === 'list' ? withdrawalListStatus[0].key : withdrawalRequestStatus[0].key })
+              key: filteredStatus?.key || withdrawStatuses[0].key,
+              title: filteredStatus?.title || withdrawStatuses[0].title,
+              exceptKey: withdrawStatuses[0].key,
+              onClear: () => setParams({ status: withdrawStatuses[0].key })
             },
             {
               key: filteredSort?.key || DEFAULT_SORT.key,

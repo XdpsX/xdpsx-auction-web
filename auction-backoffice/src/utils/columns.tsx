@@ -50,6 +50,7 @@ export const orderColumns = [
 ]
 
 export const withdrawlsColumns = [
+  { name: 'ID', uid: 'id' },
   { name: 'BANK NAME', uid: 'bankName' },
   { name: 'ACCOUNT NUMBER', uid: 'accountNumber' },
   {
