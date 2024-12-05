@@ -2,7 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: 14
       author: XdpsX
-      comment: 'Remove type column in notifications and add title, href column'
+      comment: 'Change auction_type column to type in auctions table'
       changes:
         - sqlFile:
             path: db/changelog/sql/changelog-0014.sql

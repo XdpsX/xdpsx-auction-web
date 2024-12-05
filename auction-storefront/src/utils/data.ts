@@ -54,6 +54,79 @@ export const bankList = [
   'Ngân hàng TMCP Bắc Á (Bac A Bank)',
 ]
 
+export const vnpayCodes = [
+  { code: '00', message: 'Transaction successful', status: 'success' },
+  {
+    code: '07',
+    message:
+      'Transaction successful. Transaction is suspected (related to fraud, unusual transaction).',
+    status: 'failure',
+  },
+  {
+    code: '09',
+    message:
+      "Transaction failed: Customer's card/account has not registered for Internet Banking service at the bank.",
+    status: 'failure',
+  },
+  {
+    code: '10',
+    message:
+      'Transaction failed: Customer has entered incorrect card/account information more than 3 times.',
+    status: 'failure',
+  },
+  {
+    code: '11',
+    message:
+      'Transaction failed: Payment timeout has expired. Please try the transaction again.',
+    status: 'failure',
+  },
+  {
+    code: '12',
+    message: "Transaction failed: Customer's card/account is locked.",
+    status: 'failure',
+  },
+  {
+    code: '13',
+    message:
+      'Transaction failed: Customer entered the transaction authentication password (OTP) incorrectly. Please try the transaction again.',
+    status: 'failure',
+  },
+  {
+    code: '24',
+    message: 'Transaction failed: Customer canceled the transaction.',
+    status: 'failure',
+  },
+  {
+    code: '51',
+    message:
+      'Transaction failed: Your account does not have enough balance to perform the transaction.',
+    status: 'failure',
+  },
+  {
+    code: '65',
+    message:
+      'Transaction failed: Your account has exceeded the daily transaction limit.',
+    status: 'failure',
+  },
+  {
+    code: '75',
+    message: 'The payment bank is under maintenance.',
+    status: 'failure',
+  },
+  {
+    code: '79',
+    message:
+      'Transaction failed: Customer entered the payment password incorrectly more than the allowed number of times. Please try the transaction again.',
+    status: 'failure',
+  },
+  {
+    code: '99',
+    message:
+      'Other errors (remaining errors not listed in the error code list provided).',
+    status: 'failure',
+  },
+]
+
 // export type BankType = { id: number; name: string; abbr: string }
 // export const bankList: BankType[] = [
 //   {

@@ -8,7 +8,6 @@ import com.xdpsx.auction.exception.BadRequestException;
 import com.xdpsx.auction.exception.NotFoundException;
 import com.xdpsx.auction.mapper.PageMapper;
 import com.xdpsx.auction.model.WithdrawRequest;
-import com.xdpsx.auction.model.enums.TransactionStatus;
 import com.xdpsx.auction.model.enums.TransactionType;
 import com.xdpsx.auction.model.enums.WithdrawStatus;
 import com.xdpsx.auction.repository.WithdrawRequestRepository;
@@ -74,7 +73,6 @@ public class WithdrawServiceImpl implements WithdrawService {
 
         TransactionRequest transactionRequest = TransactionRequest.builder()
                 .userId(userId)
-                .status(TransactionStatus.COMPLETED)
                 .amount(withdrawRequest.getAmount())
                 .description("Cancel withdraw")
                 .type(TransactionType.DEPOSIT).build();
@@ -92,7 +90,6 @@ public class WithdrawServiceImpl implements WithdrawService {
 
         if (savedWithdrawRequest.getStatus().equals(WithdrawStatus.REJECTED)) {
             TransactionRequest transactionRequest = TransactionRequest.builder()
-                    .status(TransactionStatus.COMPLETED)
                     .amount(savedWithdrawRequest.getAmount())
                     .description("Withdraw request is rejected")
                     .type(TransactionType.DEPOSIT)

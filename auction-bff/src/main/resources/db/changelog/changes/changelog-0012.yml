@@ -2,7 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: 12
       author: XdpsX
-      comment: 'Remove payment_method column to transactions table'
+      comment: 'Remove type column in notifications and add title, href column'
       changes:
         - sqlFile:
             path: db/changelog/sql/changelog-0012.sql

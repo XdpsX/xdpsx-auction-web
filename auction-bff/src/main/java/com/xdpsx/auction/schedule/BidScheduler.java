@@ -7,7 +7,6 @@ import com.xdpsx.auction.model.Bid;
 import com.xdpsx.auction.model.User;
 import com.xdpsx.auction.model.enums.AuctionStatus;
 import com.xdpsx.auction.model.enums.BidStatus;
-import com.xdpsx.auction.model.enums.TransactionStatus;
 import com.xdpsx.auction.model.enums.TransactionType;
 import com.xdpsx.auction.repository.BidRepository;
 import com.xdpsx.auction.service.NotificationService;
@@ -47,7 +46,6 @@ public class BidScheduler {
             TransactionRequest transactionSeller = TransactionRequest.builder()
                     .amount(bid.getTransaction().getAmount())
                     .type(TransactionType.DEPOSIT)
-                    .status(TransactionStatus.COMPLETED)
                     .description("Security fee of auction " + auction.getName())
                     .userId(seller.getId())
                     .build();

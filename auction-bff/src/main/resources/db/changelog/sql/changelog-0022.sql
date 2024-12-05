@@ -1,5 +1,0 @@
-ALTER TABLE auctions
-    DROP COLUMN is_end;
-
-ALTER TABLE auctions
-    ADD COLUMN status ENUM('LIVE', 'END', 'COMPLETED', 'NO_PAYMENT', 'NO_BID') DEFAULT 'LIVE';

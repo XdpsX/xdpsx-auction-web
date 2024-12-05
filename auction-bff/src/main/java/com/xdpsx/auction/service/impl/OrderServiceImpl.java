@@ -12,7 +12,6 @@ import com.xdpsx.auction.mapper.OrderMapper;
 import com.xdpsx.auction.mapper.PageMapper;
 import com.xdpsx.auction.model.Order;
 import com.xdpsx.auction.model.enums.OrderStatus;
-import com.xdpsx.auction.model.enums.TransactionStatus;
 import com.xdpsx.auction.model.enums.TransactionType;
 import com.xdpsx.auction.repository.OrderRepository;
 import com.xdpsx.auction.service.NotificationService;
@@ -64,10 +63,9 @@ public class OrderServiceImpl implements OrderService {
 
         TransactionRequest transactionUser = TransactionRequest.builder()
                 .userId(userId)
-                .type(TransactionType.REFUND)
+                .type(TransactionType.DEPOSIT)
                 .amount(order.getTotalAmount().multiply(BigDecimal.valueOf(1).subtract(SECURITY_FEE_RATE)))
                 .description("User cancels order")
-                .status(TransactionStatus.COMPLETED)
                 .build();
         transactionService.createTransaction(transactionUser);
 
@@ -76,7 +74,6 @@ public class OrderServiceImpl implements OrderService {
                 .type(TransactionType.DEPOSIT)
                 .amount(order.getTotalAmount().multiply(SECURITY_FEE_RATE))
                 .description("User cancels order")
-                .status(TransactionStatus.COMPLETED)
                 .build();
         transactionService.createTransaction(transactionSeller);
 
@@ -127,7 +124,6 @@ public class OrderServiceImpl implements OrderService {
                 .type(TransactionType.DEPOSIT)
                 .amount(savedOrder.getTotalAmount().multiply(BigDecimal.valueOf(1).subtract(SECURITY_FEE_RATE)))
                 .description("Payment for auction " + order.getAuction().getName())
-                .status(TransactionStatus.COMPLETED)
                 .build();
         transactionService.createTransaction(transactionSeller);
 

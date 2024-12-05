@@ -1,6 +1,5 @@
 package com.xdpsx.auction.model;
 
-import com.xdpsx.auction.model.enums.TransactionStatus;
 import com.xdpsx.auction.model.enums.TransactionType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,9 +22,6 @@ public class Transaction extends AbstractAuditEntity {
     private TransactionType type;
 
     private BigDecimal amount;
-
-    @Enumerated(EnumType.STRING)
-    private TransactionStatus status;
 
     private String description;
 

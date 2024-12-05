@@ -17,7 +17,7 @@ export const depositCallbackAPI = async (
 ): Promise<Transaction> => {
   try {
     const response = await api.post<Transaction>(
-      `/storefront/transactions/deposit?${params}`
+      `/storefront/wallets/deposit/callback?${params}`
     )
     return response.data
   } catch (error) {

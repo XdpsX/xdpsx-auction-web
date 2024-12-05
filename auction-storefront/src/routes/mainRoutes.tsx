@@ -3,8 +3,9 @@ import MainLayout from '../layouts/MainLayout'
 import AuctionDetailsPage from '../pages/AuctionDetailsPage'
 import PageTitle from '../components/layout/PageTitle'
 import ProtectedRoute from '../components/route/ProtectedRoute'
-import PaymentRedirect from '../pages/redirect/PaymentRedirect'
-import PaymentHandler from '../pages/handler/PaymentHandler'
+import DepositRedirect from '../pages/redirect/DepositRedirect'
+import PaymentFailure from '../pages/handler/PaymentFailure'
+import PaymentSuccess from '../pages/handler/PaymentSuccess'
 
 const mainRoutes = [
   {
@@ -32,18 +33,26 @@ const mainRoutes = [
     ],
   },
   {
-    path: '/transactions/:transactionId/payment/redirect',
+    path: '/deposits/:transactionId/payment/redirect',
     element: (
       <ProtectedRoute>
-        <PaymentRedirect />
+        <DepositRedirect />
       </ProtectedRoute>
     ),
   },
   {
-    path: '/payment/handler',
+    path: '/payment/success',
     element: (
       <ProtectedRoute>
-        <PaymentHandler />
+        <PaymentSuccess />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/payment/failed',
+    element: (
+      <ProtectedRoute>
+        <PaymentFailure />
       </ProtectedRoute>
     ),
   },

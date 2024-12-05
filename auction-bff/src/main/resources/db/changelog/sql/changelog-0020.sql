@@ -1,9 +1,13 @@
-ALTER TABLE seller_details
-    DROP FOREIGN KEY seller_details_ibfk_1;
-
-ALTER TABLE seller_details
-    MODIFY id BIGINT AUTO_INCREMENT;
-
-ALTER TABLE seller_details
-    ADD user_id BIGINT,
-    ADD FOREIGN KEY (user_id) REFERENCES users(id);
+CREATE TABLE withdraw_requests (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    bank_name VARCHAR(100) NOT NULL,
+    account_number VARCHAR(50) NOT NULL,
+    holder_name VARCHAR(50) NOT NULL,
+    amount DECIMAL(19, 2) NOT NULL,
+    status TINYINT NOT NULL,
+    reason TEXT,
+    user_id BIGINT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);

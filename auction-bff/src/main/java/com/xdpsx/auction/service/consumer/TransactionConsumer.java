@@ -3,6 +3,7 @@ package com.xdpsx.auction.service.consumer;
 import com.xdpsx.auction.dto.transaction.TransactionMessage;
 import com.xdpsx.auction.mapper.WalletMapper;
 import com.xdpsx.auction.model.Wallet;
+import com.xdpsx.auction.model.enums.TransactionType;
 import com.xdpsx.auction.repository.WalletRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,9 +38,10 @@ public class TransactionConsumer {
     }
 
     private BigDecimal getAmount(TransactionMessage transaction) {
-        return switch (transaction.getType()) {
-            case BID_PAID, SECURITY_FEE, WITHDRAW -> transaction.getAmount().multiply(BigDecimal.valueOf(-1));
-            default -> transaction.getAmount();
-        };
+        if (transaction.getType().equals(TransactionType.WITHDRAW)) {
+            return transaction.getAmount().multiply(BigDecimal.valueOf(-1));
+        } else {
+            return transaction.getAmount();
+        }
     }
 }

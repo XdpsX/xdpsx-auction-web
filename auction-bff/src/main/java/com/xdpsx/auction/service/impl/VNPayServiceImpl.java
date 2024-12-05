@@ -63,7 +63,7 @@ public class VNPayServiceImpl implements PaymentService {
                 .txnRef(transactionId)
                 .requestId(transactionId)
                 .ipAddress(request.getIpAddress())
-                .prefixReturn("transactions")
+                .prefixReturn("deposits")
                 .build();
         return init(initPaymentRequest);
     }

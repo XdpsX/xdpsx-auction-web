@@ -6,7 +6,6 @@ import com.xdpsx.auction.model.Auction;
 import com.xdpsx.auction.model.Bid;
 import com.xdpsx.auction.model.enums.AuctionStatus;
 import com.xdpsx.auction.model.enums.BidStatus;
-import com.xdpsx.auction.model.enums.TransactionStatus;
 import com.xdpsx.auction.model.enums.TransactionType;
 import com.xdpsx.auction.repository.AuctionRepository;
 import com.xdpsx.auction.repository.BidRepository;
@@ -84,9 +83,8 @@ public class AuctionScheduler {
         // Refund
         TransactionRequest transactionRequest = TransactionRequest.builder()
                 .amount(bid.getTransaction().getAmount())
-                .type(TransactionType.REFUND)
+                .type(TransactionType.DEPOSIT)
                 .description("Refund for bid in auction: " + bid.getAuction().getName())
-                .status(TransactionStatus.COMPLETED)
                 .userId(bid.getBidder().getId())
                 .build();
         transactionService.createTransaction(transactionRequest);

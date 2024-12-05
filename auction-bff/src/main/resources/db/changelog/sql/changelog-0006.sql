@@ -10,8 +10,6 @@ CREATE TABLE transactions (
     wallet_id BIGINT,
     amount DECIMAL(10,2) NOT NULL,
     type ENUM('WITHDRAW', 'DEPOSIT'),
-    status ENUM('PENDING', 'COMPLETED', 'FAILED'),
-    payment_method VARCHAR(15) NOT NULL,
     description VARCHAR(255),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,

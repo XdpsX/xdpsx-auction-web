@@ -2,7 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: 16
       author: XdpsX
-      comment: 'Change auction_type column to type in auctions table'
+      comment: 'Add seller_details table'
       changes:
         - sqlFile:
             path: db/changelog/sql/changelog-0016.sql
