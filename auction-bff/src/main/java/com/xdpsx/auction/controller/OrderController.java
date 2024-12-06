@@ -1,19 +1,27 @@
 package com.xdpsx.auction.controller;
 
+import com.xdpsx.auction.constant.VNPayParams;
 import com.xdpsx.auction.dto.PageResponse;
 import com.xdpsx.auction.dto.order.CreateOrderDto;
 import com.xdpsx.auction.dto.order.OrderDto;
 import com.xdpsx.auction.dto.order.OrderSellerDto;
 import com.xdpsx.auction.dto.order.OrderUserDto;
+import com.xdpsx.auction.dto.payment.InitPaymentResponse;
+import com.xdpsx.auction.exception.BadRequestException;
 import com.xdpsx.auction.model.enums.OrderStatus;
 import com.xdpsx.auction.security.UserContext;
 import com.xdpsx.auction.service.OrderService;
+import com.xdpsx.auction.service.PaymentService;
+import com.xdpsx.auction.util.RequestUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 import static com.xdpsx.auction.constant.PageConstant.*;
 
@@ -22,11 +30,30 @@ import static com.xdpsx.auction.constant.PageConstant.*;
 public class OrderController {
     private final UserContext userContext;
     private final OrderService orderService;
+    private final PaymentService paymentService;
 
     @PostMapping("/storefront/orders")
-    ResponseEntity<?> createOrder(@Valid @RequestBody CreateOrderDto request) {
+    ResponseEntity<OrderDto> createOrder(@Valid @RequestBody CreateOrderDto request) {
         OrderDto response =  orderService.createOrder(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/storefront/orders/external")
+    ResponseEntity<InitPaymentResponse> createOrderExternalPaymentLink(@Valid @RequestBody CreateOrderDto request,
+                                                                        HttpServletRequest httpServletRequest) {
+        var ipAddress = RequestUtil.getIpAddress(httpServletRequest);
+        InitPaymentResponse response =  orderService.createOrderPaymentLink(request, ipAddress);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/storefront/orders/external/callback")
+    ResponseEntity<OrderDto> createOrderExternalPaymentCallback(@RequestParam Map<String, String> params) {
+        if (!paymentService.verifyIpn(params)){
+            throw new BadRequestException("Invalid IPN");
+        }
+        var txnRef = params.get(VNPayParams.TXN_REF);
+        OrderDto response =  orderService.createOrderExternalPaymentCallback(Long.parseLong(txnRef));
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/storefront/users/me/orders")
@@ -37,7 +64,6 @@ public class OrderController {
             @RequestParam(required = false) String sort,
             @RequestParam(required = false) OrderStatus status
     ){
-
         PageResponse<OrderDto> response = orderService.getUserOrders(
                 userContext.getLoggedUser().getId(), pageNum, pageSize, keyword, sort, status
         );

@@ -13,8 +13,12 @@ import PaymentSelect, {
   PaymentItemType,
 } from '../components/payment/PaymentSelect'
 import VNPAY_LOGO from '../assets/vnpay-icon.png'
-import { ShippingInfoPayload, shippingInfoSchema } from '../models/order.type'
+
 import { createOrderAsync } from '../features/order/slice'
+import { CreateOrderPayload, createOrderSchema } from '../models/order.type'
+import { toast } from 'react-toastify'
+import { selectWallet } from '../features/wallet/slice'
+import { createOrderPaymentLinkAPI } from '../features/order/service'
 
 const paymentMethods: PaymentItemType[] = [
   { id: '0', title: 'My Wallet' },
@@ -25,15 +29,17 @@ function CheckoutPage() {
   const { state } = useLocation()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
+  const { wallet } = useAppSelector(selectWallet)
   const { checkoutBid, isLoading } = useAppSelector(selectBid)
 
   const {
     control,
     handleSubmit,
     setValue,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm({
-    resolver: yupResolver(shippingInfoSchema),
+    resolver: yupResolver(createOrderSchema),
     defaultValues: {
       bidId: state.bidId,
       recipient: '',
@@ -62,12 +68,33 @@ function CheckoutPage() {
     setValue('paymentMethod', method)
   }
 
-  const onSubmit = async (data: ShippingInfoPayload) => {
-    dispatch(createOrderAsync(data))
-      .unwrap()
-      .then((order) => {
-        navigate('/order/success', { replace: true, state: { order: order } })
-      })
+  const onSubmit = async (data: CreateOrderPayload) => {
+    if (!wallet || !checkoutBid) return
+
+    if (data.paymentMethod === '0') {
+      if (wallet.balance < checkoutBid.amount * 0.9) {
+        toast.error('Not enough balance')
+        return
+      }
+      dispatch(createOrderAsync(data))
+        .unwrap()
+        .then((order) => {
+          navigate('/order/success', { replace: true, state: { order: order } })
+        })
+        .catch((err) => {
+          if (err.fieldErrors) {
+            Object.keys(err.fieldErrors).forEach((key) => {
+              setError(key as keyof CreateOrderPayload, {
+                type: 'manual',
+                message: err.fieldErrors[key],
+              })
+            })
+          }
+        })
+    } else {
+      const paymentUrl = await createOrderPaymentLinkAPI(data)
+      window.location.replace(paymentUrl)
+    }
   }
 
   if (isLoading) {

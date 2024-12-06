@@ -1,10 +1,7 @@
-import {
-  Order,
-  OrderStatus,
-  ShippingInfoPayload,
-} from '../../models/order.type'
+import { Order, OrderStatus, CreateOrderPayload } from '../../models/order.type'
 import { Page } from '../../models/page.type'
 import api from '../../utils/api'
+import { fromAxiosErrorToAPIError } from '../../utils/error.helper'
 
 export const fetchMyOrdersAPI = async (
   pageNum: number,
@@ -35,7 +32,25 @@ export const confirmOrderAPI = async (orderId: number) => {
   return response.data
 }
 
-export const createOrderAPI = async (payload: ShippingInfoPayload) => {
+export const createOrderAPI = async (payload: CreateOrderPayload) => {
   const response = await api.post<Order>('/storefront/orders', payload)
   return response.data
+}
+
+export const createOrderPaymentLinkAPI = async (
+  payload: CreateOrderPayload
+) => {
+  const response = await api.post('/storefront/orders/external', payload)
+  return response.data.paymentUrl
+}
+
+export const createOrderExternalCallbackAPI = async (params: string) => {
+  try {
+    const response = await api.post<Order>(
+      `/storefront/orders/external/callback?${params}`
+    )
+    return response.data
+  } catch (error) {
+    throw fromAxiosErrorToAPIError(error)
+  }
 }

@@ -2,6 +2,9 @@ package com.xdpsx.auction.service.impl;
 
 import com.xdpsx.auction.constant.CacheKey;
 import com.xdpsx.auction.constant.ErrorCode;
+import com.xdpsx.auction.dto.payment.InitPaymentRequest;
+import com.xdpsx.auction.dto.payment.InitPaymentResponse;
+import com.xdpsx.auction.dto.transaction.DepositRequest;
 import com.xdpsx.auction.dto.transaction.TransactionRequest;
 import com.xdpsx.auction.dto.wallet.CreateWithdrawRequest;
 import com.xdpsx.auction.dto.wallet.WalletDto;
@@ -18,14 +21,19 @@ import com.xdpsx.auction.repository.WalletRepository;
 import com.xdpsx.auction.repository.WithdrawRequestRepository;
 import com.xdpsx.auction.security.CustomUserDetails;
 import com.xdpsx.auction.security.UserContext;
+import com.xdpsx.auction.service.OTPService;
+import com.xdpsx.auction.service.PaymentService;
 import com.xdpsx.auction.service.TransactionService;
 import com.xdpsx.auction.service.WalletService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +43,34 @@ public class WalletServiceImpl implements WalletService {
     private final TransactionService transactionService;
     private final RedisTemplate<String, String> redisTemplate;
     private final UserContext userContext;
+    private final PaymentService paymentService;
+    private final OTPService otpService;
+
+    @Value("${payment.vnpay.timeout}")
+    private Integer paymentTimeout;
+
+    @Override
+    public InitPaymentResponse createDepositLink(DepositRequest request) {
+//        String transactionId = UUID.randomUUID().toString();
+        String transactionId = otpService.generateOTP(10);
+        BigDecimal amount = request.getAmount().setScale(0, RoundingMode.DOWN);
+        redisTemplate.opsForValue().set(
+                CacheKey.getTransactionKey(transactionId),
+                amount.toString(),
+                paymentTimeout,
+                TimeUnit.MINUTES
+        );
+
+        InitPaymentRequest initPaymentRequest = InitPaymentRequest.builder()
+                .amount(amount)
+                .txnRef(transactionId)
+                .requestId(transactionId)
+                .ipAddress(request.getIpAddress())
+                .prefixReturn("deposits")
+                .build();
+        return paymentService.init(initPaymentRequest);
+    }
+
 
     @Override
     public WalletDto getWalletByOwnerId(Long ownerId) {

@@ -8,11 +8,7 @@ import {
   fetchMyOrdersAPI,
 } from './service'
 import { Page } from '../../models/page.type'
-import {
-  Order,
-  OrderStatus,
-  ShippingInfoPayload,
-} from '../../models/order.type'
+import { Order, OrderStatus, CreateOrderPayload } from '../../models/order.type'
 
 export interface OrderState {
   userOrder: Page<Order> | null
@@ -136,7 +132,7 @@ export const confirmOrderAsync = createAsyncThunk(
 
 export const createOrderAsync = createAsyncThunk(
   'order/createOrderAsync',
-  async (payload: ShippingInfoPayload, thunkAPI) => {
+  async (payload: CreateOrderPayload, thunkAPI) => {
     try {
       const data = await createOrderAPI(payload)
       return data

@@ -8,6 +8,7 @@ import PaymentFailure from '../pages/handler/PaymentFailure'
 import PaymentSuccess from '../pages/handler/PaymentSuccess'
 import CheckoutPage from '../pages/CheckoutPage'
 import OrderSuccess from '../pages/handler/OrderSuccess'
+import OrderRedirect from '../pages/redirect/OrderRedirect'
 
 const mainRoutes = [
   {
@@ -72,6 +73,14 @@ const mainRoutes = [
     element: (
       <ProtectedRoute>
         <DepositRedirect />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/orders/:orderId/payment/redirect',
+    element: (
+      <ProtectedRoute>
+        <OrderRedirect />
       </ProtectedRoute>
     ),
   },

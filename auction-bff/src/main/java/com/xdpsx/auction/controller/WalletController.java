@@ -37,11 +37,11 @@ public class WalletController {
     }
 
     @PostMapping("/storefront/wallets/deposit")
-    ResponseEntity<InitPaymentResponse> deposit(@Valid @RequestBody DepositRequest request,
+    ResponseEntity<InitPaymentResponse> createDepositLink(@Valid @RequestBody DepositRequest request,
                                                 HttpServletRequest httpServletRequest) {
         var ipAddress = RequestUtil.getIpAddress(httpServletRequest);
         request.setIpAddress(ipAddress);
-        return ResponseEntity.ok(paymentService.createPayment(request));
+        return ResponseEntity.ok(walletService.createDepositLink(request));
     }
 
     @PostMapping("/storefront/wallets/deposit/callback")

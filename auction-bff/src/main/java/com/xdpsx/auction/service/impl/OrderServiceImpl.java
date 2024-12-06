@@ -7,6 +7,8 @@ import com.xdpsx.auction.dto.order.CreateOrderDto;
 import com.xdpsx.auction.dto.order.OrderDto;
 import com.xdpsx.auction.dto.order.OrderSellerDto;
 import com.xdpsx.auction.dto.order.OrderUserDto;
+import com.xdpsx.auction.dto.payment.InitPaymentRequest;
+import com.xdpsx.auction.dto.payment.InitPaymentResponse;
 import com.xdpsx.auction.dto.transaction.TransactionRequest;
 import com.xdpsx.auction.exception.BadRequestException;
 import com.xdpsx.auction.exception.NotFoundException;
@@ -21,10 +23,7 @@ import com.xdpsx.auction.repository.BidRepository;
 import com.xdpsx.auction.repository.OrderRepository;
 import com.xdpsx.auction.security.CustomUserDetails;
 import com.xdpsx.auction.security.UserContext;
-import com.xdpsx.auction.service.NotificationService;
-import com.xdpsx.auction.service.OrderService;
-import com.xdpsx.auction.service.TransactionService;
-import com.xdpsx.auction.service.WalletService;
+import com.xdpsx.auction.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.UUID;
 
 import static com.xdpsx.auction.constant.BidConstants.SECURITY_FEE_RATE;
@@ -46,6 +46,7 @@ public class OrderServiceImpl implements OrderService {
     private final BidRepository bidRepository;
     private final UserContext userContext;
     private final WalletService walletService;
+    private final PaymentService paymentService;
 
     @Override
     @Transactional
@@ -59,10 +60,6 @@ public class OrderServiceImpl implements OrderService {
 
         handlePayForBidder(amount, userDetails.getId(), bid.getAuction().getName());
         handlePayForSeller(bid.getAuction().getSeller().getId(), bid.getAuction().getName());
-
-        bid.setStatus(BidStatus.PAID);
-        bid.getAuction().setStatus(AuctionStatus.COMPLETED);
-        bidRepository.save(bid);
 
         ShippingInfo shippingInfo = ShippingInfo.builder()
                 .recipient(request.getRecipient())
@@ -81,6 +78,11 @@ public class OrderServiceImpl implements OrderService {
                 .paymentMethod(PaymentMethod.INTERNAL_WALLET)
                 .build();
         Order savedOrder = orderRepository.save(order);
+
+        bid.setStatus(BidStatus.PAID);
+        bid.getAuction().setStatus(AuctionStatus.COMPLETED);
+        bidRepository.save(bid);
+
         return OrderMapper.INSTANCE.toOrderDto(savedOrder);
     }
 
@@ -108,6 +110,54 @@ public class OrderServiceImpl implements OrderService {
                 .userId(sellerId)
                 .build();
         notificationService.pushNotification(sellerNotification);
+    }
+
+    @Override
+    public InitPaymentResponse createOrderPaymentLink(CreateOrderDto request, String ipAddress) {
+        CustomUserDetails userDetails = userContext.getLoggedUser();
+        Bid bid = bidRepository.findByIdAndBidderAndStatus(request.getBidId(), userDetails.getId(), BidStatus.WON)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.BID_NOT_FOUND, request.getBidId()));
+        BigDecimal amount = bid.getAmount().subtract(bid.getTransaction().getAmount());
+        amount = amount.setScale(0, RoundingMode.DOWN);
+
+        ShippingInfo shippingInfo = ShippingInfo.builder()
+                .recipient(request.getRecipient())
+                .mobileNumber(request.getMobileNumber())
+                .shippingAddress(request.getShippingAddress())
+                .build();
+
+        Order order = Order.builder()
+                .trackNumber(UUID.randomUUID().toString())
+                .totalAmount(bid.getAmount())
+                .status(OrderStatus.Creating)
+                .shippingInfo(shippingInfo)
+                .note(request.getNote())
+                .user(new User(userDetails.getId()))
+                .seller(bid.getAuction().getSeller())
+                .auction(bid.getAuction())
+                .paymentMethod(PaymentMethod.fromValue(request.getPaymentMethod()))
+                .build();
+
+        Order savedOrder = orderRepository.save(order);
+
+        InitPaymentRequest initPaymentRequest = InitPaymentRequest.builder()
+                .amount(amount)
+                .txnRef(String.valueOf(savedOrder.getId()))
+                .requestId(String.valueOf(savedOrder.getId()))
+                .ipAddress(ipAddress)
+                .prefixReturn("orders")
+                .build();
+        return paymentService.init(initPaymentRequest);
+    }
+
+    @Override
+    public OrderDto createOrderExternalPaymentCallback(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND, orderId));
+
+        order.setStatus(OrderStatus.Pending);
+        Order savedOrder = orderRepository.save(order);
+        return OrderMapper.INSTANCE.toOrderDto(savedOrder);
     }
 
 

@@ -1,7 +1,7 @@
 import { AuctionInfo } from './auction.type'
 import * as yup from 'yup'
 
-export const shippingInfoSchema = yup.object().shape({
+export const createOrderSchema = yup.object().shape({
   bidId: yup.number().required('Bid ID is required'),
   recipient: yup
     .string()
@@ -18,7 +18,7 @@ export const shippingInfoSchema = yup.object().shape({
   note: yup.string().max(255, 'Note must not exceed 255 characters'),
   paymentMethod: yup.string().required('Payment method is required'),
 })
-export type ShippingInfoPayload = yup.InferType<typeof shippingInfoSchema>
+export type CreateOrderPayload = yup.InferType<typeof createOrderSchema>
 
 export type ShippingInfo = {
   recipient: string
