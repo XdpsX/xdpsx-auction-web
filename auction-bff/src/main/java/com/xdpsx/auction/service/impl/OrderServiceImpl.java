@@ -113,6 +113,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public InitPaymentResponse createOrderPaymentLink(CreateOrderDto request, String ipAddress) {
         CustomUserDetails userDetails = userContext.getLoggedUser();
         Bid bid = bidRepository.findByIdAndBidderAndStatus(request.getBidId(), userDetails.getId(), BidStatus.WON)
@@ -140,6 +141,10 @@ public class OrderServiceImpl implements OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
+        bid.setStatus(BidStatus.PAID);
+        bid.getAuction().setStatus(AuctionStatus.COMPLETED);
+        bidRepository.save(bid);
+
         InitPaymentRequest initPaymentRequest = InitPaymentRequest.builder()
                 .amount(amount)
                 .txnRef(String.valueOf(savedOrder.getId()))
@@ -158,6 +163,24 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(OrderStatus.Pending);
         Order savedOrder = orderRepository.save(order);
         return OrderMapper.INSTANCE.toOrderDto(savedOrder);
+    }
+
+    @Override
+    public InitPaymentResponse continueOrderPayment(Long orderId, String ipAddress) {
+        Order order = orderRepository.findByUserIdAndOrderIdAndStatus(userContext.getLoggedUser().getId(), orderId, OrderStatus.Creating)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND, orderId));
+
+        BigDecimal amount = order.getTotalAmount().multiply(BigDecimal.valueOf(1).subtract(SECURITY_FEE_RATE));
+        amount = amount.setScale(0, RoundingMode.DOWN);
+
+        InitPaymentRequest initPaymentRequest = InitPaymentRequest.builder()
+                .amount(amount)
+                .txnRef(String.valueOf(order.getId()))
+                .requestId(String.valueOf(order.getId()))
+                .ipAddress(ipAddress)
+                .prefixReturn("orders")
+                .build();
+        return paymentService.init(initPaymentRequest);
     }
 
 

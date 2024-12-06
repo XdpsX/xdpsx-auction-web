@@ -27,6 +27,7 @@ export type ShippingInfo = {
 }
 
 export type OrderStatus =
+  | 'Creating'
   | 'Pending'
   | 'Confirmed'
   | 'Shipped'

@@ -56,6 +56,14 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/storefront/orders/{id}/continue-payment")
+    ResponseEntity<InitPaymentResponse> continueOrderPayment(@PathVariable Long id,
+                                                             HttpServletRequest httpServletRequest) {
+        var ipAddress = RequestUtil.getIpAddress(httpServletRequest);
+        InitPaymentResponse response =  orderService.continueOrderPayment(id, ipAddress);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/storefront/users/me/orders")
     ResponseEntity<PageResponse<OrderDto>> getUserOrders(
             @RequestParam(defaultValue = PAGE_NUM, required = false) int pageNum,

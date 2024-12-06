@@ -47,14 +47,14 @@ public class OrderScheduler {
             NotificationRequest notificationSeller = NotificationRequest.builder()
                     .userId(order.getSeller().getId())
                     .title("Your Order has been confirmed")
-                    .message("Order %s has been confirmed".formatted(order.getTrackNumber()))
+                    .message("Order #%s has been confirmed".formatted(order.getTrackNumber()))
                     .build();
             notificationService.pushNotification(notificationSeller);
 
             NotificationRequest notificationUser = NotificationRequest.builder()
                     .userId(order.getUser().getId())
                     .title("Your Order has been confirmed")
-                    .message("Order %s has been automatically confirmed due to expiration".formatted(order.getTrackNumber()))
+                    .message("Order #%s has been automatically confirmed due to expiration".formatted(order.getTrackNumber()))
                     .build();
             notificationService.pushNotification(notificationUser);
         }
@@ -63,5 +63,45 @@ public class OrderScheduler {
     private List<Order> getExpiredDeliveredOrders() {
         ZonedDateTime twoDaysAgo = ZonedDateTime.now().minusDays(2);
         return orderRepository.findOrderOlderThanAndWithStatus(OrderStatus.Delivered, twoDaysAgo);
+    }
+
+    @Scheduled(cron = "0 * * * * ?")
+    @Transactional
+    public void handleExpiredCreatingOrders() {
+        List<Order> expiredCreatingOrders= getExpiredCreatingOrders();
+
+        for (Order order: expiredCreatingOrders) {
+            order.setStatus(OrderStatus.Cancelled);
+            order.setReason("Payment for expired order");
+            Order savedOrder = orderRepository.save(order);
+
+            TransactionRequest transactionSeller = TransactionRequest.builder()
+                    .userId(savedOrder.getSeller().getId())
+                    .type(TransactionType.DEPOSIT)
+                    .amount(savedOrder.getTotalAmount().multiply(SECURITY_FEE_RATE))
+                    .description("Payment for auction " + order.getAuction().getName())
+                    .build();
+            transactionService.createTransaction(transactionSeller);
+
+            NotificationRequest notificationSeller = NotificationRequest.builder()
+                    .userId(order.getSeller().getId())
+                    .title("The auction has not been paid")
+                    .message("Your auction %s has not been paid. You've received a security fee".formatted(order.getAuction().getName()))
+                    .build();
+            notificationService.pushNotification(notificationSeller);
+
+            NotificationRequest notificationUser = NotificationRequest.builder()
+                    .userId(order.getUser().getId())
+                    .title("Your Order was expired")
+                    .message("Order #%s was expired. You've lost your security fee".formatted(order.getTrackNumber()))
+                    .build();
+            notificationService.pushNotification(notificationUser);
+        }
+    }
+
+
+    private List<Order> getExpiredCreatingOrders() {
+        ZonedDateTime twoDaysAgo = ZonedDateTime.now().minusDays(2);
+        return orderRepository.findOrderOlderThanAndWithStatus(OrderStatus.Creating, twoDaysAgo);
     }
 }

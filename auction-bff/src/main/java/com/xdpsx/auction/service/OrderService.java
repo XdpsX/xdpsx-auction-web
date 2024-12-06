@@ -12,6 +12,7 @@ public interface OrderService {
     OrderDto createOrder(CreateOrderDto request);
     InitPaymentResponse createOrderPaymentLink(CreateOrderDto request, String ipAddress);
     OrderDto createOrderExternalPaymentCallback(Long orderId);
+    InitPaymentResponse continueOrderPayment(Long orderId, String ipAddress);
     PageResponse<OrderDto> getUserOrders(Long userId, int pageNum, int pageSize,
                                                String keyword, String sort, OrderStatus status);
     PageResponse<OrderDto> getSellerOrders(Long sellerId, int pageNum, int pageSize,

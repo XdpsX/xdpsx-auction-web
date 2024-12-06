@@ -55,4 +55,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("status") OrderStatus status,
             @Param("timeAgo") ZonedDateTime timeAgo
     );
+
+    @Query("SELECT o FROM Order o WHERE o.user.id = :userId AND o.id = :orderId AND o.status = :status")
+    Optional<Order> findByUserIdAndOrderIdAndStatus(@Param("userId") Long userId,
+                                                @Param("orderId") Long orderId,
+                                                @Param("status") OrderStatus status);
 }

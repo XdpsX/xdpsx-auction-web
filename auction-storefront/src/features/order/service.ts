@@ -54,3 +54,10 @@ export const createOrderExternalCallbackAPI = async (params: string) => {
     throw fromAxiosErrorToAPIError(error)
   }
 }
+
+export const continueOrderPaymentAPI = async (orderId: number) => {
+  const response = await api.post(
+    `/storefront/orders/${orderId}/continue-payment`
+  )
+  return response.data.paymentUrl
+}

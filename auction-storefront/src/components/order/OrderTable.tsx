@@ -13,6 +13,7 @@ import { cancelOrderAsync, confirmOrderAsync } from '../../features/order/slice'
 import ConfirmModal from '../ui/ConfirmModal'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
+import { continueOrderPaymentAPI } from '../../features/order/service'
 
 function OrderTable({
   orderPage,
@@ -44,7 +45,7 @@ function OrderTable({
     setOpenModal(true)
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (action === 'cancel' && orderId) {
       dispatch(cancelOrderAsync(orderId))
         .unwrap()
@@ -57,6 +58,9 @@ function OrderTable({
         .then(() => {
           toast.success('Order has been confirmed')
         })
+    } else if (action === 'continue' && orderId) {
+      const paymentUrl = await continueOrderPaymentAPI(orderId)
+      window.location.replace(paymentUrl)
     }
     setOpenModal(false)
   }
@@ -99,7 +103,7 @@ function OrderTable({
                     scope="col"
                     className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
-                    Total Amount
+                    {status === 'Creating' ? 'Amount to pay' : 'Total Amount'}
                   </th>
                   <th
                     scope="col"
@@ -144,7 +148,9 @@ function OrderTable({
                     </td>
 
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {formatPrice(item.totalAmount)}
+                      {status === 'Creating'
+                        ? formatPrice(item.totalAmount * 0.9)
+                        : formatPrice(item.totalAmount)}
                     </td>
                     <td className="whitespace-wrap px-3 py-4 text-sm text-gray-500">
                       <div>
@@ -159,6 +165,18 @@ function OrderTable({
                     </td>
 
                     <td className="whitespace-nowrap text-left py-4 pl-3  text-sm font-medium">
+                      {status === 'Creating' && (
+                        <Button
+                          className="bg-blue-600 hover:bg-blue-700"
+                          onClick={handleOpenModal.bind(
+                            null,
+                            'continue',
+                            item.id
+                          )}
+                        >
+                          Continue
+                        </Button>
+                      )}
                       {(status === 'Pending' || status === 'Confirmed') && (
                         <Button
                           className="bg-red-600 hover:bg-red-700"

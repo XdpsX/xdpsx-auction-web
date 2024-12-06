@@ -54,6 +54,10 @@ export const sidebarLinks: SidebarLinkType[] = [
     group: true,
     children: [
       {
+        to: '/user/orders?status=Creating',
+        title: 'Creating Orders',
+      },
+      {
         to: '/user/orders?status=Pending',
         title: 'Pending Orders',
       },
