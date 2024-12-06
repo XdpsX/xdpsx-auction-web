@@ -40,7 +40,9 @@ function AuctionCard({ auction }: { auction: Auction }) {
         </div>
         <div className="flex items-center justify-between gap-4">
           <p className="font-semibold">{formatPrice(auction.startingPrice)}</p>
-          <span className="text-sm">1 bids</span>
+          <span className="text-sm">
+            {auction.type === 'ENGLISH' ? auction.numBids : '?'} bids
+          </span>
         </div>
         <div className="flex items-center justify-between">
           <p className="text-gray-600 flex items-center gap-2">

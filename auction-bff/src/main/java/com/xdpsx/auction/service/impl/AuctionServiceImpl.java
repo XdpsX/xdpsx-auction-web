@@ -94,7 +94,7 @@ public class AuctionServiceImpl implements AuctionService {
                 specification.getCategoryAuctionsSpec(category.getId()),
                 PageRequest.of(pageNum - 1, pageSize)
         );
-        return PageMapper.toPageResponse(auctionPage, AuctionMapper.INSTANCE::toResponse);
+        return PageMapper.toPageResponse(auctionPage, this::mapToResponse);
     }
 
     @Override
@@ -112,5 +112,14 @@ public class AuctionServiceImpl implements AuctionService {
     private Category findPublishedCategory(Integer categoryId){
         return categoryRepository.findPublishedCategoryById(categoryId)
                 .orElseThrow(() -> new NotFoundException("Category with id=%s not found".formatted(categoryId)));
+    }
+
+    private AuctionResponse mapToResponse(Auction auction) {
+        AuctionResponse response = AuctionMapper.INSTANCE.toResponse(auction);
+        if (auction.isEnglishAuction()) {
+            long numBids = bidRepository.countBidsByAuctionId(auction.getId());
+            response.setNumBids(numBids);
+        }
+        return response;
     }
 }

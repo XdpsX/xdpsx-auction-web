@@ -11,6 +11,7 @@ export type Auction = {
   type: string
   published: boolean
   seller: SellerInfo
+  numBids: number | null
 }
 
 export type AuctionDetails = {

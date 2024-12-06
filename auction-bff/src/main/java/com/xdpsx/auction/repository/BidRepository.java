@@ -64,4 +64,7 @@ public interface BidRepository extends JpaRepository<Bid, Long>, JpaSpecificatio
             @Param("status") BidStatus status,
             @Param("timeAgo") ZonedDateTime timeAgo
     );
+
+    @Query("SELECT COUNT(b) FROM Bid b WHERE b.auction.id = :auctionId")
+    long countBidsByAuctionId(@Param("auctionId") Long auctionId);
 }
