@@ -30,7 +30,7 @@ public class OrderController {
     }
 
     @GetMapping("/storefront/users/me/orders")
-    ResponseEntity<PageResponse<OrderSellerDto>> getUserOrders(
+    ResponseEntity<PageResponse<OrderDto>> getUserOrders(
             @RequestParam(defaultValue = PAGE_NUM, required = false) int pageNum,
             @RequestParam(defaultValue = PAGE_SIZE, required = false) @Max(MAX_PAGE_SIZE) int pageSize,
             @RequestParam(required = false) String keyword,
@@ -38,14 +38,14 @@ public class OrderController {
             @RequestParam(required = false) OrderStatus status
     ){
 
-        PageResponse<OrderSellerDto> response = orderService.getUserOrders(
+        PageResponse<OrderDto> response = orderService.getUserOrders(
                 userContext.getLoggedUser().getId(), pageNum, pageSize, keyword, sort, status
         );
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/backoffice/sellers/me/orders")
-    ResponseEntity<PageResponse<OrderUserDto>> getSellerOrders(
+    ResponseEntity<PageResponse<OrderDto>> getSellerOrders(
             @RequestParam(defaultValue = PAGE_NUM, required = false) int pageNum,
             @RequestParam(defaultValue = PAGE_SIZE, required = false) @Max(MAX_PAGE_SIZE) int pageSize,
             @RequestParam(required = false) String keyword,
@@ -53,7 +53,7 @@ public class OrderController {
             @RequestParam(required = false) OrderStatus status
     ){
 
-        PageResponse<OrderUserDto> response = orderService.getSellerOrders(
+        PageResponse<OrderDto> response = orderService.getSellerOrders(
                 userContext.getLoggedUser().getId(), pageNum, pageSize, keyword, sort, status
         );
         return ResponseEntity.ok(response);

@@ -23,7 +23,7 @@ public enum OrderStatus {
         if (nextValue < OrderStatus.values().length) {
 //            return OrderStatus.values()[nextValue];
             for (OrderStatus status : OrderStatus.values()) {
-                if (status.getValue() == value) {
+                if (status.getValue() == nextValue) {
                     return status;
                 }
             }

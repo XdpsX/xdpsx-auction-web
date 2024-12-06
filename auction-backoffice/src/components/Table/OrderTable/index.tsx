@@ -71,19 +71,27 @@ function OrderTable({
         case 'auction':
           return (
             <User
+              className='flex flex-col items-start'
               avatarProps={{
                 radius: 'lg',
-                src: order.auctionImageUrl ? order.auctionImageUrl : 'https://i.pravatar.cc/150?u=a04258114e29026702d'
+                src: order.auction.mainImage
+                  ? order.auction.mainImage
+                  : 'https://i.pravatar.cc/150?u=a04258114e29026702d'
               }}
-              name={order.auctionName}
+              name={order.auction.name}
             >
-              {order.auctionName}
+              {order.auction.name}
             </User>
           )
         case 'totalAmount':
           return <p className='text-sm'>{formatPrice(order.totalAmount)}</p>
         case 'shippingAddress':
-          return <p className='text-sm'>{order.shippingAddress}</p>
+          return (
+            <div className='text-sm'>
+              <p className='font-semibold'>{order.shippingInfo.recipient}</p>
+              <p>{order.shippingInfo.shippingAddress}</p>
+            </div>
+          )
         case 'updatedAt':
           return <p className='text-sm'>{formatDateTime(order.updatedAt)}</p>
 

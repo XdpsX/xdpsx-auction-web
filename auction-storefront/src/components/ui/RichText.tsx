@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import DOMPurify from 'dompurify'
 
 interface RichTextProps {
@@ -6,15 +6,22 @@ interface RichTextProps {
   description: string
   maxHeight?: number
 }
+
 const RichText = ({ label, description, maxHeight = 80 }: RichTextProps) => {
   const [isExpanded, setIsExpanded] = useState(false)
+  const [isLongDescription, setIsLongDescription] = useState(false)
+  const descriptionRef = useRef<HTMLDivElement | null>(null)
 
   const toggleDescription = () => {
     setIsExpanded(!isExpanded)
   }
 
-  // Kiểm tra chiều dài của mô tả
-  const isLongDescription = description.length > maxHeight
+  useEffect(() => {
+    if (descriptionRef.current) {
+      const { scrollHeight } = descriptionRef.current
+      setIsLongDescription(scrollHeight > maxHeight)
+    }
+  }, [description, maxHeight])
 
   return (
     <div>
@@ -27,6 +34,7 @@ const RichText = ({ label, description, maxHeight = 80 }: RichTextProps) => {
         }`}
       >
         <div
+          ref={descriptionRef}
           dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(description) }}
         />
         {!isExpanded && isLongDescription && (

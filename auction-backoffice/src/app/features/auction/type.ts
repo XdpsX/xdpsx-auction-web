@@ -37,3 +37,10 @@ export const auctionSchema = yup.object().shape({
 })
 
 export type AuctionPayload = yup.InferType<typeof auctionSchema>
+
+export type AuctionInfo = {
+  id: number
+  name: string
+  mainImage: string
+  type: 'ENGLISH' | 'SEALED_BID'
+}

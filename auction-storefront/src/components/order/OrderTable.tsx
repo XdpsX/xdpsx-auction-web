@@ -85,15 +85,15 @@ function OrderTable({
                 <tr>
                   <th
                     scope="col"
-                    className="py-3.5 pl-4 pr-1 text-left text-sm font-semibold text-gray-900 sm:pl-0"
+                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
-                    Auction
+                    ID
                   </th>
                   <th
                     scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    className="py-3.5 pl-4 pr-1 text-left text-sm font-semibold text-gray-900 sm:pl-0"
                   >
-                    Tracking Number
+                    Auction
                   </th>
                   <th
                     scope="col"
@@ -125,8 +125,11 @@ function OrderTable({
               <tbody className="divide-y divide-gray-200">
                 {items.map((item) => (
                   <tr key={item.id}>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      {item.id}
+                    </td>
                     <td className=" whitespace-nowrap py-4 pl-4  font-medium text-gray-900 sm:pl-0">
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-col gap-2">
                         <div className="w-12 h-12">
                           <img
                             src={item.auction.mainImage}
@@ -141,13 +144,15 @@ function OrderTable({
                     </td>
 
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {item.trackNumber}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       {formatPrice(item.totalAmount)}
                     </td>
                     <td className="whitespace-wrap px-3 py-4 text-sm text-gray-500">
-                      {item.shippingInfo.shippingAddress}
+                      <div>
+                        <p className="font-semibold text-gray-800">
+                          {item.shippingInfo.recipient}
+                        </p>
+                        <p>{item.shippingInfo.shippingAddress}</p>
+                      </div>
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       {formatDateTime(item.updatedAt)}

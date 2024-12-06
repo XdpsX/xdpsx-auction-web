@@ -9,9 +9,9 @@ import com.xdpsx.auction.model.enums.OrderStatus;
 
 public interface OrderService {
     OrderDto createOrder(CreateOrderDto request);
-    PageResponse<OrderSellerDto> getUserOrders(Long userId, int pageNum, int pageSize,
+    PageResponse<OrderDto> getUserOrders(Long userId, int pageNum, int pageSize,
                                                String keyword, String sort, OrderStatus status);
-    PageResponse<OrderUserDto> getSellerOrders(Long sellerId, int pageNum, int pageSize,
+    PageResponse<OrderDto> getSellerOrders(Long sellerId, int pageNum, int pageSize,
                                                String keyword, String sort, OrderStatus status);
     OrderSellerDto cancelOrder(Long orderId, Long userId);
     OrderUserDto updateOrderStatus(Long orderId, Long sellerId);

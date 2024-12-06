@@ -20,13 +20,14 @@ import {
 import AuctionImages from '../components/auction/AuctionImages'
 import SockJS from 'sockjs-client'
 import socketUrl from '../utils/socket'
+import LoadingOverlay from '../components/ui/LoadingOverlay'
 
 function AuctionDetailsPage() {
   const navigate = useNavigate()
   const { slug } = useParams()
   const id = useMemo(() => +getIdFromSlug(slug as string), [slug])
   const dispatch = useAppDispatch()
-  const { auctionDetails } = useAppSelector(selectAuction)
+  const { auctionDetails, isLoading } = useAppSelector(selectAuction)
 
   const [isBidUpdated, setIsBidUpdated] = useState(false)
   const [isAuctionEnded, setIsAuctionEnded] = useState(false)
@@ -68,6 +69,10 @@ function AuctionDetailsPage() {
       console.log('Disconnected')
     }
   }, [dispatch, id, userProfile?.id])
+
+  if (isLoading) {
+    return <LoadingOverlay />
+  }
 
   if (!auctionDetails) return null
 

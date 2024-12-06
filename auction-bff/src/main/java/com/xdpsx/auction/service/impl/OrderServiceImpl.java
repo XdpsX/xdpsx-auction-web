@@ -112,20 +112,20 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public PageResponse<OrderSellerDto> getUserOrders(Long userId, int pageNum, int pageSize,
+    public PageResponse<OrderDto> getUserOrders(Long userId, int pageNum, int pageSize,
                                                       String keyword, String sort, OrderStatus status) {
         Page<Order> orderPage = orderRepository.findUserOrders(
                 userId, keyword, status, PageRequest.of(pageNum - 1, pageSize, getSort(sort))
         );
-        return PageMapper.toPageResponse(orderPage, OrderMapper.INSTANCE::toOrderSellerDto);
+        return PageMapper.toPageResponse(orderPage, OrderMapper.INSTANCE::toOrderDto);
     }
 
     @Override
-    public PageResponse<OrderUserDto> getSellerOrders(Long sellerId, int pageNum, int pageSize, String keyword, String sort, OrderStatus status) {
+    public PageResponse<OrderDto> getSellerOrders(Long sellerId, int pageNum, int pageSize, String keyword, String sort, OrderStatus status) {
         Page<Order> orderPage = orderRepository.findSellerOrders(
                 sellerId, keyword, status, PageRequest.of(pageNum - 1, pageSize, getSort(sort))
         );
-        return PageMapper.toPageResponse(orderPage, OrderMapper.INSTANCE::toOrderUserDto);
+        return PageMapper.toPageResponse(orderPage, OrderMapper.INSTANCE::toOrderDto);
     }
 
     @Override
@@ -136,13 +136,13 @@ public class OrderServiceImpl implements OrderService {
             throw new BadRequestException("Order can not be cancelled");
         }
         order.setStatus(OrderStatus.Cancelled);
-        order.setNote("User cancels order");
+        order.setReason("User cancels order");
 
         TransactionRequest transactionUser = TransactionRequest.builder()
                 .userId(userId)
                 .type(TransactionType.DEPOSIT)
                 .amount(order.getTotalAmount().multiply(BigDecimal.valueOf(1).subtract(SECURITY_FEE_RATE)))
-                .description("User cancels order")
+                .description("Cancel order #" + order.getTrackNumber())
                 .build();
         transactionService.createTransaction(transactionUser);
 
@@ -150,14 +150,14 @@ public class OrderServiceImpl implements OrderService {
                 .userId(order.getSeller().getId())
                 .type(TransactionType.DEPOSIT)
                 .amount(order.getTotalAmount().multiply(SECURITY_FEE_RATE))
-                .description("User cancels order")
+                .description("Compensation amount due to the user canceling the order #" + order.getTrackNumber())
                 .build();
         transactionService.createTransaction(transactionSeller);
 
         NotificationRequest notificationSeller = NotificationRequest.builder()
                 .userId(order.getSeller().getId())
-                .title("Your Order has been cancelled")
-                .message("Order %s has been cancelled".formatted(order.getTrackNumber()))
+                .title("Your Order has been Cancelled")
+                .message("Order #%s has been cancelled".formatted(order.getTrackNumber()))
                 .build();
         notificationService.pushNotification(notificationSeller);
 
@@ -200,7 +200,7 @@ public class OrderServiceImpl implements OrderService {
                 .userId(savedOrder.getSeller().getId())
                 .type(TransactionType.DEPOSIT)
                 .amount(savedOrder.getTotalAmount().multiply(BigDecimal.valueOf(1).subtract(SECURITY_FEE_RATE)))
-                .description("Payment for auction " + order.getAuction().getName())
+                .description("Payment for order #" + order.getTrackNumber())
                 .build();
         transactionService.createTransaction(transactionSeller);
 
