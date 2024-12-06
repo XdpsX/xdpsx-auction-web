@@ -11,5 +11,5 @@ public interface BidService {
     BidResponse getMyBidInAuction(Long auctionId);
     BidResponse refundBid(Long id);
     PageResponse<BidAuctionDto> getUserBids(Long userId, int pageNum, int pageSize, String sort, BidStatus status);
-    BidResponse payBid(Long id);
+    BidAuctionDto getUserWonBidDetails(Long bidId, Long userId);
 }

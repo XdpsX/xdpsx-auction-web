@@ -1,9 +1,18 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { RootState } from '../../store/type'
 import { fromAxiosErrorToAPIErrorDetails } from '../../utils/error.helper'
-import { cancelOrderAPI, confirmOrderAPI, fetchMyOrdersAPI } from './service'
+import {
+  cancelOrderAPI,
+  confirmOrderAPI,
+  createOrderAPI,
+  fetchMyOrdersAPI,
+} from './service'
 import { Page } from '../../models/page.type'
-import { Order, OrderStatus } from '../../models/order.type'
+import {
+  Order,
+  OrderStatus,
+  ShippingInfoPayload,
+} from '../../models/order.type'
 
 export interface OrderState {
   userOrder: Page<Order> | null
@@ -118,6 +127,18 @@ export const confirmOrderAsync = createAsyncThunk(
   async (orderId: number, thunkAPI) => {
     try {
       const data = await confirmOrderAPI(orderId)
+      return data
+    } catch (error) {
+      return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))
+    }
+  }
+)
+
+export const createOrderAsync = createAsyncThunk(
+  'order/createOrderAsync',
+  async (payload: ShippingInfoPayload, thunkAPI) => {
+    try {
+      const data = await createOrderAPI(payload)
       return data
     } catch (error) {
       return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))

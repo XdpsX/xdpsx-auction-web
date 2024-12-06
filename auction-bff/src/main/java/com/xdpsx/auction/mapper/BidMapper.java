@@ -17,6 +17,5 @@ public interface BidMapper {
 
     @Mapping(target = "auction", source = "entity.auction")
     @Mapping(target = "canRefund", ignore = true)
-    @Mapping(target = "canPaid", ignore = true)
     BidAuctionDto toBidAuctionDto(Bid entity);
 }

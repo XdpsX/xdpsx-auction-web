@@ -28,11 +28,6 @@ export const refundBidAPI = async (bidId: number) => {
   return response.data
 }
 
-export const payBidAPI = async (bidId: number) => {
-  const response = await api.post<Bid>(`/storefront/bids/${bidId}/pay`)
-  return response.data
-}
-
 export const fetchMyBidsAPI = async (
   pageNum: number,
   pageSize: number,
@@ -47,5 +42,12 @@ export const fetchMyBidsAPI = async (
       status,
     },
   })
+  return response.data
+}
+
+export const fetchMyWonBidAPI = async (bidId: number) => {
+  const response = await api.get<BidInfo>(
+    `/storefront/users/me/bids/won/${bidId}`
+  )
   return response.data
 }

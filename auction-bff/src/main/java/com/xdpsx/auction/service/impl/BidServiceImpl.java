@@ -18,7 +18,6 @@ import com.xdpsx.auction.model.*;
 import com.xdpsx.auction.model.enums.*;
 import com.xdpsx.auction.repository.AuctionRepository;
 import com.xdpsx.auction.repository.BidRepository;
-import com.xdpsx.auction.repository.OrderRepository;
 import com.xdpsx.auction.security.CustomUserDetails;
 import com.xdpsx.auction.security.UserContext;
 import com.xdpsx.auction.service.BidService;
@@ -40,7 +39,6 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -49,7 +47,6 @@ public class BidServiceImpl implements BidService {
     private final UserContext userContext;
     private final BidRepository bidRepository;
     private final AuctionRepository auctionRepository;
-    private final OrderRepository orderRepository;
     private final WalletService walletService;
     private final TransactionService transactionService;
     private final NotificationService notificationService;
@@ -232,62 +229,12 @@ public class BidServiceImpl implements BidService {
     }
 
     @Override
-    @Transactional
-    public BidResponse payBid(Long id) {
-        CustomUserDetails userDetails = userContext.getLoggedUser();
-        Bid bid = bidRepository.findByIdAndBidderAndStatus(id, userDetails.getId(), BidStatus.WON)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.BID_NOT_FOUND, id));
-
-        BigDecimal amount = bid.getAmount().subtract(bid.getTransaction().getAmount());
-        walletService.validateWalletBalance(userDetails.getId(), amount);
-
-        handlePayForBidder(amount, userDetails.getId(), bid.getAuction().getName());
-        handlePayForSeller(bid.getAuction().getSeller().getId(), bid.getAuction().getName());
-
-        bid.setStatus(BidStatus.PAID);
-        bid.getAuction().setStatus(AuctionStatus.COMPLETED);
-        Bid savedBid = bidRepository.save(bid);
-
-        Order order = Order.builder()
-                .trackNumber(UUID.randomUUID().toString())
-                .auctionName(bid.getAuction().getName())
-                .auctionImage(bid.getAuction().getMainMedia())
-                .totalAmount(bid.getAmount())
-                .shippingAddress(userDetails.getAddress())
-                .status(OrderStatus.Pending)
-                .user(new User(userDetails.getId()))
-                .seller(bid.getAuction().getSeller())
-                .auction(bid.getAuction())
-                .build();
-        orderRepository.save(order);
-        return BidMapper.INSTANCE.toResponse(savedBid);
+    public BidAuctionDto getUserWonBidDetails(Long bidId, Long userId) {
+        Bid bid = bidRepository.findByIdAndBidderAndStatus(bidId, userId, BidStatus.WON)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.BID_NOT_FOUND, bidId));
+        return BidMapper.INSTANCE.toBidAuctionDto(bid);
     }
 
-    private void handlePayForBidder(BigDecimal amount, Long bidderId, String auctionName) {
-        TransactionRequest transactionBidder = TransactionRequest.builder()
-                .amount(amount)
-                .type(TransactionType.WITHDRAW)
-                .description("Paid for auction: " + auctionName)
-                .userId(bidderId)
-                .build();
-        transactionService.createTransaction(transactionBidder);
-
-        NotificationRequest bidderNotification = NotificationRequest.builder()
-                .title("Paid Bid")
-                .message("You have paid for auction: " + auctionName)
-                .userId(bidderId)
-                .build();
-        notificationService.pushNotification(bidderNotification);
-    }
-
-    private void handlePayForSeller(Long sellerId, String auctionName) {
-        NotificationRequest sellerNotification = NotificationRequest.builder()
-                .title("Sold Bid")
-                .message("Your auction %s has been sold".formatted(auctionName))
-                .userId(sellerId)
-                .build();
-        notificationService.pushNotification(sellerNotification);
-    }
 
     private BidAuctionDto mapToBidAuctionDto(Bid bid){
         BidAuctionDto dto = BidMapper.INSTANCE.toBidAuctionDto(bid);

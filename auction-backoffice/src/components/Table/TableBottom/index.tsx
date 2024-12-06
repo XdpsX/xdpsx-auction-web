@@ -50,7 +50,7 @@ function TableBottom({
             labelPlacement='outside-left'
             className='flex items-center w-16'
           >
-            <SelectItem key='3'>3</SelectItem>
+            <SelectItem key='5'>5</SelectItem>
             <SelectItem key='10'>10</SelectItem>
             <SelectItem key='20'>20</SelectItem>
           </Select>

@@ -129,13 +129,13 @@ function OrderTable({
                       <div className="flex items-center gap-2">
                         <div className="w-12 h-12">
                           <img
-                            src={item.auctionImageUrl}
+                            src={item.auction.mainImage}
                             alt="Auction image"
                             className="w-full h-full object-contain"
                           />
                         </div>
                         <div className="max-w-[220px]">
-                          <p className="truncate">{item.auctionName}</p>
+                          <p className="truncate">{item.auction.name}</p>
                         </div>
                       </div>
                     </td>
@@ -147,7 +147,7 @@ function OrderTable({
                       {formatPrice(item.totalAmount)}
                     </td>
                     <td className="whitespace-wrap px-3 py-4 text-sm text-gray-500">
-                      {item.shippingAddress}
+                      {item.shippingInfo.shippingAddress}
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       {formatDateTime(item.updatedAt)}

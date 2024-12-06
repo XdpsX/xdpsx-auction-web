@@ -1,6 +1,7 @@
 package com.xdpsx.auction.model;
 
 import com.xdpsx.auction.model.enums.OrderStatus;
+import com.xdpsx.auction.model.enums.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,19 +21,20 @@ public class Order extends AbstractAuditEntity{
 
     private String trackNumber;
 
-    private String auctionName;
-
-    @OneToOne
-    private Media auctionImage;
-
     private BigDecimal totalAmount;
 
-    private String shippingAddress;
+    @Embedded
+    private ShippingInfo shippingInfo;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.ORDINAL)
     private OrderStatus status;
 
+    @Enumerated(EnumType.ORDINAL)
+    private PaymentMethod paymentMethod;
+
     private String note;
+
+    private String reason;
 
     @ManyToOne
     private User user;
@@ -42,10 +44,6 @@ public class Order extends AbstractAuditEntity{
 
     @OneToOne
     private Auction auction;
-
-    public String getAuctionImageUrl() {
-        return auctionImage.getUrl();
-    }
 
     public boolean isCanCancel() {
         return (status.equals(OrderStatus.Pending)) || (status.equals(OrderStatus.Cancelled));

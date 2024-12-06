@@ -9,19 +9,16 @@ import Select from '../ui/Select'
 import cn from '../../utils/cn'
 import AuctionType from '../auction/AuctionType'
 import Button from '../ui/Button'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import ConfirmModal from '../ui/ConfirmModal'
 import { useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import {
-  payBidAsync,
   refundBidAsync,
   selectBid,
   setCurrentBidId,
 } from '../../features/bid/slice'
 import { toast } from 'react-toastify'
-import { selectUser } from '../../features/user/slice'
-import { selectWallet } from '../../features/wallet/slice'
 
 function BidTable({
   bidPage,
@@ -32,52 +29,30 @@ function BidTable({
   isLoading: boolean
   status: string
 }) {
+  const navigate = useNavigate()
   const dispatch = useAppDispatch()
-  const { userProfile } = useAppSelector(selectUser)
-  const { wallet } = useAppSelector(selectWallet)
   const { currentBidId } = useAppSelector(selectBid)
   const { setParams } = useQueryParams()
   const [openModal, setOpenModal] = useState(false)
-  const [amountToPay, setAmountToPay] = useState<number | null>(null)
-  const [currentAction, setCurrentAction] = useState<'paid' | 'refund' | null>(
-    null
-  )
 
-  const handleOpenModal = (
-    action: 'paid' | 'refund',
-    bidId: number,
-    amountToPay: number
-  ) => {
-    setAmountToPay(amountToPay)
-    setCurrentAction(action)
+  const handleOpenModal = (bidId: number) => {
     dispatch(setCurrentBidId(bidId))
     setOpenModal(true)
   }
 
-  const handleSubmit = () => {
-    if (currentAction === 'paid' && currentBidId) {
-      if (!userProfile || !wallet || !amountToPay) return
-      if (wallet.balance < amountToPay) {
-        toast.error('Not enough balance')
-        return
-      }
-      if (!userProfile.address || !userProfile.mobileNumber) {
-        toast.error('Please update your profile with address or mobile number')
-        return
-      }
-      dispatch(payBidAsync(currentBidId))
-        .unwrap()
-        .then(() => {
-          toast.success('Pay successfully')
-        })
-    } else if (currentAction === 'refund' && currentBidId) {
-      dispatch(refundBidAsync(currentBidId))
-        .unwrap()
-        .then(() => {
-          toast.success('Refund successfully')
-        })
-    }
-    setOpenModal(false)
+  const onPay = (bidId: number) => {
+    navigate('/checkout', { state: { bidId: bidId } })
+  }
+
+  const onCancel = () => {
+    if (!currentBidId) return
+
+    dispatch(refundBidAsync(currentBidId))
+      .unwrap()
+      .then(() => {
+        toast.success('Refund successfully')
+        setOpenModal(false)
+      })
   }
 
   const onPageChange = (pageNum: number) => {
@@ -214,13 +189,7 @@ function BidTable({
                         {status === 'WON' && (
                           <Button
                             className="bg-blue-600 hover:bg-blue-700"
-                            onClick={() =>
-                              handleOpenModal(
-                                'paid',
-                                item.id,
-                                item.amount * 0.9
-                              )
-                            }
+                            onClick={onPay.bind(null, item.id)}
                           >
                             Paid
                           </Button>
@@ -239,9 +208,7 @@ function BidTable({
                             {item.canRefund ? (
                               <Button
                                 className="bg-red-600 hover:bg-red-700"
-                                onClick={() =>
-                                  handleOpenModal('refund', item.id, 0)
-                                }
+                                onClick={handleOpenModal.bind(null, item.id)}
                               >
                                 Refund
                               </Button>
@@ -286,7 +253,7 @@ function BidTable({
       <ConfirmModal
         open={openModal}
         onClose={() => setOpenModal(false)}
-        onSubmit={handleSubmit}
+        onSubmit={onCancel}
       />
     </>
   )

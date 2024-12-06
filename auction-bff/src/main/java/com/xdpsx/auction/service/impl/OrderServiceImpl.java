@@ -3,6 +3,8 @@ package com.xdpsx.auction.service.impl;
 import com.xdpsx.auction.constant.ErrorCode;
 import com.xdpsx.auction.dto.PageResponse;
 import com.xdpsx.auction.dto.notification.NotificationRequest;
+import com.xdpsx.auction.dto.order.CreateOrderDto;
+import com.xdpsx.auction.dto.order.OrderDto;
 import com.xdpsx.auction.dto.order.OrderSellerDto;
 import com.xdpsx.auction.dto.order.OrderUserDto;
 import com.xdpsx.auction.dto.transaction.TransactionRequest;
@@ -10,20 +12,28 @@ import com.xdpsx.auction.exception.BadRequestException;
 import com.xdpsx.auction.exception.NotFoundException;
 import com.xdpsx.auction.mapper.OrderMapper;
 import com.xdpsx.auction.mapper.PageMapper;
+import com.xdpsx.auction.model.Bid;
 import com.xdpsx.auction.model.Order;
-import com.xdpsx.auction.model.enums.OrderStatus;
-import com.xdpsx.auction.model.enums.TransactionType;
+import com.xdpsx.auction.model.ShippingInfo;
+import com.xdpsx.auction.model.User;
+import com.xdpsx.auction.model.enums.*;
+import com.xdpsx.auction.repository.BidRepository;
 import com.xdpsx.auction.repository.OrderRepository;
+import com.xdpsx.auction.security.CustomUserDetails;
+import com.xdpsx.auction.security.UserContext;
 import com.xdpsx.auction.service.NotificationService;
 import com.xdpsx.auction.service.OrderService;
 import com.xdpsx.auction.service.TransactionService;
+import com.xdpsx.auction.service.WalletService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 import static com.xdpsx.auction.constant.BidConstants.SECURITY_FEE_RATE;
 
@@ -33,6 +43,73 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final TransactionService transactionService;
     private final NotificationService notificationService;
+    private final BidRepository bidRepository;
+    private final UserContext userContext;
+    private final WalletService walletService;
+
+    @Override
+    @Transactional
+    public OrderDto createOrder(CreateOrderDto request) {
+        CustomUserDetails userDetails = userContext.getLoggedUser();
+        Bid bid = bidRepository.findByIdAndBidderAndStatus(request.getBidId(), userDetails.getId(), BidStatus.WON)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.BID_NOT_FOUND, request.getBidId()));
+
+        BigDecimal amount = bid.getAmount().subtract(bid.getTransaction().getAmount());
+        walletService.validateWalletBalance(userDetails.getId(), amount);
+
+        handlePayForBidder(amount, userDetails.getId(), bid.getAuction().getName());
+        handlePayForSeller(bid.getAuction().getSeller().getId(), bid.getAuction().getName());
+
+        bid.setStatus(BidStatus.PAID);
+        bid.getAuction().setStatus(AuctionStatus.COMPLETED);
+        bidRepository.save(bid);
+
+        ShippingInfo shippingInfo = ShippingInfo.builder()
+                .recipient(request.getRecipient())
+                .mobileNumber(request.getMobileNumber())
+                .shippingAddress(request.getShippingAddress())
+                .build();
+        Order order = Order.builder()
+                .trackNumber(UUID.randomUUID().toString())
+                .totalAmount(bid.getAmount())
+                .status(OrderStatus.Pending)
+                .shippingInfo(shippingInfo)
+                .note(request.getNote())
+                .user(new User(userDetails.getId()))
+                .seller(bid.getAuction().getSeller())
+                .auction(bid.getAuction())
+                .paymentMethod(PaymentMethod.INTERNAL_WALLET)
+                .build();
+        Order savedOrder = orderRepository.save(order);
+        return OrderMapper.INSTANCE.toOrderDto(savedOrder);
+    }
+
+    private void handlePayForBidder(BigDecimal amount, Long bidderId, String auctionName) {
+        TransactionRequest transactionBidder = TransactionRequest.builder()
+                .amount(amount)
+                .type(TransactionType.WITHDRAW)
+                .description("Payment for the auction: " + auctionName)
+                .userId(bidderId)
+                .build();
+        transactionService.createTransaction(transactionBidder);
+
+        NotificationRequest bidderNotification = NotificationRequest.builder()
+                .title("Payment Bid")
+                .message("Your payment for the product: %s has been successfully processed. Thank you for your purchase!".formatted(auctionName))
+                .userId(bidderId)
+                .build();
+        notificationService.pushNotification(bidderNotification);
+    }
+
+    private void handlePayForSeller(Long sellerId, String auctionName) {
+        NotificationRequest sellerNotification = NotificationRequest.builder()
+                .title("New Payment Received")
+                .message("You have received a new payment for the auction: %s".formatted(auctionName))
+                .userId(sellerId)
+                .build();
+        notificationService.pushNotification(sellerNotification);
+    }
+
 
     @Override
     public PageResponse<OrderSellerDto> getUserOrders(Long userId, int pageNum, int pageSize,

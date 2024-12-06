@@ -5,8 +5,8 @@ import { fromAxiosErrorToAPIErrorDetails } from '../../utils/error.helper'
 import { APIErrorDetails } from '../../models/error.type'
 import {
   fetchMyBidsAPI,
+  fetchMyWonBidAPI,
   getUserBidAPI,
-  payBidAPI,
   placeBidAPI,
   refundBidAPI,
 } from './service'
@@ -16,6 +16,7 @@ export interface BidState {
   userBid: Bid | null
   userBids: Page<BidInfo> | null
   currentBidId: number | null
+  checkoutBid: BidInfo | null
   isLoading: boolean
   isProcessing: boolean
   error: APIErrorDetails | null
@@ -25,6 +26,7 @@ const initialState: BidState = {
   userBid: null,
   userBids: null,
   currentBidId: null,
+  checkoutBid: null,
   isLoading: false,
   isProcessing: false,
   error: null,
@@ -81,22 +83,6 @@ export const bidSlice = createSlice({
     builder.addCase(refundBidAsync.rejected, (state) => {
       state.isProcessing = false
     })
-    // payBidAsync
-    builder.addCase(payBidAsync.pending, (state) => {
-      state.isProcessing = true
-    })
-    builder.addCase(payBidAsync.fulfilled, (state) => {
-      state.isProcessing = false
-      if (state.userBids && state.currentBidId) {
-        state.userBids.items = state.userBids.items.filter(
-          (bid) => bid.id !== state.currentBidId
-        )
-        state.userBids.totalItems -= 1
-      }
-    })
-    builder.addCase(payBidAsync.rejected, (state) => {
-      state.isProcessing = false
-    })
     // fetchMyBidsAsync
     builder.addCase(fetchMyBidsAsync.pending, (state) => {
       state.isLoading = true
@@ -106,6 +92,17 @@ export const bidSlice = createSlice({
       state.userBids = action.payload
     })
     builder.addCase(fetchMyBidsAsync.rejected, (state) => {
+      state.isLoading = false
+    })
+    // fetchMyWonBidAsync
+    builder.addCase(fetchMyWonBidAsync.pending, (state) => {
+      state.isLoading = true
+    })
+    builder.addCase(fetchMyWonBidAsync.fulfilled, (state, action) => {
+      state.isLoading = false
+      state.checkoutBid = action.payload
+    })
+    builder.addCase(fetchMyWonBidAsync.rejected, (state) => {
       state.isLoading = false
     })
   },
@@ -155,18 +152,6 @@ export const refundBidAsync = createAsyncThunk(
   }
 )
 
-export const payBidAsync = createAsyncThunk(
-  'bid/payBidAsync',
-  async (bidId: number, thunkAPI) => {
-    try {
-      const data = await payBidAPI(bidId)
-      return data
-    } catch (error) {
-      return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))
-    }
-  }
-)
-
 export const fetchMyBidsAsync = createAsyncThunk(
   'bid/fetchMyBidsAsync',
   async (
@@ -185,6 +170,18 @@ export const fetchMyBidsAsync = createAsyncThunk(
   ) => {
     try {
       const data = await fetchMyBidsAPI(pageNum, pageSize, sort, status)
+      return data
+    } catch (error) {
+      return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))
+    }
+  }
+)
+
+export const fetchMyWonBidAsync = createAsyncThunk(
+  'bid/fetchMyWonBidAsync',
+  async (bidId: number, thunkAPI) => {
+    try {
+      const data = await fetchMyWonBidAPI(bidId)
       return data
     } catch (error) {
       return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))

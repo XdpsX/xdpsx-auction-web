@@ -42,7 +42,11 @@ function AuctionBid({ isAuctionEnded, auction, highestBid }: AuctionBidProps) {
     )
   }
 
-  if (userProfile && userProfile.id === auction.seller.id) {
+  if (
+    userProfile &&
+    userProfile.sellerDetails &&
+    userProfile.sellerDetails.id === auction.seller.id
+  ) {
     return (
       <p className="text-lg font-bold">You can't bid on your own auction</p>
     )

@@ -8,7 +8,7 @@ function PaymentSuccess() {
     return <Navigate to="/" replace />
   }
   return (
-    <div className="flex flex-col items-center justify-center pt-32 gap-4 px-8 max-w-md mx-auto">
+    <div className="flex flex-col items-center justify-center pt-12 pb-16 gap-4 px-8 max-w-md mx-auto">
       <BsCheck2Circle className="text-green-500 text-9xl" />
       <h1 className="font-bold text-2xl">Payment Successful</h1>
       <p className="text-gray-700 text-lg">{state.message}</p>

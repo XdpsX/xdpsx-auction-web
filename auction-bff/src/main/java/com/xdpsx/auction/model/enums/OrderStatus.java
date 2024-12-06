@@ -1,21 +1,33 @@
 package com.xdpsx.auction.model.enums;
 
 public enum OrderStatus {
-    Pending(0), Confirmed(1), Shipped(2), Delivered(3), Completed(4), Cancelled(5), Returned(6);
+    Creating(0),
+    Pending(1),
+    Confirmed(2),
+    Shipped(3),
+    Delivered(4),
+    Completed(5),
+    Cancelled(6),
+    Returned(7);
 
-    private final Integer level;
+    private final int value;
 
-    OrderStatus(int level) {
-        this.level = level;
+    OrderStatus(int value) {
+        this.value = value;
     }
-    public Integer getPriority() {
-        return level;
+    public Integer getValue() {
+        return value;
     }
     public OrderStatus next() {
-        int nextOrdinal = this.ordinal() + 1;
-        if (nextOrdinal < OrderStatus.values().length) {
-            return OrderStatus.values()[nextOrdinal];
+        int nextValue = this.value + 1;
+        if (nextValue < OrderStatus.values().length) {
+//            return OrderStatus.values()[nextValue];
+            for (OrderStatus status : OrderStatus.values()) {
+                if (status.getValue() == value) {
+                    return status;
+                }
+            }
         }
-        return this;
+        return null;
     }
 }

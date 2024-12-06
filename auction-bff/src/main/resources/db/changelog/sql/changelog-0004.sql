@@ -1,7 +1,7 @@
 CREATE TABLE auctions (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(128) NOT NULL,
-    description VARCHAR(4000),
+    description TEXT,
     starting_price DECIMAL(15,2) NOT NULL,
     step_price DECIMAL(15,2),
     starting_time TIMESTAMP NOT NULL,

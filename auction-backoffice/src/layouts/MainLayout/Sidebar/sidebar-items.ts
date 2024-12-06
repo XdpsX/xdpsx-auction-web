@@ -117,7 +117,6 @@ const sidebarItems: SidebarItem[] = [
     path: '/withdrawal',
     icon: 'ph:hand-withdraw',
     group: true,
-    roles: ['ADMIN'],
     children: [
       {
         key: 'withdrawal-list',
@@ -127,7 +126,8 @@ const sidebarItems: SidebarItem[] = [
       {
         key: 'withdrawal-request',
         title: 'Request List',
-        path: '/withdrawal/request-list'
+        path: '/withdrawal/request-list',
+        roles: ['ADMIN']
       }
     ]
   }

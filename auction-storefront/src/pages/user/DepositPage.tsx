@@ -1,6 +1,8 @@
 import { useForm } from 'react-hook-form'
 import Button from '../../components/ui/Button'
-import PaymentSelect from '../../components/payment/PaymentSelect'
+import PaymentSelect, {
+  PaymentItemType,
+} from '../../components/payment/PaymentSelect'
 import { useAppSelector } from '../../store/hooks'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { DepositPayload, depositSchema } from '../../models/transaction.type'
@@ -10,6 +12,13 @@ import { depositAPI } from '../../features/transaction/service'
 import { toast } from 'react-toastify'
 import { getErrorMessage } from '../../utils/error.helper'
 import { selectWallet } from '../../features/wallet/slice'
+import VNPAY_LOGO from '../../assets/vnpay-icon.png'
+import MOMO_LOGO from '../../assets/momo-icon.svg'
+
+const depositMethods: PaymentItemType[] = [
+  { id: 'VNPAY', title: 'VNPay', img: VNPAY_LOGO },
+  { id: 'MOMO', title: 'Momo', img: MOMO_LOGO },
+]
 
 function Deposit() {
   const { wallet } = useAppSelector(selectWallet)
@@ -82,11 +91,14 @@ function Deposit() {
             </div>
           </div>
           <div className="mt-8 flex flex-col flex-wrap sm:flex-row">
-            <div className="truncate pt-3 capitalize sm:w-[20%] sm:text-right">
+            <div className="truncate pt-3 capitalize sm:w-[20%] sm:text-right mb-2">
               Payment Method:
             </div>
             <div className="sm:w-[80%] sm:pl-5 -mt-1">
-              <PaymentSelect onChangePaymentMethod={onChangePaymentMethod} />
+              <PaymentSelect
+                paymentMethods={depositMethods}
+                onChangePaymentMethod={onChangePaymentMethod}
+              />
               {errors.paymentMethod && (
                 <p className="text-sm text-red-500">
                   {errors.paymentMethod.message}

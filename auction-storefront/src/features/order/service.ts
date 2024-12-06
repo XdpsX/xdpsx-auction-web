@@ -1,4 +1,8 @@
-import { Order, OrderStatus } from '../../models/order.type'
+import {
+  Order,
+  OrderStatus,
+  ShippingInfoPayload,
+} from '../../models/order.type'
 import { Page } from '../../models/page.type'
 import api from '../../utils/api'
 
@@ -28,5 +32,10 @@ export const cancelOrderAPI = async (orderId: number) => {
 
 export const confirmOrderAPI = async (orderId: number) => {
   const response = await api.put<Order>(`/storefront/orders/${orderId}/confirm`)
+  return response.data
+}
+
+export const createOrderAPI = async (payload: ShippingInfoPayload) => {
+  const response = await api.post<Order>('/storefront/orders', payload)
   return response.data
 }
