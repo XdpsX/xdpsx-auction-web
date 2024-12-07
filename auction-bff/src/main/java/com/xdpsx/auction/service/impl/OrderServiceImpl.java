@@ -4,9 +4,8 @@ import com.xdpsx.auction.constant.ErrorCode;
 import com.xdpsx.auction.dto.PageResponse;
 import com.xdpsx.auction.dto.notification.NotificationRequest;
 import com.xdpsx.auction.dto.order.CreateOrderDto;
+import com.xdpsx.auction.dto.order.OrderDetailsDto;
 import com.xdpsx.auction.dto.order.OrderDto;
-import com.xdpsx.auction.dto.order.OrderSellerDto;
-import com.xdpsx.auction.dto.order.OrderUserDto;
 import com.xdpsx.auction.dto.payment.InitPaymentRequest;
 import com.xdpsx.auction.dto.payment.InitPaymentResponse;
 import com.xdpsx.auction.dto.transaction.TransactionRequest;
@@ -28,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -183,6 +183,15 @@ public class OrderServiceImpl implements OrderService {
         return paymentService.init(initPaymentRequest);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @Override
+    public PageResponse<OrderDto> getPageOrders(int pageNum, int pageSize, String keyword, String sort, OrderStatus status) {
+        Page<Order> orderPage = orderRepository.findPageOrders(
+                keyword, status, PageRequest.of(pageNum - 1, pageSize, getSort(sort))
+        );
+        return PageMapper.toPageResponse(orderPage, OrderMapper.INSTANCE::toOrderDto);
+    }
+
 
     @Override
     public PageResponse<OrderDto> getUserOrders(Long userId, int pageNum, int pageSize,
@@ -202,7 +211,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderSellerDto cancelOrder(Long orderId, Long userId) {
+    public OrderDto cancelOrder(Long orderId, Long userId) {
         Order order = orderRepository.findByIdAndUserId(orderId, userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND, orderId));
         if (!order.isCanCancel()) {
@@ -236,11 +245,11 @@ public class OrderServiceImpl implements OrderService {
 
 
         Order savedOrder = orderRepository.save(order);
-        return OrderMapper.INSTANCE.toOrderSellerDto(savedOrder);
+        return OrderMapper.INSTANCE.toOrderDto(savedOrder);
     }
 
     @Override
-    public OrderUserDto updateOrderStatus(Long orderId, Long sellerId) {
+    public OrderDto updateOrderStatus(Long orderId, Long sellerId) {
         Order order = orderRepository.findByIdAndSellerId(orderId, sellerId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND, orderId));
         if (!order.isLowerDelivered()) {
@@ -256,11 +265,11 @@ public class OrderServiceImpl implements OrderService {
                     .build();
             notificationService.pushNotification(notificationSeller);
         }
-        return OrderMapper.INSTANCE.toOrderUserDto(savedOrder);
+        return OrderMapper.INSTANCE.toOrderDto(savedOrder);
     }
 
     @Override
-    public OrderSellerDto confirmOrderDelivered(Long orderId, Long userId) {
+    public OrderDto confirmOrderDelivered(Long orderId, Long userId) {
         Order order = orderRepository.findByIdAndUserId(orderId, userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND, orderId));
         if (!order.getStatus().equals(OrderStatus.Delivered)) {
@@ -283,7 +292,29 @@ public class OrderServiceImpl implements OrderService {
                 .message("Order %s has been confirmed".formatted(order.getTrackNumber()))
                 .build();
         notificationService.pushNotification(notificationSeller);
-        return OrderMapper.INSTANCE.toOrderSellerDto(savedOrder);
+        return OrderMapper.INSTANCE.toOrderDto(savedOrder);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Override
+    public OrderDetailsDto getOrderDetails(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND, id));
+        return OrderMapper.INSTANCE.toOrderDetailsDto(order);
+    }
+
+    @Override
+    public OrderDetailsDto getUserOrderDetails(Long userId, Long orderId) {
+        Order order = orderRepository.findByIdAndUserId(orderId, userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND, orderId));
+        return OrderMapper.INSTANCE.toOrderDetailsDto(order);
+    }
+
+    @Override
+    public OrderDetailsDto getSellerOrderDetails(Long sellerId, Long orderId) {
+        Order order = orderRepository.findByIdAndSellerId(orderId, sellerId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND, orderId));
+        return OrderMapper.INSTANCE.toOrderDetailsDto(order);
     }
 
     private Sort getSort(String sortParam) {

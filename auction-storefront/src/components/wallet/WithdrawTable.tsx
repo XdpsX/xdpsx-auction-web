@@ -13,6 +13,9 @@ import { useAppDispatch } from '../../store/hooks'
 import { cancelWithdrawAsync } from '../../features/wallet/slice'
 import { toast } from 'react-toastify'
 import Button from '../ui/Button'
+import { MdOutlineCancel } from 'react-icons/md'
+import { FaRegEye } from 'react-icons/fa'
+import Modal from '../ui/Modal'
 
 function WithdrawTable({
   withdrawPage,
@@ -24,6 +27,8 @@ function WithdrawTable({
   const dispatch = useAppDispatch()
   const { setParams } = useQueryParams()
   const [openModal, setOpenModal] = useState(false)
+  const [reasonModal, setReasonModal] = useState(false)
+  const [reason, setReason] = useState<string | null>()
   const [withdrawId, setWithdrawId] = useState<number | null>(null)
 
   const onPageChange = (pageNum: number) => {
@@ -33,6 +38,11 @@ function WithdrawTable({
   const onPageSizeChange = (pageSize: string) => {
     console.log(pageSize)
     setParams({ pageSize: pageSize, pageNum: '1', sort: null })
+  }
+
+  const handleOpenReasonModal = (reason: string | null) => {
+    setReason(reason)
+    setReasonModal(true)
   }
 
   const handleOpenModal = (withdrawId: number) => {
@@ -92,20 +102,13 @@ function WithdrawTable({
                     scope="col"
                     className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
-                    Bank Name
+                    Bank
                   </th>
                   <th
                     scope="col"
                     className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                   >
-                    Account Number
-                  </th>
-
-                  <th
-                    scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                  >
-                    Holder Name
+                    Holder
                   </th>
                   <th
                     scope="col"
@@ -128,28 +131,46 @@ function WithdrawTable({
                       {item.id}
                     </td>
 
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <td className="whitespace-nowrap px-3 py-4 text-sm ">
                       {formatPrice(item.amount)}
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {item.bankName}
+                    <td className="whitespace-nowrap px-3 py-4 text-gray-500">
+                      <div>
+                        <p className="text-gray-800">{item.accountNumber}</p>
+                        <p className="italic text-gray-600 text-sm">
+                          {item.bankName}
+                        </p>
+                      </div>
                     </td>
-                    <td className="whitespace-wrap px-3 py-4 text-sm text-gray-500">
-                      {item.accountNumber}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                    <td className="whitespace-wrap px-3 py-4 text-sm">
                       {item.holderName}
                     </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+
+                    <td className="whitespace-nowrap px-3 py-4 text-sm ">
                       {item.status}
                     </td>
                     {item.status === 'PENDING' && (
                       <td className="whitespace-nowrap text-left py-4 pl-3  text-sm font-medium">
                         <Button
-                          className="bg-red-600 hover:bg-red-700"
+                          title="Cancel"
+                          className="bg-red-600 hover:bg-red-700 py-1"
                           onClick={handleOpenModal.bind(null, item.id)}
                         >
-                          Cancel
+                          <MdOutlineCancel size={20} />
+                        </Button>
+                      </td>
+                    )}
+                    {item.status === 'REJECTED' && (
+                      <td className="whitespace-nowrap text-left py-4 pl-3  text-sm font-medium">
+                        <Button
+                          title="Rejection Reason"
+                          className="bg-yellow-600 hover:bg-yellow-700 py-1"
+                          onClick={handleOpenReasonModal.bind(
+                            null,
+                            item.reason
+                          )}
+                        >
+                          <FaRegEye size={20} />
                         </Button>
                       </td>
                     )}
@@ -188,6 +209,12 @@ function WithdrawTable({
         onSubmit={handleSubmit}
         content={`Do you want to cancel this withdraw request?`}
       />
+      <Modal open={reasonModal} onClose={() => setReasonModal(false)}>
+        <div className="space-y-4">
+          <h3 className="text-xl font-semibold">Rejection Reason</h3>
+          <p className="text-gray-800">{reason}</p>
+        </div>
+      </Modal>
     </>
   )
 }

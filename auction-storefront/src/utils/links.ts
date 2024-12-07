@@ -3,6 +3,7 @@ import Register from '../pages/auth/Register'
 import BidsPage from '../pages/user/BidsPage'
 import ChangePasswordPage from '../pages/user/ChangePasswordPage'
 import DepositPage from '../pages/user/DepositPage'
+import OrderDetailsPage from '../pages/user/OrderDetailsPage'
 import OrdersPage from '../pages/user/OrdersPage'
 import ProfilePage from '../pages/user/ProfilePage'
 import SellerRegisterPage from '../pages/user/SellerRegisterPage'
@@ -64,5 +65,10 @@ export const userLinks = [
     title: 'Ordres',
     path: '/user/orders',
     element: OrdersPage,
+  },
+  {
+    title: 'Ordres Details',
+    path: '/user/orders/:id',
+    element: OrderDetailsPage,
   },
 ]

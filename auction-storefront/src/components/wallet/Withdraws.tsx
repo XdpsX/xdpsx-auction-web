@@ -38,7 +38,7 @@ function Withdraws() {
   }, [dispatch, pageNum, pageSize, sort, status])
 
   const onStatusChange = (key: string) => {
-    setParams({ status: key })
+    setParams({ status: key, pageNum: '1' })
   }
   const onSortChange = (key: string) => {
     setParams({ sort: key })

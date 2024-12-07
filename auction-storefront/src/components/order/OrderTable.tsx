@@ -14,6 +14,10 @@ import ConfirmModal from '../ui/ConfirmModal'
 import { useState } from 'react'
 import { toast } from 'react-toastify'
 import { continueOrderPaymentAPI } from '../../features/order/service'
+import { MdOutlineCancel, MdOutlinePayment } from 'react-icons/md'
+import { IoCheckmarkOutline } from 'react-icons/io5'
+import { FaRegEye } from 'react-icons/fa'
+import { Link } from 'react-router-dom'
 
 function OrderTable({
   orderPage,
@@ -164,41 +168,51 @@ function OrderTable({
                       {formatDateTime(item.updatedAt)}
                     </td>
 
-                    <td className="whitespace-nowrap text-left py-4 pl-3  text-sm font-medium">
+                    <td className="whitespace-nowrap text-left py-4 pl-3  text-sm font-medium flex items-center gap-2">
+                      <Link
+                        to={`/user/orders/${item.id}`}
+                        title="View"
+                        className="bg-yellow-600 hover:bg-yellow-700 py-1 px-3 text-white rounded-md"
+                      >
+                        <FaRegEye size={20} />
+                      </Link>
                       {status === 'Creating' && (
                         <Button
-                          className="bg-blue-600 hover:bg-blue-700"
+                          title="Continue Payment"
+                          className="bg-blue-600 hover:bg-blue-700 py-1"
                           onClick={handleOpenModal.bind(
                             null,
                             'continue',
                             item.id
                           )}
                         >
-                          Continue
+                          <MdOutlinePayment size={24} />
                         </Button>
                       )}
                       {(status === 'Pending' || status === 'Confirmed') && (
                         <Button
-                          className="bg-red-600 hover:bg-red-700"
+                          title="Cancel"
+                          className="bg-red-600 hover:bg-red-700 py-1"
                           onClick={handleOpenModal.bind(
                             null,
                             'cancel',
                             item.id
                           )}
                         >
-                          Cancel
+                          <MdOutlineCancel size={20} />
                         </Button>
                       )}
                       {status === 'Delivered' && (
                         <Button
-                          className="bg-blue-600 hover:bg-blue-700"
+                          title="Confirm"
+                          className="bg-blue-600 hover:bg-blue-700 py-1"
                           onClick={handleOpenModal.bind(
                             null,
                             'confirm',
                             item.id
                           )}
                         >
-                          Confirm
+                          <IoCheckmarkOutline size={20} />
                         </Button>
                       )}
                     </td>

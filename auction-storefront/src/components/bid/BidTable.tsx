@@ -19,6 +19,8 @@ import {
   setCurrentBidId,
 } from '../../features/bid/slice'
 import { toast } from 'react-toastify'
+import { RiRefund2Fill } from 'react-icons/ri'
+import { MdOutlinePayment } from 'react-icons/md'
 
 function BidTable({
   bidPage,
@@ -188,10 +190,11 @@ function BidTable({
                       <td className="whitespace-nowrap text-left py-4 pl-3  text-sm font-medium">
                         {status === 'WON' && (
                           <Button
-                            className="bg-blue-600 hover:bg-blue-700"
+                            title="Pay"
+                            className="bg-blue-600 hover:bg-blue-700 py-1"
                             onClick={onPay.bind(null, item.id)}
                           >
-                            Paid
+                            <MdOutlinePayment size={20} />
                           </Button>
                         )}
                         {status === 'ACTIVE' && (
@@ -207,10 +210,11 @@ function BidTable({
                             </Link>
                             {item.canRefund ? (
                               <Button
-                                className="bg-red-600 hover:bg-red-700"
+                                title="Refund"
+                                className=" bg-red-600 hover:bg-red-700 py-1"
                                 onClick={handleOpenModal.bind(null, item.id)}
                               >
-                                Refund
+                                <RiRefund2Fill size={20} />
                               </Button>
                             ) : (
                               <span className="bg-green-100 text-green-500 p-1">

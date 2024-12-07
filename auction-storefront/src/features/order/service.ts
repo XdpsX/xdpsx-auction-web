@@ -1,4 +1,9 @@
-import { Order, OrderStatus, CreateOrderPayload } from '../../models/order.type'
+import {
+  Order,
+  OrderStatus,
+  CreateOrderPayload,
+  OrderDetails,
+} from '../../models/order.type'
 import { Page } from '../../models/page.type'
 import api from '../../utils/api'
 import { fromAxiosErrorToAPIError } from '../../utils/error.helper'
@@ -60,4 +65,11 @@ export const continueOrderPaymentAPI = async (orderId: number) => {
     `/storefront/orders/${orderId}/continue-payment`
   )
   return response.data.paymentUrl
+}
+
+export const fetchOrderDetailsAPI = async (orderId: number) => {
+  const response = await api.get<OrderDetails>(
+    `/storefront/users/me/orders/${orderId}`
+  )
+  return response.data
 }

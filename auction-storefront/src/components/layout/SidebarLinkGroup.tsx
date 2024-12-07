@@ -51,9 +51,9 @@ const SidebarLinkGroup = memo(
             {item.title}
           </div>
           {open ? (
-            <FaChevronUp color=" #e5e7eb" size={14} />
+            <FaChevronUp color=" #adaeb1" size={14} />
           ) : (
-            <FaChevronDown color="#e5e7eb" size={14} />
+            <FaChevronDown color="#adaeb1" size={14} />
           )}
         </NavLink>
         {/* <!-- Dropdown Menu Start --> */}

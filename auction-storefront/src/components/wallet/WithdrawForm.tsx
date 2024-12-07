@@ -184,6 +184,7 @@ function WithdrawForm() {
               control={control}
             />
             <button
+              type="button"
               onClick={() => {
                 if (wallet) setValue('amount', wallet.balance)
               }}

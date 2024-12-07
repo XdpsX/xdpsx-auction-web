@@ -13,6 +13,15 @@ import java.util.List;
 import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
+
+    @Query("SELECT o FROM Order o WHERE " +
+            "(:number IS NULL OR o.trackNumber LIKE %:number%) AND " +
+            "(:status IS NULL OR o.status = :status)")
+    Page<Order> findPageOrders(
+            @Param("number") String number,
+            @Param("status") OrderStatus status,
+            Pageable pageable);
+
     @Query("SELECT o FROM Order o WHERE " +
             "o.user.id = :userId AND " +
             "(:number IS NULL OR o.trackNumber LIKE %:number%) AND " +

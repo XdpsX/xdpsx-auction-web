@@ -6,4 +6,7 @@
   .divider-next {
     @apply relative after:absolute  after:h-full after:w-[2px]  after:top-0 after:-right-[10px] after:bg-slate-300;
   }
+  .order-key {
+    @apply bg-blue-100 text-blue-800 text-sm font-medium mr-2 px-2 py-2 rounded uppercase;
+  }
 }

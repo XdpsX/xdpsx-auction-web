@@ -6,17 +6,25 @@ import {
   confirmOrderAPI,
   createOrderAPI,
   fetchMyOrdersAPI,
+  fetchOrderDetailsAPI,
 } from './service'
 import { Page } from '../../models/page.type'
-import { Order, OrderStatus, CreateOrderPayload } from '../../models/order.type'
+import {
+  Order,
+  OrderStatus,
+  CreateOrderPayload,
+  OrderDetails,
+} from '../../models/order.type'
 
 export interface OrderState {
   userOrder: Page<Order> | null
+  orderDetails: OrderDetails | null
   isLoading: boolean
 }
 
 const initialState: OrderState = {
   userOrder: null,
+  orderDetails: null,
   isLoading: false,
 }
 
@@ -64,6 +72,17 @@ export const orderSlice = createSlice({
       }
     })
     builder.addCase(confirmOrderAsync.rejected, (state) => {
+      state.isLoading = false
+    })
+    // fetchOrderDetailsAsync
+    builder.addCase(fetchOrderDetailsAsync.pending, (state) => {
+      state.isLoading = true
+    })
+    builder.addCase(fetchOrderDetailsAsync.fulfilled, (state, action) => {
+      state.isLoading = false
+      state.orderDetails = action.payload
+    })
+    builder.addCase(fetchOrderDetailsAsync.rejected, (state) => {
       state.isLoading = false
     })
   },
@@ -135,6 +154,18 @@ export const createOrderAsync = createAsyncThunk(
   async (payload: CreateOrderPayload, thunkAPI) => {
     try {
       const data = await createOrderAPI(payload)
+      return data
+    } catch (error) {
+      return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))
+    }
+  }
+)
+
+export const fetchOrderDetailsAsync = createAsyncThunk(
+  'order/fetchOrderDetailsAsync',
+  async (orderId: number, thunkAPI) => {
+    try {
+      const data = await fetchOrderDetailsAPI(orderId)
       return data
     } catch (error) {
       return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))

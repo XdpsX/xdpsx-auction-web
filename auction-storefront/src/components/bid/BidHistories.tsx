@@ -53,10 +53,10 @@ function BidHistories({ auctionId }: { auctionId: number }) {
                 <th className="py-2 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
                   Bidder
                 </th>
-                <th className="hidden px-3 py-2 text-left text-sm font-semibold text-gray-900 lg:table-cell">
+                <th className=" px-3 py-2 text-left text-sm font-semibold text-gray-900 ">
                   Amount
                 </th>
-                <th className="hidden px-3 py-2 text-left text-sm font-semibold text-gray-900 lg:table-cell">
+                <th className=" px-3 py-2 text-left text-sm font-semibold text-gray-900 ">
                   Time
                 </th>
               </tr>
@@ -83,7 +83,7 @@ function BidHistories({ auctionId }: { auctionId: number }) {
                   <td
                     className={classNames(
                       idx === 0 ? '' : 'border-t border-gray-200',
-                      'hidden px-3 py-2 text-sm text-gray-500 lg:table-cell'
+                      ' px-3 py-2 text-sm text-gray-500 '
                     )}
                   >
                     {bid.amount}
@@ -91,7 +91,7 @@ function BidHistories({ auctionId }: { auctionId: number }) {
                   <td
                     className={classNames(
                       idx === 0 ? '' : 'border-t border-gray-200',
-                      'hidden px-3 py-2 text-sm text-gray-500 lg:table-cell'
+                      ' px-3 py-2 text-sm text-gray-500 '
                     )}
                   >
                     {bid.updatedAt}

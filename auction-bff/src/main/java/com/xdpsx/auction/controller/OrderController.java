@@ -3,9 +3,8 @@ package com.xdpsx.auction.controller;
 import com.xdpsx.auction.constant.VNPayParams;
 import com.xdpsx.auction.dto.PageResponse;
 import com.xdpsx.auction.dto.order.CreateOrderDto;
+import com.xdpsx.auction.dto.order.OrderDetailsDto;
 import com.xdpsx.auction.dto.order.OrderDto;
-import com.xdpsx.auction.dto.order.OrderSellerDto;
-import com.xdpsx.auction.dto.order.OrderUserDto;
 import com.xdpsx.auction.dto.payment.InitPaymentResponse;
 import com.xdpsx.auction.exception.BadRequestException;
 import com.xdpsx.auction.model.enums.OrderStatus;
@@ -93,27 +92,57 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/backoffice/orders")
+    ResponseEntity<PageResponse<OrderDto>> getPageOrders(
+            @RequestParam(defaultValue = PAGE_NUM, required = false) int pageNum,
+            @RequestParam(defaultValue = PAGE_SIZE, required = false) @Max(MAX_PAGE_SIZE) int pageSize,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String sort,
+            @RequestParam(required = false) OrderStatus status
+    ){
+        PageResponse<OrderDto> response = orderService.getPageOrders(pageNum, pageSize, keyword, sort, status);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/backoffice/orders/{id}")
+    ResponseEntity<OrderDetailsDto> getOrderDetails(@PathVariable Long id) {
+        OrderDetailsDto response = orderService.getOrderDetails(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/storefront/users/me/orders/{id}")
+    ResponseEntity<OrderDetailsDto> getUserOrderDetails(@PathVariable Long id) {
+        OrderDetailsDto response = orderService.getUserOrderDetails(userContext.getLoggedUser().getId(), id);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/backoffice/sellers/me/orders/{id}")
+    ResponseEntity<OrderDetailsDto> getSellerOrderDetails(@PathVariable Long id) {
+        OrderDetailsDto response = orderService.getSellerOrderDetails(userContext.getLoggedUser().getId(), id);
+        return ResponseEntity.ok(response);
+    }
+
     @PutMapping("/storefront/orders/{id}/cancel")
-    ResponseEntity<OrderSellerDto> cancelOrder(
+    ResponseEntity<OrderDto> cancelOrder(
             @PathVariable Long id
     ){
-        OrderSellerDto response = orderService.cancelOrder(id, userContext.getLoggedUser().getId());
+        OrderDto response = orderService.cancelOrder(id, userContext.getLoggedUser().getId());
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/backoffice/orders/{id}/update-status")
-    ResponseEntity<OrderUserDto> updateOrderStatus(
+    ResponseEntity<OrderDto> updateOrderStatus(
             @PathVariable Long id
     ){
-        OrderUserDto response = orderService.updateOrderStatus(id, userContext.getLoggedUser().getId());
+        OrderDto response = orderService.updateOrderStatus(id, userContext.getLoggedUser().getId());
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/storefront/orders/{id}/confirm")
-    ResponseEntity<OrderSellerDto> confirmOrderDelivered(
+    ResponseEntity<OrderDto> confirmOrderDelivered(
             @PathVariable Long id
     ){
-        OrderSellerDto response = orderService.confirmOrderDelivered(id, userContext.getLoggedUser().getId());
+        OrderDto response = orderService.confirmOrderDelivered(id, userContext.getLoggedUser().getId());
         return ResponseEntity.ok(response);
     }
 
