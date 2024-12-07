@@ -3,10 +3,7 @@ package com.xdpsx.auction.service.impl;
 import com.xdpsx.auction.constant.BidConstants;
 import com.xdpsx.auction.constant.ErrorCode;
 import com.xdpsx.auction.dto.PageResponse;
-import com.xdpsx.auction.dto.bid.BidAuctionDto;
-import com.xdpsx.auction.dto.bid.BidHistory;
-import com.xdpsx.auction.dto.bid.BidRequest;
-import com.xdpsx.auction.dto.bid.BidResponse;
+import com.xdpsx.auction.dto.bid.*;
 import com.xdpsx.auction.dto.notification.NotificationRequest;
 import com.xdpsx.auction.dto.transaction.TransactionRequest;
 import com.xdpsx.auction.dto.transaction.TransactionResponse;
@@ -19,6 +16,7 @@ import com.xdpsx.auction.model.*;
 import com.xdpsx.auction.model.enums.*;
 import com.xdpsx.auction.repository.AuctionRepository;
 import com.xdpsx.auction.repository.BidRepository;
+import com.xdpsx.auction.repository.UserRepository;
 import com.xdpsx.auction.security.CustomUserDetails;
 import com.xdpsx.auction.security.UserContext;
 import com.xdpsx.auction.service.BidService;
@@ -52,6 +50,7 @@ public class BidServiceImpl implements BidService {
     private final TransactionService transactionService;
     private final NotificationService notificationService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final UserRepository userRepository;
 
     @Override
     public BidResponse getMyBidInAuction(Long auctionId){
@@ -121,7 +120,7 @@ public class BidServiceImpl implements BidService {
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
-    public BidResponse placeBid(Long auctionId, BidRequest bidRequest) {
+    public BidResponseHistory placeBid(Long auctionId, BidRequest bidRequest) {
         CustomUserDetails userDetails = userContext.getLoggedUser();
         Auction auction = auctionRepository.findLiveAuction(auctionId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.AUCTION_NOT_FOUND, auctionId));
@@ -136,11 +135,11 @@ public class BidServiceImpl implements BidService {
         }
     }
 
-    private BidResponse placeBidForEnglishAuction(Auction auction, BidRequest bidRequest, Long userId) {
+    private BidResponseHistory placeBidForEnglishAuction(Auction auction, BidRequest bidRequest, Long userId) {
         validateEnglishBidAmount(auction.getId(), bidRequest.getAmount(), auction.getStartingPrice(), auction.getStepPrice());
 
         List<Bid> activeBids = bidRepository.findBidsWithStatusAndAuctionAndUser(auction.getId(), userId, BidStatus.ACTIVE);
-        BidResponse bidResponse;
+        BidResponseHistory bidResponse;
         if (activeBids.isEmpty()) { // create new bid
             bidResponse = createNewBid(auction, bidRequest, userId);
         } else {
@@ -151,7 +150,7 @@ public class BidServiceImpl implements BidService {
         return bidResponse;
     }
 
-    private BidResponse placeBidForSealedAuction(Auction auction, BidRequest bidRequest, Long userId) {
+    private BidResponseHistory placeBidForSealedAuction(Auction auction, BidRequest bidRequest, Long userId) {
         if (bidRequest.getAmount().compareTo(auction.getStartingPrice()) >= 0) {
             throw new BadRequestException(ErrorCode.BID_HIGHER);
         }
@@ -163,9 +162,12 @@ public class BidServiceImpl implements BidService {
         return createNewBid(auction, bidRequest, userId);
     }
 
-    private BidResponse createNewBid(Auction auction, BidRequest bidRequest, Long userId) {
+    private BidResponseHistory createNewBid(Auction auction, BidRequest bidRequest, Long userId) {
         BigDecimal securityFee = bidRequest.getAmount().multiply(BidConstants.SECURITY_FEE_RATE);
         walletService.validateWalletBalance(userId, securityFee);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, userId));
 
         TransactionRequest transactionRequest = TransactionRequest.builder()
                 .amount(securityFee)
@@ -177,17 +179,17 @@ public class BidServiceImpl implements BidService {
 
         Bid bid = Bid.builder()
                 .amount(bidRequest.getAmount())
-                .bidder(new User(userId))
+                .bidder(user)
                 .auction(auction)
                 .status(BidStatus.ACTIVE)
                 .transaction(new Transaction(transactionResponse.getId()))
                 .build();
         Bid savedBid = bidRepository.save(bid);
 
-        return BidMapper.INSTANCE.toResponse(savedBid);
+        return BidMapper.INSTANCE.toBidResponseHistory(savedBid);
     }
 
-    private BidResponse updateBid(BidRequest bidRequest, Bid existingBid, Long userId) {
+    private BidResponseHistory updateBid(BidRequest bidRequest, Bid existingBid, Long userId) {
         BigDecimal newSecurityFee = bidRequest.getAmount().multiply(BidConstants.SECURITY_FEE_RATE);
 
         BigDecimal oldSecurityFee = existingBid.getAmount().multiply(BidConstants.SECURITY_FEE_RATE);
@@ -205,7 +207,7 @@ public class BidServiceImpl implements BidService {
         existingBid.setAmount(bidRequest.getAmount());
         Bid savedBid = bidRepository.save(existingBid);
 
-        return BidMapper.INSTANCE.toResponse(savedBid);
+        return BidMapper.INSTANCE.toBidResponseHistory(savedBid);
     }
 
     private void validateEnglishBidAmount(Long auctionId, BigDecimal amount, BigDecimal startingAmount, BigDecimal stepAmount) {

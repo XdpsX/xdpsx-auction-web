@@ -1,13 +1,11 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Modal from '../ui/Modal'
-import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import {
-  fetchAuctionBidHistoriesAsync,
-  selectBid,
-  setBidHistories,
-} from '../../features/bid/slice'
+import { useAppSelector } from '../../store/hooks'
 import { classNames } from '../../utils/helper'
 import { selectUser } from '../../features/user/slice'
+import { BidHistory } from '../../models/bid.type'
+import { Page } from '../../models/page.type'
+import { fetchAuctionBidHistoriesAPI } from '../../features/bid/service'
 
 function BidHistoriesModal({
   open,
@@ -18,50 +16,52 @@ function BidHistoriesModal({
   setOpen: (open: boolean) => void
   auctionId: number
 }) {
-  const dispatch = useAppDispatch()
   const { userProfile } = useAppSelector(selectUser)
   const modalContentRef = useRef<HTMLDivElement>(null)
-  const { bidHistories, isBidHistoryLoading: isLoading } =
-    useAppSelector(selectBid)
+  const [histories, setHistories] = useState<Page<BidHistory> | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    dispatch(
-      fetchAuctionBidHistoriesAsync({
-        auctionId,
-        pageNum: 1,
-        pageSize: 5,
+    setIsLoading(true)
+    fetchAuctionBidHistoriesAPI(auctionId, 1, 5)
+      .then((data) => {
+        setHistories(data)
       })
-    )
+      .catch((error) => {
+        console.error('Failed to fetch bid histories:', error)
+      })
+    setIsLoading(false)
 
     return () => {
-      dispatch(setBidHistories(null))
+      setHistories(null)
     }
-  }, [auctionId, dispatch])
+  }, [auctionId])
 
   const handleScroll = async () => {
     if (modalContentRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = modalContentRef.current
       if (scrollTop + clientHeight + 4 >= scrollHeight && !isLoading) {
-        if (!bidHistories) return
-        if (bidHistories.pageNum < bidHistories.totalPages) {
+        if (!histories) return
+        if (histories.pageNum < histories.totalPages) {
+          setIsLoading(true)
           try {
-            const nextPage = bidHistories.pageNum + 1
-            dispatch(
-              fetchAuctionBidHistoriesAsync({
-                auctionId,
-                pageNum: nextPage,
-                pageSize: 5,
+            const nextPage = histories.pageNum + 1
+            fetchAuctionBidHistoriesAPI(auctionId, nextPage, 5).then((data) => {
+              setHistories({
+                ...data,
+                items: [...histories.items, ...data.items],
               })
-            )
+            })
           } catch (error) {
             console.error('Failed to fetch next page:', error)
           }
+          setIsLoading(false)
         }
       }
     }
   }
 
-  if (!bidHistories) return null
+  if (!histories) return null
 
   return (
     <Modal open={open} onClose={() => setOpen(false)} modalClassName="max-w-lg">
@@ -87,7 +87,7 @@ function BidHistoriesModal({
               </tr>
             </thead>
             <tbody>
-              {bidHistories.items.map((bid, idx) => (
+              {histories.items.map((bid, idx) => (
                 <tr key={bid.id}>
                   <td
                     className={classNames(

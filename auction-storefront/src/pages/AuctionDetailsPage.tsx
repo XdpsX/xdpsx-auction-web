@@ -22,6 +22,7 @@ import SockJS from 'sockjs-client'
 import socketUrl from '../utils/socket'
 import LoadingOverlay from '../components/ui/LoadingOverlay'
 import BidHistories from '../components/bid/BidHistories'
+import { addBidHistory } from '../features/bid/slice'
 
 function AuctionDetailsPage() {
   const navigate = useNavigate()
@@ -54,6 +55,17 @@ function AuctionDetailsPage() {
           if (newHighestBid.bidderId !== userProfile?.id) {
             toast.warn('New bid has been placed')
           }
+          dispatch(
+            addBidHistory({
+              id: newHighestBid.id,
+              amount: newHighestBid.amount,
+              bidder: {
+                id: newHighestBid.bidder.id,
+                name: newHighestBid.bidder.name,
+              },
+              updatedAt: newHighestBid.updatedAt,
+            })
+          )
           setTimeout(() => {
             setIsBidUpdated(false)
           }, 1500)

@@ -1,26 +1,28 @@
 import { useEffect, useState } from 'react'
-import { useAppSelector } from '../../store/hooks'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { selectUser } from '../../features/user/slice'
-import { fetchAuctionBidHistoriesAPI } from '../../features/bid/service'
-import { Page } from '../../models/page.type'
-import { BidHistory } from '../../models/bid.type'
 import BidHistoriesModal from './BidHistoriesModal'
 import { classNames } from '../../utils/helper'
+import {
+  fetchAuctionBidHistoriesAsync,
+  selectBid,
+} from '../../features/bid/slice'
 
 function BidHistories({ auctionId }: { auctionId: number }) {
+  const dispatch = useAppDispatch()
   const { userProfile } = useAppSelector(selectUser)
   const [open, setOpen] = useState(false)
-  const [histories, setHistories] = useState<Page<BidHistory> | null>(null)
+  const { bidHistories } = useAppSelector(selectBid)
 
   useEffect(() => {
-    fetchAuctionBidHistoriesAPI(auctionId, 1, 5).then((response) => {
-      setHistories(response)
-    })
-  }, [auctionId])
+    dispatch(
+      fetchAuctionBidHistoriesAsync({ auctionId, pageNum: 1, pageSize: 5 })
+    )
+  }, [auctionId, dispatch])
 
-  if (!histories) return null
+  if (!bidHistories) return null
 
-  if (histories.items.length === 0) {
+  if (bidHistories.items.length === 0) {
     return (
       <>
         <hr />
@@ -60,7 +62,7 @@ function BidHistories({ auctionId }: { auctionId: number }) {
               </tr>
             </thead>
             <tbody>
-              {histories.items.map((bid, idx) => (
+              {bidHistories.items.map((bid, idx) => (
                 <tr key={bid.id}>
                   <td
                     className={classNames(
@@ -98,7 +100,7 @@ function BidHistories({ auctionId }: { auctionId: number }) {
               ))}
             </tbody>
           </table>
-          {histories.totalPages > 1 && (
+          {bidHistories.totalPages > 1 && (
             <div className="text-center mt-4">
               <button
                 className="text-blue-500 font-semibold"

@@ -44,16 +44,28 @@ export const bidSlice = createSlice({
     setCurrentBidId: (state, action) => {
       state.currentBidId = action.payload
     },
-    addBidHistories: (state, action) => {
+    addBidHistory: (state, { payload }: { payload: BidHistory }) => {
       if (state.bidHistories) {
-        state.bidHistories.items = [
-          ...state.bidHistories.items,
-          ...action.payload,
-        ]
+        const findBid = state.bidHistories.items.find(
+          (bid) => bid.id === payload.id
+        )
+        if (findBid) {
+          state.bidHistories.items = state.bidHistories.items.filter(
+            (bid) => bid.id !== payload.id
+          )
+          state.bidHistories.items = [payload, ...state.bidHistories.items]
+        } else {
+          state.bidHistories.items = [payload, ...state.bidHistories.items]
+        }
+      } else {
+        state.bidHistories = {
+          items: [payload],
+          pageNum: 1,
+          pageSize: 5,
+          totalItems: 1,
+          totalPages: 1,
+        }
       }
-    },
-    setBidHistories: (state, action) => {
-      state.bidHistories = action.payload
     },
   },
   extraReducers: (builder) => {
@@ -129,15 +141,16 @@ export const bidSlice = createSlice({
       fetchAuctionBidHistoriesAsync.fulfilled,
       (state, action) => {
         state.isBidHistoryLoading = false
-        if (state.bidHistories) {
-          state.bidHistories.items = [
-            ...state.bidHistories.items,
-            ...action.payload.items,
-          ]
-        } else {
-          state.bidHistories = action.payload
-        }
-        state.bidHistories.pageNum = action.payload.pageNum
+        // if (state.bidHistories) {
+        //   state.bidHistories.items = [
+        //     ...state.bidHistories.items,
+        //     ...action.payload.items,
+        //   ]
+        // } else {
+        //   state.bidHistories = action.payload
+        // }
+        // state.bidHistories.pageNum = action.payload.pageNum
+        state.bidHistories = action.payload
       }
     )
     builder.addCase(fetchAuctionBidHistoriesAsync.rejected, (state) => {
@@ -149,8 +162,7 @@ export const bidSlice = createSlice({
 const bidReducer = bidSlice.reducer
 export default bidReducer
 export const selectBid = (state: RootState) => state.bid
-export const { setCurrentBidId, addBidHistories, setBidHistories } =
-  bidSlice.actions
+export const { setCurrentBidId, addBidHistory } = bidSlice.actions
 
 export const placeBidAsync = createAsyncThunk(
   'bid/placeBidAsync',

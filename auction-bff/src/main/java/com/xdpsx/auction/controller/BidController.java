@@ -1,10 +1,7 @@
 package com.xdpsx.auction.controller;
 
 import com.xdpsx.auction.dto.PageResponse;
-import com.xdpsx.auction.dto.bid.BidAuctionDto;
-import com.xdpsx.auction.dto.bid.BidHistory;
-import com.xdpsx.auction.dto.bid.BidRequest;
-import com.xdpsx.auction.dto.bid.BidResponse;
+import com.xdpsx.auction.dto.bid.*;
 import com.xdpsx.auction.model.enums.BidStatus;
 import com.xdpsx.auction.security.CustomUserDetails;
 import com.xdpsx.auction.security.UserContext;
@@ -25,9 +22,9 @@ public class BidController {
     private final UserContext userContext;
 
     @PostMapping("/storefront/auctions/{auctionId}/bids")
-    ResponseEntity<BidResponse> placeBid(@PathVariable("auctionId") Long auctionId,
-                                         @Valid @RequestBody BidRequest bidRequest) {
-        BidResponse response = bidService.placeBid(auctionId, bidRequest);
+    ResponseEntity<BidResponseHistory> placeBid(@PathVariable("auctionId") Long auctionId,
+                                                @Valid @RequestBody BidRequest bidRequest) {
+        BidResponseHistory response = bidService.placeBid(auctionId, bidRequest);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
