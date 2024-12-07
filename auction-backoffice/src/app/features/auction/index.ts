@@ -1,9 +1,9 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { RootState } from '~/app/store'
 import { createAuctionAPI, fetchAllAuctionsAPI, fetchMyAuctionsAPI } from './service'
 import { Auction, AuctionPayload } from '~/app/features/auction/type'
 import { APIError } from '~/app/features/error/type'
 import { Page } from '~/app/features/page/type'
+import { getUserRole2 } from '~/utils/helper'
 
 export const fetchAllAuctions = createAsyncThunk(
   'auction/fetchAllAuctions',
@@ -18,8 +18,7 @@ export const fetchAllAuctions = createAsyncThunk(
     thunkAPI
   ) => {
     try {
-      const state = thunkAPI.getState() as RootState
-      const isAdmin = state.user.userRole === 'ADMIN'
+      const isAdmin = getUserRole2() === 'ADMIN'
       if (isAdmin) {
         const data = await fetchAllAuctionsAPI(pageNum, pageSize, keyword, sort, published)
         return data

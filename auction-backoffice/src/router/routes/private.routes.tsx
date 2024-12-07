@@ -6,6 +6,8 @@ import LoadingOverlay from '~/components/LoadingOverlay'
 import RoleProtected from '../guards/RoleProtected'
 import OrderList from '~/pages/order/OrderList'
 import WithdrawalList from '~/pages/withdrawal/WithdrawalList'
+import OrderDetailsPage from '~/pages/order/OrderDetailsPage'
+import NotFound from '~/pages/error/NotFound'
 
 const CategoriesList = lazy(() => import('~/pages/category/CategoriesList'))
 const Dashboard = lazy(() => import('~/pages/Dashboard'))
@@ -69,11 +71,11 @@ const privateRoutes = [
       },
       {
         path: '/orders/:status',
-        element: (
-          <RoleProtected roles={['SELLER']}>
-            <OrderList />
-          </RoleProtected>
-        )
+        element: <OrderList />
+      },
+      {
+        path: '/orders/details/:id',
+        element: <OrderDetailsPage />
       },
       {
         path: '/withdrawal',
@@ -92,6 +94,10 @@ const privateRoutes = [
         )
       }
     ]
+  },
+  {
+    path: '/not-found',
+    element: <NotFound />
   }
 ]
 

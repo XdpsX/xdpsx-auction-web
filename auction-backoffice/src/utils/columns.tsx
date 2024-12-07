@@ -37,6 +37,7 @@ export const sellerColumns = [
 ]
 
 export const orderColumns = [
+  { name: 'ID', uid: 'id' },
   { name: 'TRACKING NUMBER', uid: 'trackNumber', roles: ['ADMIN', 'SELLER'] },
   { name: 'AUCTION', uid: 'auction', roles: ['ADMIN', 'SELLER'] },
   {
@@ -51,8 +52,7 @@ export const orderColumns = [
 
 export const withdrawlsColumns = [
   { name: 'ID', uid: 'id' },
-  { name: 'BANK NAME', uid: 'bankName' },
-  { name: 'ACCOUNT NUMBER', uid: 'accountNumber' },
+  { name: 'BANK', uid: 'bankName' },
   {
     name: 'HOLDER NAME',
     uid: 'holderName'

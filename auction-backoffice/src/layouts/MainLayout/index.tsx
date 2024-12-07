@@ -11,7 +11,7 @@ export default function MainLayout() {
   const [isHidden, setIsHidden] = React.useState(false)
 
   return (
-    <div className='flex h-dvh w-full'>
+    <div className='flex h-screen w-full'>
       <aside
         className={cn(
           'relative bg-black/90 flex h-full w-72 max-w-[288px] flex-1 flex-col !border-r-small border-divider p-6 transition-[transform,opacity,margin] duration-250 ease-in-out',
@@ -25,7 +25,7 @@ export default function MainLayout() {
         </div>
         <Sidebar sidebarItems={sidebarItems} />
       </aside>
-      <div className='w-full flex-1 flex-col py-4 px-8 bg-background overflow-y-scroll'>
+      <div className='w-full flex-1 flex-col py-4 px-8 bg-background overflow-y-auto'>
         <MainHeader isHidden={isHidden} setIsHidden={setIsHidden} />
         <main className='mt-8 3xl:py-12 h-full w-full overflow-visible'>
           <div className='flex h-[90%] w-full flex-col gap-4 rounded-medium'>

@@ -65,9 +65,12 @@ function WithdrawalTable({ withdrawalPage, isLoading }: { withdrawalPage: Page<W
         case 'id':
           return <CopyText>{`${withdrawal.id}`}</CopyText>
         case 'bankName':
-          return <p className='text-sm'>{withdrawal.bankName}</p>
-        case 'accountNumber':
-          return <CopyText>{withdrawal.accountNumber}</CopyText>
+          return (
+            <div>
+              <CopyText className='text-base text-gray-800'>{withdrawal.accountNumber}</CopyText>
+              <p className='text-sm italic text-gray-600'>{withdrawal.bankName}</p>
+            </div>
+          )
         case 'holderName':
           return <p className='text-sm'>{withdrawal.holderName}</p>
         case 'status':

@@ -80,34 +80,39 @@ const sidebarItems: SidebarItem[] = [
     group: true,
     children: [
       {
-        key: 'list-orders',
-        title: 'List',
-        index: true,
-        roles: ['ADMIN']
-      },
-      {
         key: 'pending-orders',
         title: 'Pending Orders',
-        path: '/orders/Pending',
-        roles: ['SELLER']
+        path: '/orders/Pending'
       },
       {
         key: 'confirmed-orders',
         title: 'Confirmed Orders',
-        path: '/orders/Confirmed',
-        roles: ['SELLER']
+        path: '/orders/Confirmed'
       },
       {
         key: 'shipped-orders',
         title: 'Shipped Orders',
-        path: '/orders/Shipped',
-        roles: ['SELLER']
+        path: '/orders/Shipped'
       },
       {
         key: 'delivered-orders',
         title: 'Delivered Orders',
-        path: '/orders/Delivered',
-        roles: ['SELLER']
+        path: '/orders/Delivered'
+      },
+      {
+        key: 'completed-orders',
+        title: 'Completed Orders',
+        path: '/orders/Completed'
+      },
+      {
+        key: 'cancelled-orders',
+        title: 'Cancelled Orders',
+        path: '/orders/Cancelled'
+      },
+      {
+        key: 'returned-orders',
+        title: 'Returned Orders',
+        path: '/orders/Returned'
       }
     ]
   },

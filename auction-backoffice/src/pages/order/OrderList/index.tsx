@@ -1,6 +1,6 @@
 import { Key, useEffect, useMemo } from 'react'
-import { useParams } from 'react-router-dom'
-import { fetchMyOrdersAsync } from '~/app/features/order'
+import { useNavigate, useParams } from 'react-router-dom'
+import { fetchOrdersAsync } from '~/app/features/order'
 import { OrderStatus } from '~/app/features/order/type'
 import useAppDispatch from '~/app/hooks/useAppDispatch'
 import useAppSelector from '~/app/hooks/useAppSelector'
@@ -15,6 +15,7 @@ import { orderSortOptions } from '~/utils/data'
 
 function OrderList() {
   const { status } = useParams()
+  const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const {
     params: { pageNum, pageSize, keyword, published, sort },
@@ -26,7 +27,7 @@ function OrderList() {
 
   useEffect(() => {
     dispatch(
-      fetchMyOrdersAsync({
+      fetchOrdersAsync({
         pageNum: Number(pageNum),
         pageSize: Number(pageSize),
         keyword: keyword || null,
@@ -34,7 +35,11 @@ function OrderList() {
         status: (status as OrderStatus) || 'Pending'
       })
     )
-  }, [dispatch, published, keyword, pageNum, pageSize, sort, status])
+      .unwrap()
+      .catch(() => {
+        navigate('/not-found')
+      })
+  }, [dispatch, published, keyword, pageNum, pageSize, sort, status, navigate])
 
   const onClear = () => {
     setParams({ keyword: '', pageNum: 1 })

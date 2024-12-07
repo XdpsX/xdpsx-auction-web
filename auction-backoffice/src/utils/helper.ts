@@ -82,3 +82,14 @@ export const getUserRole = (accessToken: string): string => {
   if (roles.includes('ADMIN')) return 'ADMIN'
   return 'SELLER'
 }
+
+export const getUserRole2 = (): string => {
+  const accessToken = localStorage.getItem('accessToken') || ''
+  if (!accessToken) {
+    console.error('Access token not found')
+    window.location.href = '/login'
+  }
+  const roles = getRolesFromToken(accessToken)
+  if (roles.includes('ADMIN')) return 'ADMIN'
+  return 'SELLER'
+}

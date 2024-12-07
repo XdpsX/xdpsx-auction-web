@@ -112,6 +112,15 @@ function OrderDetailsPage() {
           )}
         </div>
       </div>
+
+      <div className="flex justify-center">
+        <button
+          onClick={() => navigate(-1)}
+          className="bg-gray-200 text-gray-800 px-4 py-2 text-lg"
+        >
+          Back
+        </button>
+      </div>
     </div>
   )
 }

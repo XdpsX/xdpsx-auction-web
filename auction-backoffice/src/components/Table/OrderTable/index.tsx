@@ -24,6 +24,7 @@ import { updateOrderStatusAsync } from '~/app/features/order'
 import { Order, OrderStatus } from '~/app/features/order/type'
 import { Page } from '~/app/features/page/type'
 import useAppDispatch from '~/app/hooks/useAppDispatch'
+import useAppSelector from '~/app/hooks/useAppSelector'
 import { CopyText } from '~/components/CopyText'
 import { orderColumns } from '~/utils/columns'
 import { getNextStatus, orderActions } from '~/utils/data'
@@ -41,6 +42,7 @@ function OrderTable({
   const actions = orderActions[status]
   const { isOpen, onOpen, onOpenChange } = useDisclosure()
   const dispatch = useAppDispatch()
+  const { userRole } = useAppSelector((state) => state.user)
   const [action, setAction] = useState('')
   const [orderId, setOrderId] = useState<number | null>(null)
 
@@ -66,6 +68,8 @@ function OrderTable({
   const renderCell = useCallback(
     (order: Order, columnKey: Key) => {
       switch (columnKey) {
+        case 'id':
+          return <CopyText>{`${order.id}`}</CopyText>
         case 'trackNumber':
           return <CopyText>{`${order.trackNumber}`}</CopyText>
         case 'auction':
@@ -100,12 +104,15 @@ function OrderTable({
             <div className='relative flex items-center justify-center gap-3'>
               {actions.includes('View') && (
                 <Tooltip content='Details'>
-                  <Link to='#' className='text-lg text-default-400 cursor-pointer active:opacity-50'>
+                  <Link
+                    to={`/orders/details/${order.id}`}
+                    className='text-lg text-default-400 cursor-pointer active:opacity-50'
+                  >
                     <Icon icon='solar:eye-outline' width={20} />
                   </Link>
                 </Tooltip>
               )}
-              {actions.includes('Update') && (
+              {actions.includes('Update') && userRole !== 'ADMIN' && (
                 <Tooltip content='Update Status'>
                   <Button
                     onClick={() => handleOpen('Update', order.id)}
@@ -117,7 +124,7 @@ function OrderTable({
                   </Button>
                 </Tooltip>
               )}
-              {actions.includes('Cancel') && (
+              {actions.includes('Cancel') && userRole !== 'ADMIN' && (
                 <Tooltip color='danger' content='Cancel'>
                   <Button
                     onClick={() => handleOpen('Cancel', order.id)}
@@ -135,7 +142,7 @@ function OrderTable({
           return null
       }
     },
-    [actions, handleOpen]
+    [actions, handleOpen, userRole]
   )
 
   return (
