@@ -1,6 +1,7 @@
 package com.xdpsx.auction.mapper;
 
 import com.xdpsx.auction.dto.bid.BidAuctionDto;
+import com.xdpsx.auction.dto.bid.BidHistory;
 import com.xdpsx.auction.dto.bid.BidResponse;
 import com.xdpsx.auction.model.Bid;
 import org.mapstruct.Mapper;
@@ -18,4 +19,7 @@ public interface BidMapper {
     @Mapping(target = "auction", source = "entity.auction")
     @Mapping(target = "canRefund", ignore = true)
     BidAuctionDto toBidAuctionDto(Bid entity);
+
+    @Mapping(target = "bidder", source = "entity.bidder")
+    BidHistory toBidHistory(Bid entity);
 }

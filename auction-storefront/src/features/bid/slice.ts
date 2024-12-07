@@ -1,9 +1,10 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { Bid, BidInfo, BidPayload } from '../../models/bid.type'
+import { Bid, BidHistory, BidInfo, BidPayload } from '../../models/bid.type'
 import { RootState } from '../../store/type'
 import { fromAxiosErrorToAPIErrorDetails } from '../../utils/error.helper'
 import { APIErrorDetails } from '../../models/error.type'
 import {
+  fetchAuctionBidHistoriesAPI,
   fetchMyBidsAPI,
   fetchMyWonBidAPI,
   getUserBidAPI,
@@ -17,8 +18,10 @@ export interface BidState {
   userBids: Page<BidInfo> | null
   currentBidId: number | null
   checkoutBid: BidInfo | null
+  bidHistories: Page<BidHistory> | null
   isLoading: boolean
   isProcessing: boolean
+  isBidHistoryLoading: boolean
   error: APIErrorDetails | null
 }
 
@@ -27,8 +30,10 @@ const initialState: BidState = {
   userBids: null,
   currentBidId: null,
   checkoutBid: null,
+  bidHistories: null,
   isLoading: false,
   isProcessing: false,
+  isBidHistoryLoading: false,
   error: null,
 }
 
@@ -38,6 +43,17 @@ export const bidSlice = createSlice({
   reducers: {
     setCurrentBidId: (state, action) => {
       state.currentBidId = action.payload
+    },
+    addBidHistories: (state, action) => {
+      if (state.bidHistories) {
+        state.bidHistories.items = [
+          ...state.bidHistories.items,
+          ...action.payload,
+        ]
+      }
+    },
+    setBidHistories: (state, action) => {
+      state.bidHistories = action.payload
     },
   },
   extraReducers: (builder) => {
@@ -105,13 +121,36 @@ export const bidSlice = createSlice({
     builder.addCase(fetchMyWonBidAsync.rejected, (state) => {
       state.isLoading = false
     })
+    // fetchAuctionBidHistoriesAsync
+    builder.addCase(fetchAuctionBidHistoriesAsync.pending, (state) => {
+      state.isBidHistoryLoading = true
+    })
+    builder.addCase(
+      fetchAuctionBidHistoriesAsync.fulfilled,
+      (state, action) => {
+        state.isBidHistoryLoading = false
+        if (state.bidHistories) {
+          state.bidHistories.items = [
+            ...state.bidHistories.items,
+            ...action.payload.items,
+          ]
+        } else {
+          state.bidHistories = action.payload
+        }
+        state.bidHistories.pageNum = action.payload.pageNum
+      }
+    )
+    builder.addCase(fetchAuctionBidHistoriesAsync.rejected, (state) => {
+      state.isBidHistoryLoading = false
+    })
   },
 })
 
 const bidReducer = bidSlice.reducer
 export default bidReducer
 export const selectBid = (state: RootState) => state.bid
-export const { setCurrentBidId } = bidSlice.actions
+export const { setCurrentBidId, addBidHistories, setBidHistories } =
+  bidSlice.actions
 
 export const placeBidAsync = createAsyncThunk(
   'bid/placeBidAsync',
@@ -182,6 +221,29 @@ export const fetchMyWonBidAsync = createAsyncThunk(
   async (bidId: number, thunkAPI) => {
     try {
       const data = await fetchMyWonBidAPI(bidId)
+      return data
+    } catch (error) {
+      return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))
+    }
+  }
+)
+
+export const fetchAuctionBidHistoriesAsync = createAsyncThunk(
+  'bid/fetchAuctionBidHistoriesAsync',
+  async (
+    {
+      auctionId,
+      pageNum,
+      pageSize,
+    }: { auctionId: number; pageNum: number; pageSize: number },
+    thunkAPI
+  ) => {
+    try {
+      const data = await fetchAuctionBidHistoriesAPI(
+        auctionId,
+        pageNum,
+        pageSize
+      )
       return data
     } catch (error) {
       return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))

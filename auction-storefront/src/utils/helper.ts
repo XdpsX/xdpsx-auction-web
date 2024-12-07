@@ -9,3 +9,7 @@ export const getRolesFromToken = (token: string): string[] => {
   const scope = decodedToken.scope
   return scope.split(' ')
 }
+
+export function classNames(...classes: string[]) {
+  return classes.filter(Boolean).join(' ')
+}

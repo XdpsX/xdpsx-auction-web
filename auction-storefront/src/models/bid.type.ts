@@ -27,3 +27,13 @@ export type BidInfo = {
   canRefund: boolean
   auction: AuctionInfo
 }
+
+export type BidHistory = {
+  id: number
+  amount: number
+  bidder: {
+    id: number
+    name: string
+  }
+  updatedAt: string
+}

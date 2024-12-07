@@ -4,14 +4,16 @@ import {
   DialogPanel,
   DialogTitle,
 } from '@headlessui/react'
+import cn from '../../utils/cn'
 
 interface ModalProps {
   open: boolean
   onClose: () => void
   title?: string
   children: React.ReactNode
+  modalClassName?: string
 }
-function Modal({ open, onClose, children, title }: ModalProps) {
+function Modal({ open, onClose, children, title, modalClassName }: ModalProps) {
   return (
     <Dialog
       open={open}
@@ -27,7 +29,10 @@ function Modal({ open, onClose, children, title }: ModalProps) {
         <div className="flex min-h-full items-center justify-center p-4">
           <DialogPanel
             transition
-            className="w-full max-w-md rounded-xl bg-white border p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0"
+            className={cn(
+              'w-full max-w-md rounded-xl bg-white border p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0',
+              modalClassName
+            )}
           >
             {title && (
               <DialogTitle as="h3" className="text-2xl font-medium text-black">

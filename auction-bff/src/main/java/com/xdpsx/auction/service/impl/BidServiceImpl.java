@@ -4,6 +4,7 @@ import com.xdpsx.auction.constant.BidConstants;
 import com.xdpsx.auction.constant.ErrorCode;
 import com.xdpsx.auction.dto.PageResponse;
 import com.xdpsx.auction.dto.bid.BidAuctionDto;
+import com.xdpsx.auction.dto.bid.BidHistory;
 import com.xdpsx.auction.dto.bid.BidRequest;
 import com.xdpsx.auction.dto.bid.BidResponse;
 import com.xdpsx.auction.dto.notification.NotificationRequest;
@@ -233,6 +234,17 @@ public class BidServiceImpl implements BidService {
         Bid bid = bidRepository.findByIdAndBidderAndStatus(bidId, userId, BidStatus.WON)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.BID_NOT_FOUND, bidId));
         return BidMapper.INSTANCE.toBidAuctionDto(bid);
+    }
+
+    @Override
+    public PageResponse<BidHistory> getAuctionBidHistories(Long auctionId, int pageNum, int pageSize) {
+        Auction auction = auctionRepository.findById(auctionId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.AUCTION_NOT_FOUND, auctionId));
+        if (auction.isSealedBidAuction()) {
+            throw new BadRequestException("Can not get bid histories of Sealed bid auction");
+        }
+        Page<Bid> bidPage = bidRepository.findByAuctionId(auctionId, PageRequest.of(pageNum - 1, pageSize, Sort.by("amount").descending()));
+        return PageMapper.toPageResponse(bidPage, BidMapper.INSTANCE::toBidHistory);
     }
 
 

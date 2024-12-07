@@ -2,6 +2,7 @@ package com.xdpsx.auction.controller;
 
 import com.xdpsx.auction.dto.PageResponse;
 import com.xdpsx.auction.dto.bid.BidAuctionDto;
+import com.xdpsx.auction.dto.bid.BidHistory;
 import com.xdpsx.auction.dto.bid.BidRequest;
 import com.xdpsx.auction.dto.bid.BidResponse;
 import com.xdpsx.auction.model.enums.BidStatus;
@@ -57,6 +58,16 @@ public class BidController {
     @GetMapping("/storefront/users/me/bids/won/{id}")
     ResponseEntity<BidAuctionDto> getMyWonBidDetails(@PathVariable Long id){
         BidAuctionDto response = bidService.getUserWonBidDetails(id, userContext.getLoggedUser().getId());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/public/auctions/{id}/bid-history")
+    ResponseEntity<PageResponse<BidHistory>> getAuctionBidHistories(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = PAGE_NUM, required = false) int pageNum,
+            @RequestParam(defaultValue = PAGE_SIZE, required = false) @Max(MAX_PAGE_SIZE) int pageSize
+    ){
+        PageResponse<BidHistory> response = bidService.getAuctionBidHistories(id, pageNum, pageSize);
         return ResponseEntity.ok(response);
     }
 }

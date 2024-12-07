@@ -20,8 +20,9 @@ function AuctionBid({ isAuctionEnded, auction, highestBid }: AuctionBidProps) {
   const isAuthenticated = !!userProfile
 
   useEffect(() => {
+    if (!userProfile) return
     dispatch(getUserBidAsync(auction.id))
-  }, [auction.id, dispatch])
+  }, [auction.id, dispatch, userProfile])
 
   if (isAuctionEnded) {
     return (

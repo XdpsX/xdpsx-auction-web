@@ -21,6 +21,7 @@ import AuctionImages from '../components/auction/AuctionImages'
 import SockJS from 'sockjs-client'
 import socketUrl from '../utils/socket'
 import LoadingOverlay from '../components/ui/LoadingOverlay'
+import BidHistories from '../components/bid/BidHistories'
 
 function AuctionDetailsPage() {
   const navigate = useNavigate()
@@ -152,6 +153,8 @@ function AuctionDetailsPage() {
           />
         </div>
       </div>
+
+      {auctionDetails.type === 'ENGLISH' && <BidHistories auctionId={id} />}
 
       <hr />
 

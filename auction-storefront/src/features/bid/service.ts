@@ -1,4 +1,4 @@
-import { Bid, BidInfo, BidPayload } from '../../models/bid.type'
+import { Bid, BidHistory, BidInfo, BidPayload } from '../../models/bid.type'
 import { Page } from '../../models/page.type'
 import api from '../../utils/api'
 
@@ -48,6 +48,23 @@ export const fetchMyBidsAPI = async (
 export const fetchMyWonBidAPI = async (bidId: number) => {
   const response = await api.get<BidInfo>(
     `/storefront/users/me/bids/won/${bidId}`
+  )
+  return response.data
+}
+
+export const fetchAuctionBidHistoriesAPI = async (
+  auctionId: number,
+  pageNum: number,
+  pageSize: number
+) => {
+  const response = await api.get<Page<BidHistory>>(
+    `/public/auctions/${auctionId}/bid-history`,
+    {
+      params: {
+        pageNum,
+        pageSize,
+      },
+    }
   )
   return response.data
 }

@@ -67,4 +67,7 @@ public interface BidRepository extends JpaRepository<Bid, Long>, JpaSpecificatio
 
     @Query("SELECT COUNT(b) FROM Bid b WHERE b.auction.id = :auctionId")
     long countBidsByAuctionId(@Param("auctionId") Long auctionId);
+
+    @Query("SELECT b FROM Bid b WHERE b.auction.id = :auctionId")
+    Page<Bid> findByAuctionId(@Param("auctionId") Long auctionId, Pageable pageable);
 }
