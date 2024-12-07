@@ -58,35 +58,35 @@ function OrderDetailsPage() {
         </div>
         <div className='md:grid md:grid-cols-4 gap-y-2 gap-x-3 items-center'>
           <span className='md:col-p-1 order-key'>Track number:</span>
-          <p className=' md:col-span-3 mb-4'>{orderDetails.trackNumber}</p>
+          <p className=' md:col-span-3 mb-4 md:mb-0'>{orderDetails.trackNumber}</p>
 
           <span className='md:col-span-1 order-key'>Total Amount:</span>
-          <p className='md:col-span-3 mb-4'>{formatPrice(orderDetails.totalAmount)}</p>
+          <p className='md:col-span-3 mb-4 md:mb-0'>{formatPrice(orderDetails.totalAmount)}</p>
 
           <span className='md:col-span-1 order-key'>Created At:</span>
-          <p className='md:col-span-3 mb-4'>{formatDateTime(orderDetails.createdAt)}</p>
+          <p className='md:col-span-3 mb-4 md:mb-0'>{formatDateTime(orderDetails.createdAt)}</p>
 
           <span className='md:col-span-1 order-key'>Updated At:</span>
-          <p className='md:col-span-3 mb-4'>{formatDateTime(orderDetails.updatedAt)}</p>
+          <p className='md:col-span-3 mb-4 md:mb-0'>{formatDateTime(orderDetails.updatedAt)}</p>
 
           <span className='md:col-span-1 order-key'>Recipient:</span>
-          <p className='md:col-span-3 mb-4'>{orderDetails.shippingInfo.recipient}</p>
+          <p className='md:col-span-3 mb-4 md:mb-0'>{orderDetails.shippingInfo.recipient}</p>
 
           <span className='md:col-span-1 order-key'>Shipping Info:</span>
-          <p className='md:col-span-3 mb-4'>
+          <p className='md:col-span-3 mb-4 md:mb-0'>
             {orderDetails.shippingInfo.mobileNumber} / {orderDetails.shippingInfo.shippingAddress}
           </p>
 
           <span className='md:col-span-1 order-key'>Status:</span>
-          <p className='md:col-span-3 mb-4 uppercase'>{orderDetails.status}</p>
+          <p className='md:col-span-3 mb-4 md:mb-0 uppercase'>{orderDetails.status}</p>
 
           <span className='md:col-span-1 order-key'>Payment Method:</span>
-          <p className='md:col-span-3 mb-4 uppercase'>{orderDetails.paymentMethod}</p>
+          <p className='md:col-span-3 mb-4 md:mb-0 uppercase'>{orderDetails.paymentMethod}</p>
 
           {(orderDetails.status === 'Cancelled' || orderDetails.status === 'Returned') && (
             <>
               <span className='md:col-span-1 order-key'>Reason:</span>
-              <p className='md:col-span-3 mb-4 '>{orderDetails.reason}</p>
+              <p className='md:col-span-3 mb-4 md:mb-0 '>{orderDetails.reason}</p>
             </>
           )}
 

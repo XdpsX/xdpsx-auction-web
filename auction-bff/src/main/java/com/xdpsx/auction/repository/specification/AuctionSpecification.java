@@ -19,6 +19,13 @@ public class AuctionSpecification extends AbstractSpecification<Auction> {
                 .and(getSortSpec(sort));
     }
 
+    public Specification<Auction> getTrashedAuctionsSpec(String name, String sort, Boolean published) {
+        return Specification.where(hasName(name))
+                .and(hasTrashed(true))
+                .and(hasPublished(published))
+                .and(getSortSpec(sort));
+    }
+
     public Specification<Auction> getUserAuctionsSpec(String name, String sort, Boolean published, Long userId) {
         return Specification.where(hasName(name))
                 .and(hasSeller(userId))

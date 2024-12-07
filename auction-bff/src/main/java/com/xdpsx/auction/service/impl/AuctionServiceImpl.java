@@ -3,8 +3,10 @@ package com.xdpsx.auction.service.impl;
 import com.xdpsx.auction.constant.ErrorCode;
 import com.xdpsx.auction.dto.PageResponse;
 import com.xdpsx.auction.dto.auction.*;
+import com.xdpsx.auction.dto.bid.BidResponse;
 import com.xdpsx.auction.exception.NotFoundException;
 import com.xdpsx.auction.mapper.AuctionMapper;
+import com.xdpsx.auction.mapper.BidMapper;
 import com.xdpsx.auction.mapper.PageMapper;
 import com.xdpsx.auction.model.*;
 import com.xdpsx.auction.model.enums.AuctionStatus;
@@ -40,6 +42,17 @@ public class AuctionServiceImpl implements AuctionService {
                                                               String sort, Boolean published) {
         Page<Auction> auctionPage = auctionRepository.findAll(
                 specification.getAllAuctionsSpec(keyword, sort, published),
+                PageRequest.of(pageNum - 1, pageSize)
+        );
+        return PageMapper.toPageResponse(auctionPage, AuctionMapper.INSTANCE::toAuctionSellerInfo);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Override
+    public PageResponse<AuctionSellerInfo> getAllTrashedAuctions(int pageNum, int pageSize, String keyword,
+                                                                 String sort, Boolean published) {
+        Page<Auction> auctionPage = auctionRepository.findAll(
+                specification.getTrashedAuctionsSpec(keyword, sort, published),
                 PageRequest.of(pageNum - 1, pageSize)
         );
         return PageMapper.toPageResponse(auctionPage, AuctionMapper.INSTANCE::toAuctionSellerInfo);
@@ -107,6 +120,35 @@ public class AuctionServiceImpl implements AuctionService {
                     .orElse(null);
         }
         return AuctionMapper.INSTANCE.toAuctionDetails(auction, highestBid);
+    }
+
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public AuctionDetailsGet getAuctionDetails(Long id) {
+        Auction auction = auctionRepository.findAuctionDetailsById(id)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.AUCTION_NOT_FOUND, id));
+        AuctionDetailsDto dto = AuctionMapper.INSTANCE.toAuctionDetailsDto(auction);
+        BidResponse highestBid = null;
+        if (auction.isEnglishAuction()){
+            Bid bid = bidRepository.findHighestBidByAuctionId(auction.getId())
+                    .orElse(null);
+            highestBid = BidMapper.INSTANCE.toResponse(bid);
+        }
+        return new AuctionDetailsGet(dto, highestBid);
+    }
+
+    @Override
+    public AuctionDetailsGet getSellerAuctionDetails(Long sellerId, Long auctionId) {
+        Auction auction = auctionRepository.findAuctionDetailsByIdAndSellerId(auctionId, sellerId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.AUCTION_NOT_FOUND, auctionId));
+        AuctionDetailsDto dto = AuctionMapper.INSTANCE.toSellerAuctionDetailsDto(auction);
+        BidResponse highestBid = null;
+        if (auction.isEnglishAuction()){
+            Bid bid = bidRepository.findHighestBidByAuctionId(auction.getId())
+                    .orElse(null);
+            highestBid = BidMapper.INSTANCE.toResponse(bid);
+        }
+        return new AuctionDetailsGet(dto, highestBid);
     }
 
     private Category findPublishedCategory(Integer categoryId){

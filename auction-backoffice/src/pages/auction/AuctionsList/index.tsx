@@ -8,7 +8,7 @@ import { publishedOptions, sortOptions } from '~/utils/data'
 import AddButton from '~/components/AddButton'
 import useAppDispatch from '~/app/hooks/useAppDispatch'
 import useAppSelector from '~/app/hooks/useAppSelector'
-import { fetchAllAuctions } from '~/app/features/auction'
+import { fetchAllAuctions, fetchTrashedAuctionsAsync } from '~/app/features/auction'
 import Search from '~/components/Search'
 import Filter from '~/components/Filter'
 import Sort from '~/components/Sort'
@@ -17,7 +17,7 @@ import { DEFAULT_PUBLISHED, DEFAULT_SORT } from '~/constants'
 import TableBottom from '~/components/Table/TableBottom'
 import AuctionTable from '~/components/Table/AuctionTable'
 
-function AuctionsList() {
+function AuctionsList({ page = 'list' }: { page?: 'list' | 'trashed' }) {
   const dispatch = useAppDispatch()
   const {
     params: { pageNum, pageSize, keyword, published, sort },
@@ -31,16 +31,29 @@ function AuctionsList() {
   const filteredSort = useMemo(() => sortOptions.find((option) => option.key === sort), [sort])
 
   useEffect(() => {
-    dispatch(
-      fetchAllAuctions({
-        pageNum: Number(pageNum),
-        pageSize: Number(pageSize),
-        keyword: keyword || null,
-        published: published === 'all' ? null : published === 'true' ? true : false,
-        sort: sort
-      })
-    )
-  }, [dispatch, published, keyword, pageNum, pageSize, sort])
+    if (page === 'list') {
+      dispatch(
+        fetchAllAuctions({
+          pageNum: Number(pageNum),
+          pageSize: Number(pageSize),
+          keyword: keyword || null,
+          published: published === 'all' ? null : published === 'true' ? true : false,
+          sort: sort
+        })
+      )
+    }
+    if (page === 'trashed') {
+      dispatch(
+        fetchTrashedAuctionsAsync({
+          pageNum: Number(pageNum),
+          pageSize: Number(pageSize),
+          keyword: keyword || null,
+          published: published === 'all' ? null : published === 'true' ? true : false,
+          sort: sort
+        })
+      )
+    }
+  }, [dispatch, published, keyword, pageNum, pageSize, sort, page])
 
   const onClear = () => {
     setParams({ keyword: '', pageNum: 1 })
@@ -122,7 +135,7 @@ function AuctionsList() {
         />
       </div>
 
-      <AuctionTable auctionPage={auctionPage} isLoading={isLoading} />
+      <AuctionTable auctionPage={auctionPage} isLoading={isLoading} page={page} />
 
       {auctionPage.items.length > 0 && (
         <TableBottom

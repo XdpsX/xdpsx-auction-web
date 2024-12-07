@@ -33,9 +33,15 @@ const sidebarItems: SidebarItem[] = [
       {
         key: 'auctions-list',
         title: 'List',
-        path: '/',
+        // path: '/',
         index: true,
         roles: ['ADMIN', 'SELLER']
+      },
+      {
+        key: 'auctions-trashed',
+        title: 'Trashed',
+        path: '/auctions/trashed',
+        roles: ['ADMIN']
       },
       {
         key: 'auctions-add',

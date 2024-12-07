@@ -27,4 +27,8 @@ public class AuctionImage {
         }
         return media.getUrl();
     }
+
+    public Long getId(){
+        return media.getId();
+    }
 }

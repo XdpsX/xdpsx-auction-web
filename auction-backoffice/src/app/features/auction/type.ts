@@ -1,5 +1,7 @@
 import * as yup from 'yup'
 import { SellerInfo } from '../seller/type'
+import { MediaDto } from '../media/type'
+import { BidInfo } from '../bid/type'
 
 export type Auction = {
   id: number
@@ -43,4 +45,27 @@ export type AuctionInfo = {
   name: string
   mainImage: string
   type: 'ENGLISH' | 'SEALED_BID'
+}
+
+export type AuctionDetails = {
+  id: number
+  name: string
+  description: string | null
+  startingPrice: number
+  stepPrice: number
+  startingTime: string
+  endingTime: string
+  type: 'ENGLISH' | 'SEALED_BID'
+  status: 'LIVE' | 'END' | 'COMPLETED' | 'NO_PAYMENT' | 'NO_BID'
+  trashed: boolean | null
+  published: boolean | null
+  mainImage: MediaDto
+  images: MediaDto[]
+  category: string
+  seller: SellerInfo
+}
+
+export type AuctionDetailsGet = {
+  auctionContent: AuctionDetails
+  highestBid: BidInfo | null
 }

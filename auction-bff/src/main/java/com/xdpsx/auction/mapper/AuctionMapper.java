@@ -47,6 +47,20 @@ public interface AuctionMapper {
     @Mapping(target = "seller", source = "entity.seller.sellerDetails")
     AuctionSellerInfo toAuctionSellerInfo(Auction entity);
 
+    @Mapping(target = "category", source = "entity.category.name")
+    @Mapping(target = "seller", source = "entity.seller.sellerDetails")
+    @Mapping(target = "images", source = "entity.images")
+    @Mapping(target = "mainImage", source = "entity.mainMedia")
+    AuctionDetailsDto toAuctionDetailsDto(Auction entity);
+
+    @Mapping(target = "category", source = "entity.category.name")
+    @Mapping(target = "seller", source = "entity.seller.sellerDetails")
+    @Mapping(target = "images", source = "entity.images")
+    @Mapping(target = "mainImage", source = "entity.mainMedia")
+    @Mapping(target = "trashed", expression = "java(null)")
+    @Mapping(target = "published", expression = "java(null)")
+    AuctionDetailsDto toSellerAuctionDetailsDto(Auction entity);
+
     default List<String> mapImages(List<AuctionImage> auctionImages) {
         return auctionImages.stream()
                 .map(AuctionImage::getUrl)

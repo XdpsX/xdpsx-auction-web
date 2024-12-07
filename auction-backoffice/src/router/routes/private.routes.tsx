@@ -8,6 +8,7 @@ import OrderList from '~/pages/order/OrderList'
 import WithdrawalList from '~/pages/withdrawal/WithdrawalList'
 import OrderDetailsPage from '~/pages/order/OrderDetailsPage'
 import NotFound from '~/pages/error/NotFound'
+import AuctionDetailsPage from '~/pages/auction/AuctionDetailsPage'
 
 const CategoriesList = lazy(() => import('~/pages/category/CategoriesList'))
 const Dashboard = lazy(() => import('~/pages/Dashboard'))
@@ -52,6 +53,18 @@ const privateRoutes = [
             <AuctionAdd />
           </RoleProtected>
         )
+      },
+      {
+        path: '/auctions/trashed',
+        element: (
+          <RoleProtected roles={['ADMIN']}>
+            <AuctionsList page='trashed' />
+          </RoleProtected>
+        )
+      },
+      {
+        path: '/auctions/details/:id',
+        element: <AuctionDetailsPage />
       },
       {
         path: '/sellers',

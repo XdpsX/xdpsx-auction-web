@@ -21,8 +21,17 @@ import { capitalize } from '~/utils/helper'
 import { Page } from '~/app/features/page/type'
 import useAppSelector from '~/app/hooks/useAppSelector'
 import { auctionColumns } from '~/utils/columns'
+import { Link } from 'react-router-dom'
 
-function AuctionTable({ auctionPage, isLoading }: { auctionPage: Page<Auction>; isLoading: boolean }) {
+function AuctionTable({
+  auctionPage,
+  isLoading,
+  page
+}: {
+  auctionPage: Page<Auction>
+  isLoading: boolean
+  page: 'list' | 'trashed'
+}) {
   const { userRole } = useAppSelector((state) => state.user)
 
   const filteredColumns = React.useMemo(
@@ -93,20 +102,27 @@ function AuctionTable({ auctionPage, isLoading }: { auctionPage: Page<Auction>; 
         return (
           <div className='relative flex items-center justify-center gap-2'>
             <Tooltip content='Details'>
-              <span className='text-lg text-default-400 cursor-pointer active:opacity-50'>
+              <Link
+                to={`/auctions/details/${auction.id}`}
+                className='text-lg text-default-400 cursor-pointer active:opacity-50'
+              >
                 <Icon icon='solar:eye-outline' height={18} width={18} />
-              </span>
+              </Link>
             </Tooltip>
-            <Tooltip content='Edit user'>
-              <span className='text-lg text-default-400 cursor-pointer active:opacity-50'>
-                <Icon icon='solar:pen-2-outline' height={18} width={18} />
-              </span>
-            </Tooltip>
-            <Tooltip color='danger' content='Delete user'>
-              <span className='text-lg text-danger cursor-pointer active:opacity-50'>
-                <Icon icon='solar:trash-bin-minimalistic-outline' height={18} width={18} />
-              </span>
-            </Tooltip>
+            {page !== 'trashed' && (
+              <>
+                <Tooltip content='Edit user'>
+                  <span className='text-lg text-default-400 cursor-pointer active:opacity-50'>
+                    <Icon icon='solar:pen-2-outline' height={18} width={18} />
+                  </span>
+                </Tooltip>
+                <Tooltip color='danger' content='Delete user'>
+                  <span className='text-lg text-danger cursor-pointer active:opacity-50'>
+                    <Icon icon='solar:trash-bin-minimalistic-outline' height={18} width={18} />
+                  </span>
+                </Tooltip>
+              </>
+            )}
           </div>
         )
       default:

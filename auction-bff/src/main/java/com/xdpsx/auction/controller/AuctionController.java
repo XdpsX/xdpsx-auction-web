@@ -4,6 +4,7 @@ import com.xdpsx.auction.dto.PageResponse;
 import com.xdpsx.auction.dto.auction.*;
 import com.xdpsx.auction.dto.error.ErrorDetailsDto;
 import com.xdpsx.auction.model.Media;
+import com.xdpsx.auction.security.UserContext;
 import com.xdpsx.auction.service.AuctionService;
 import com.xdpsx.auction.service.MediaService;
 import com.xdpsx.auction.validation.FileTypeConstraint;
@@ -31,6 +32,7 @@ import static org.springframework.http.MediaType.*;
 public class AuctionController {
     private final AuctionService auctionService;
     private final MediaService mediaService;
+    private final UserContext userContext;
 
     @GetMapping("/backoffice/auctions/all")
     ResponseEntity<PageResponse<AuctionSellerInfo>> getAllPageAuctions(
@@ -41,6 +43,19 @@ public class AuctionController {
             @RequestParam(required = false) Boolean published
     ) {
         PageResponse<AuctionSellerInfo> response = auctionService.getAllPageAuctions(pageNum, pageSize,
+                keyword, sort, published);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/backoffice/auctions/trashed")
+    ResponseEntity<PageResponse<AuctionSellerInfo>> getAllTrashedAuctions(
+            @RequestParam(defaultValue = PAGE_NUM, required = false) int pageNum,
+            @RequestParam(defaultValue = PAGE_SIZE, required = false) @Max(MAX_PAGE_SIZE) int pageSize,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String sort,
+            @RequestParam(required = false) Boolean published
+    ) {
+        PageResponse<AuctionSellerInfo> response = auctionService.getAllTrashedAuctions(pageNum, pageSize,
                 keyword, sort, published);
         return ResponseEntity.ok(response);
     }
@@ -94,6 +109,19 @@ public class AuctionController {
             @PathVariable Long id
     ) {
         AuctionDetails response = auctionService.getPublishedAuction(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("backoffice/auctions/{id}")
+    ResponseEntity<AuctionDetailsGet> getAuctionDetails(@PathVariable Long id) {
+        AuctionDetailsGet response = auctionService.getAuctionDetails(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("backoffice/seller/auctions/{id}")
+    ResponseEntity<AuctionDetailsGet> getSellerAuctionDetails(@PathVariable Long id) {
+        AuctionDetailsGet response = auctionService.getSellerAuctionDetails(
+                userContext.getLoggedUser().getId(), id);
         return ResponseEntity.ok(response);
     }
 

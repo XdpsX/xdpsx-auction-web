@@ -32,11 +32,11 @@ public class MediaController {
 //        return ResponseEntity.ok(media);
 //    }
 //
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<?> deleteFile(@PathVariable Long id){
-//        mediaService.deleteMedia(id);
-//        return ResponseEntity.noContent().build();
-//    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteFile(@PathVariable Long id){
+        mediaService.deleteMedia(id);
+        return ResponseEntity.noContent().build();
+    }
 //
 //    @GetMapping("/{id}")
 //    public ResponseEntity<?> getMediaUrlById(@PathVariable Long id){
