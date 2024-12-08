@@ -3,6 +3,7 @@ export type FilterItemType = {
   label: string
   allOptions: FilterOptionType[]
   value: string
+  exceptRole?: string
 }
 
 export type FilterOptionType = {

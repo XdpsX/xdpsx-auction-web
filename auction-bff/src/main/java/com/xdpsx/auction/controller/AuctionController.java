@@ -4,6 +4,8 @@ import com.xdpsx.auction.dto.PageResponse;
 import com.xdpsx.auction.dto.auction.*;
 import com.xdpsx.auction.dto.error.ErrorDetailsDto;
 import com.xdpsx.auction.model.Media;
+import com.xdpsx.auction.model.enums.AuctionStatus;
+import com.xdpsx.auction.model.enums.AuctionType;
 import com.xdpsx.auction.security.UserContext;
 import com.xdpsx.auction.service.AuctionService;
 import com.xdpsx.auction.service.MediaService;
@@ -40,10 +42,13 @@ public class AuctionController {
             @RequestParam(defaultValue = PAGE_SIZE, required = false) @Max(MAX_PAGE_SIZE) int pageSize,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String sort,
-            @RequestParam(required = false) Boolean published
+            @RequestParam(required = false) Boolean published,
+            @RequestParam(required = false) AuctionType type,
+            @RequestParam(required = false) AuctionStatus status,
+            @RequestParam(required = false) AuctionTime time
     ) {
         PageResponse<AuctionSellerInfo> response = auctionService.getAllPageAuctions(pageNum, pageSize,
-                keyword, sort, published);
+                keyword, sort, published, type, status, time);
         return ResponseEntity.ok(response);
     }
 
@@ -53,10 +58,13 @@ public class AuctionController {
             @RequestParam(defaultValue = PAGE_SIZE, required = false) @Max(MAX_PAGE_SIZE) int pageSize,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String sort,
-            @RequestParam(required = false) Boolean published
+            @RequestParam(required = false) Boolean published,
+            @RequestParam(required = false) AuctionType type,
+            @RequestParam(required = false) AuctionStatus status,
+            @RequestParam(required = false) AuctionTime time
     ) {
         PageResponse<AuctionSellerInfo> response = auctionService.getAllTrashedAuctions(pageNum, pageSize,
-                keyword, sort, published);
+                keyword, sort, published, type, status, time);
         return ResponseEntity.ok(response);
     }
 
@@ -66,10 +74,12 @@ public class AuctionController {
             @RequestParam(defaultValue = PAGE_SIZE, required = false) @Max(MAX_PAGE_SIZE) int pageSize,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String sort,
-            @RequestParam(required = false) Boolean published
+            @RequestParam(required = false) AuctionType type,
+            @RequestParam(required = false) AuctionStatus status,
+            @RequestParam(required = false) AuctionTime time
     ) {
         PageResponse<AuctionDto> response = auctionService.getCurrentUserAuctions(pageNum, pageSize,
-                keyword, sort, published);
+                keyword, sort, type, status, time);
         return ResponseEntity.ok(response);
     }
 

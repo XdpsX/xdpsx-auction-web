@@ -1,10 +1,14 @@
 package com.xdpsx.auction.repository.specification;
 
+import com.xdpsx.auction.dto.auction.AuctionTime;
 import com.xdpsx.auction.model.Auction;
+import com.xdpsx.auction.model.enums.AuctionStatus;
+import com.xdpsx.auction.model.enums.AuctionType;
 import jakarta.persistence.criteria.Order;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
 import static com.xdpsx.auction.constant.PageConstant.*;
@@ -12,26 +16,38 @@ import static com.xdpsx.auction.constant.PageConstant.*;
 @Component
 public class AuctionSpecification extends AbstractSpecification<Auction> {
 
-    public Specification<Auction> getAllAuctionsSpec(String name, String sort, Boolean published) {
+    public Specification<Auction> getAllAuctionsSpec(String name, String sort, Boolean published,
+                                                     AuctionType type, AuctionStatus status, AuctionTime time) {
         return Specification.where(hasName(name))
                 .and(hasTrashed(false))
                 .and(hasPublished(published))
-                .and(getSortSpec(sort));
+                .and(getSortSpec(sort))
+                .and(hasType(type))
+                .and(hasStatus(status))
+                .and(hasAuctionTime(time));
     }
 
-    public Specification<Auction> getTrashedAuctionsSpec(String name, String sort, Boolean published) {
+    public Specification<Auction> getTrashedAuctionsSpec(String name, String sort, Boolean published,
+                                                         AuctionType type, AuctionStatus status, AuctionTime time) {
         return Specification.where(hasName(name))
                 .and(hasTrashed(true))
                 .and(hasPublished(published))
-                .and(getSortSpec(sort));
+                .and(getSortSpec(sort))
+                .and(hasType(type))
+                .and(hasStatus(status))
+                .and(hasAuctionTime(time));
     }
 
-    public Specification<Auction> getUserAuctionsSpec(String name, String sort, Boolean published, Long userId) {
+    public Specification<Auction> getUserAuctionsSpec(String name, String sort, Long userId,
+                                                      AuctionType type, AuctionStatus status, AuctionTime time) {
         return Specification.where(hasName(name))
                 .and(hasSeller(userId))
                 .and(hasTrashed(false))
-                .and(hasPublished(published))
-                .and(getSortSpec(sort));
+                .and(hasPublished(true))
+                .and(getSortSpec(sort))
+                .and(hasType(type))
+                .and(hasStatus(status))
+                .and(hasAuctionTime(time));
     }
 
     public Specification<Auction> getCategoryAuctionsSpec(Integer categoryId) {
@@ -61,6 +77,50 @@ public class AuctionSpecification extends AbstractSpecification<Auction> {
         return (root, query, criteriaBuilder) -> {
             if (categoryId == null) return criteriaBuilder.conjunction();
             return criteriaBuilder.equal(root.get("category").get("id"), categoryId);
+        };
+    }
+
+    private Specification<Auction> hasType(AuctionType type) {
+        return (root, query, criteriaBuilder) -> {
+            if (type == null) return criteriaBuilder.conjunction();
+            return criteriaBuilder.equal(root.get("type"), type);
+        };
+    }
+
+    private Specification<Auction> hasStatus(AuctionStatus status) {
+        return (root, query, criteriaBuilder) -> {
+            if (status == null) return criteriaBuilder.conjunction();
+            return criteriaBuilder.equal(root.get("status"), status);
+        };
+    }
+
+    private Specification<Auction> hasStartingPriceBetween(BigDecimal startingPriceFrom, BigDecimal startingPriceTo) {
+        return (root, query, criteriaBuilder) -> {
+            if (startingPriceFrom == null && startingPriceTo == null) return criteriaBuilder.conjunction();
+            if (startingPriceFrom != null && startingPriceTo != null) {
+                return criteriaBuilder.between(root.get("startingPrice"), startingPriceFrom, startingPriceTo);
+            }
+            if (startingPriceFrom != null) {
+                return criteriaBuilder.greaterThanOrEqualTo(root.get("startingPrice"), startingPriceFrom);
+            }
+            return criteriaBuilder.lessThanOrEqualTo(root.get("startingPrice"), startingPriceTo);
+        };
+    }
+
+    private Specification<Auction> hasAuctionTime(AuctionTime auctionTime) {
+        return (root, query, criteriaBuilder) -> {
+            if (auctionTime == null) return criteriaBuilder.conjunction();
+
+            ZonedDateTime now = ZonedDateTime.now();
+            return switch (auctionTime) {
+                case UPCOMING -> criteriaBuilder.greaterThan(root.get("startingTime"), now);
+                case LIVE -> criteriaBuilder.and(
+                        criteriaBuilder.lessThanOrEqualTo(root.get("startingTime"), now),
+                        criteriaBuilder.greaterThanOrEqualTo(root.get("endingTime"), now)
+                );
+                case END -> criteriaBuilder.lessThan(root.get("endingTime"), now);
+                default -> criteriaBuilder.conjunction();
+            };
         };
     }
 

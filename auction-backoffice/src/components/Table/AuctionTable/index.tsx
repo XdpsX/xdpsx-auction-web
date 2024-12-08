@@ -39,96 +39,99 @@ function AuctionTable({
     [userRole]
   )
 
-  const renderCell = React.useCallback((auction: Auction, columnKey: Key) => {
-    switch (columnKey) {
-      case 'id':
-        return <CopyText>{`${auction.id}`}</CopyText>
-      case 'image':
-        return (
-          <img
-            className='w-10 h-10 object-cover'
-            src={auction.mainImage || 'https://i.pravatar.cc/150?u=a042581f4e29026024d'}
-          />
-        )
-      case 'name':
-        return <p className='text-bold text-sm capitalize max-w-[140px] truncate'>{auction.name}</p>
-      case 'price':
-        return <p className='text-sm'>{formatPrice(auction.startingPrice)}</p>
-      case 'published':
-        return <Switch isSelected={auction.published} />
-      case 'status': {
-        const now = new Date()
-        const content = (
-          <div>
-            <p>
-              <span className='font-semibold'>Starting time:</span> {formatDateTime(auction.startingTime)}
-            </p>
-            <p>
-              <span className='font-semibold'>Ending time:</span> {formatDateTime(auction.endingTime)}
-            </p>
-          </div>
-        )
-        if (now < new Date(auction.startingTime)) {
-          return <Status status='Upcoming' content={content} />
-        } else if (now < new Date(auction.endingTime)) {
-          return <Status status='Live' content={content} />
-        } else {
-          return <Status status='Ended' content={content} />
+  const renderCell = React.useCallback(
+    (auction: Auction, columnKey: Key) => {
+      switch (columnKey) {
+        case 'id':
+          return <CopyText>{`${auction.id}`}</CopyText>
+        case 'image':
+          return (
+            <img
+              className='w-10 h-10 object-cover'
+              src={auction.mainImage || 'https://i.pravatar.cc/150?u=a042581f4e29026024d'}
+            />
+          )
+        case 'name':
+          return <p className='text-bold text-sm capitalize max-w-[140px] truncate'>{auction.name}</p>
+        case 'price':
+          return <p className='text-sm'>{formatPrice(auction.startingPrice)}</p>
+        case 'published':
+          return <Switch isSelected={auction.published} />
+        case 'status': {
+          const now = new Date()
+          const content = (
+            <div>
+              <p>
+                <span className='font-semibold'>Starting time:</span> {formatDateTime(auction.startingTime)}
+              </p>
+              <p>
+                <span className='font-semibold'>Ending time:</span> {formatDateTime(auction.endingTime)}
+              </p>
+            </div>
+          )
+          if (now < new Date(auction.startingTime)) {
+            return <Status status='Upcoming' content={content} />
+          } else if (now < new Date(auction.endingTime)) {
+            return <Status status='Live' content={content} />
+          } else {
+            return <Status status='Ended' content={content} />
+          }
         }
-      }
-      case 'type':
-        return auction.type === 'ENGLISH' ? (
-          <Chip className='bg-green-500/90'>{capitalize(auction.type)}</Chip>
-        ) : (
-          <Chip color='warning' className='dark:text-white'>
-            {capitalize(auction.type)}
-          </Chip>
-        )
-      case 'seller':
-        if (!auction.seller) return null
+        case 'type':
+          return auction.type === 'ENGLISH' ? (
+            <Chip className='bg-green-500/90'>{capitalize(auction.type)}</Chip>
+          ) : (
+            <Chip color='warning' className='dark:text-white'>
+              {capitalize(auction.type)}
+            </Chip>
+          )
+        case 'seller':
+          if (!auction.seller) return null
 
-        return (
-          <User
-            avatarProps={{ radius: 'lg', src: auction.seller.avatarUrl }}
-            // description={auction[columnKey].name}
-            name={auction[columnKey]?.name}
-          >
-            {auction.seller.name}
-          </User>
-        )
-      case 'category':
-        return <p className='text-sm'>{auction.category}</p>
-      case 'actions':
-        return (
-          <div className='relative flex items-center justify-center gap-2'>
-            <Tooltip content='Details'>
-              <Link
-                to={`/auctions/details/${auction.id}`}
-                className='text-lg text-default-400 cursor-pointer active:opacity-50'
-              >
-                <Icon icon='solar:eye-outline' height={18} width={18} />
-              </Link>
-            </Tooltip>
-            {page !== 'trashed' && (
-              <>
-                <Tooltip content='Edit user'>
-                  <span className='text-lg text-default-400 cursor-pointer active:opacity-50'>
-                    <Icon icon='solar:pen-2-outline' height={18} width={18} />
-                  </span>
-                </Tooltip>
-                <Tooltip color='danger' content='Delete user'>
-                  <span className='text-lg text-danger cursor-pointer active:opacity-50'>
-                    <Icon icon='solar:trash-bin-minimalistic-outline' height={18} width={18} />
-                  </span>
-                </Tooltip>
-              </>
-            )}
-          </div>
-        )
-      default:
-        return null
-    }
-  }, [])
+          return (
+            <User
+              avatarProps={{ radius: 'lg', src: auction.seller.avatarUrl }}
+              // description={auction[columnKey].name}
+              name={auction[columnKey]?.name}
+            >
+              {auction.seller.name}
+            </User>
+          )
+        case 'category':
+          return <p className='text-sm'>{auction.category}</p>
+        case 'actions':
+          return (
+            <div className='relative flex items-center justify-center gap-2'>
+              <Tooltip content='Details'>
+                <Link
+                  to={`/auctions/details/${auction.id}`}
+                  className='text-lg text-default-400 cursor-pointer active:opacity-50'
+                >
+                  <Icon icon='solar:eye-outline' height={18} width={18} />
+                </Link>
+              </Tooltip>
+              {page !== 'trashed' && (
+                <>
+                  <Tooltip content='Edit user'>
+                    <span className='text-lg text-default-400 cursor-pointer active:opacity-50'>
+                      <Icon icon='solar:pen-2-outline' height={18} width={18} />
+                    </span>
+                  </Tooltip>
+                  <Tooltip color='danger' content='Delete user'>
+                    <span className='text-lg text-danger cursor-pointer active:opacity-50'>
+                      <Icon icon='solar:trash-bin-minimalistic-outline' height={18} width={18} />
+                    </span>
+                  </Tooltip>
+                </>
+              )}
+            </div>
+          )
+        default:
+          return null
+      }
+    },
+    [page]
+  )
 
   return (
     <Table aria-label='Auctions Table'>

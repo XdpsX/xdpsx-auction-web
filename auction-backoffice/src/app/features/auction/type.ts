@@ -40,11 +40,15 @@ export const auctionSchema = yup.object().shape({
 
 export type AuctionPayload = yup.InferType<typeof auctionSchema>
 
+export type AuctionType = 'ENGLISH' | 'SEALED_BID'
+export type AuctionStatus = 'LIVE' | 'END' | 'COMPLETED' | 'NO_PAYMENT' | 'NO_BID'
+export type AuctionTime = 'UPCOMING' | 'LIVE' | 'END'
+
 export type AuctionInfo = {
   id: number
   name: string
   mainImage: string
-  type: 'ENGLISH' | 'SEALED_BID'
+  type: AuctionType
 }
 
 export type AuctionDetails = {
@@ -55,8 +59,8 @@ export type AuctionDetails = {
   stepPrice: number
   startingTime: string
   endingTime: string
-  type: 'ENGLISH' | 'SEALED_BID'
-  status: 'LIVE' | 'END' | 'COMPLETED' | 'NO_PAYMENT' | 'NO_BID'
+  type: AuctionType
+  status: AuctionStatus
   trashed: boolean | null
   published: boolean | null
   mainImage: MediaDto

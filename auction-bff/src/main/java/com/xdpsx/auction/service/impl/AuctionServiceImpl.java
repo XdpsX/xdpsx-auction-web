@@ -10,6 +10,7 @@ import com.xdpsx.auction.mapper.BidMapper;
 import com.xdpsx.auction.mapper.PageMapper;
 import com.xdpsx.auction.model.*;
 import com.xdpsx.auction.model.enums.AuctionStatus;
+import com.xdpsx.auction.model.enums.AuctionType;
 import com.xdpsx.auction.repository.AuctionRepository;
 import com.xdpsx.auction.repository.BidRepository;
 import com.xdpsx.auction.repository.CategoryRepository;
@@ -39,9 +40,10 @@ public class AuctionServiceImpl implements AuctionService {
     @PreAuthorize("hasRole('ADMIN')")
     @Override
     public PageResponse<AuctionSellerInfo> getAllPageAuctions(int pageNum, int pageSize, String keyword,
-                                                              String sort, Boolean published) {
+                                                              String sort, Boolean published,
+                                                              AuctionType type, AuctionStatus status, AuctionTime time) {
         Page<Auction> auctionPage = auctionRepository.findAll(
-                specification.getAllAuctionsSpec(keyword, sort, published),
+                specification.getAllAuctionsSpec(keyword, sort, published, type, status, time),
                 PageRequest.of(pageNum - 1, pageSize)
         );
         return PageMapper.toPageResponse(auctionPage, AuctionMapper.INSTANCE::toAuctionSellerInfo);
@@ -50,20 +52,21 @@ public class AuctionServiceImpl implements AuctionService {
     @PreAuthorize("hasRole('ADMIN')")
     @Override
     public PageResponse<AuctionSellerInfo> getAllTrashedAuctions(int pageNum, int pageSize, String keyword,
-                                                                 String sort, Boolean published) {
+                                                                 String sort, Boolean published,
+                                                                 AuctionType type, AuctionStatus status, AuctionTime time) {
         Page<Auction> auctionPage = auctionRepository.findAll(
-                specification.getTrashedAuctionsSpec(keyword, sort, published),
+                specification.getTrashedAuctionsSpec(keyword, sort, published, type, status, time),
                 PageRequest.of(pageNum - 1, pageSize)
         );
         return PageMapper.toPageResponse(auctionPage, AuctionMapper.INSTANCE::toAuctionSellerInfo);
     }
 
     @Override
-    public PageResponse<AuctionDto> getCurrentUserAuctions(int pageNum, int pageSize, String keyword,
-                                                           String sort, Boolean published) {
+    public PageResponse<AuctionDto> getCurrentUserAuctions(int pageNum, int pageSize, String keyword, String sort,
+                                                           AuctionType type, AuctionStatus status, AuctionTime time) {
         CustomUserDetails user = userContext.getLoggedUser();
         Page<Auction> auctionPage = auctionRepository.findAll(
-                specification.getUserAuctionsSpec(keyword, sort, published, user.getId()),
+                specification.getUserAuctionsSpec(keyword, sort, user.getId(), type, status, time),
                 PageRequest.of(pageNum - 1, pageSize)
         );
         return PageMapper.toPageResponse(auctionPage, AuctionMapper.INSTANCE::toDto);

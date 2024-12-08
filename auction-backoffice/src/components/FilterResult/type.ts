@@ -3,4 +3,5 @@ export type FilterResultItem = {
   title: string
   exceptKey?: string
   onClear: () => void
+  exceptRole?: string
 }

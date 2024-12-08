@@ -7,6 +7,28 @@ export const publishedOptions: SelectItemType[] = [
   { key: 'false', title: 'Unpublished' }
 ]
 
+export const auctionTypeOptions: SelectItemType[] = [
+  { key: 'all', title: 'All' },
+  { key: 'ENGLISH', title: 'English' },
+  { key: 'SEALED_BID', title: 'Sealed_Bid' }
+]
+
+export const auctionStatusOptions: SelectItemType[] = [
+  { key: 'all', title: 'All' },
+  { key: 'LIVE', title: 'Live' },
+  { key: 'END', title: 'End' },
+  { key: 'COMPLETED', title: 'Completed' },
+  { key: 'NO_PAYMENT', title: 'No Payment' },
+  { key: 'NO_BID', title: 'No Bid' }
+]
+
+export const auctionTimeOptions: SelectItemType[] = [
+  { key: 'all', title: 'All' },
+  { key: 'UPCOMING', title: 'Upcoming' },
+  { key: 'LIVE', title: 'Live' },
+  { key: 'END', title: 'End' }
+]
+
 export const sortOptions = [
   { title: 'Newest', key: '-date' },
   { title: 'Oldest', key: 'date' },

@@ -7,7 +7,14 @@ import {
   fetchSellerAuctionDetailsAPI,
   fetchTrashedAuctionsAPI
 } from './service'
-import { Auction, AuctionDetailsGet, AuctionPayload } from '~/app/features/auction/type'
+import {
+  Auction,
+  AuctionDetailsGet,
+  AuctionPayload,
+  AuctionStatus,
+  AuctionTime,
+  AuctionType
+} from '~/app/features/auction/type'
 import { APIError } from '~/app/features/error/type'
 import { Page } from '~/app/features/page/type'
 import { getUserRole2 } from '~/utils/helper'
@@ -20,17 +27,29 @@ export const fetchAllAuctions = createAsyncThunk(
       pageSize,
       keyword,
       sort,
-      published
-    }: { pageNum: number; pageSize: number; keyword: string | null; sort: string | null; published: boolean | null },
+      published,
+      type,
+      status,
+      time
+    }: {
+      pageNum: number
+      pageSize: number
+      keyword: string | null
+      sort: string | null
+      published: boolean | null
+      type: AuctionType | null
+      status: AuctionStatus | null
+      time: AuctionTime | null
+    },
     thunkAPI
   ) => {
     try {
       const isAdmin = getUserRole2() === 'ADMIN'
       if (isAdmin) {
-        const data = await fetchAllAuctionsAPI(pageNum, pageSize, keyword, sort, published)
+        const data = await fetchAllAuctionsAPI(pageNum, pageSize, keyword, sort, published, type, status, time)
         return data
       } else {
-        const data = await fetchMyAuctionsAPI(pageNum, pageSize, keyword, sort, published)
+        const data = await fetchMyAuctionsAPI(pageNum, pageSize, keyword, sort, type, status, time)
         return data
       }
     } catch (error) {
@@ -47,12 +66,24 @@ export const fetchTrashedAuctionsAsync = createAsyncThunk(
       pageSize,
       keyword,
       sort,
-      published
-    }: { pageNum: number; pageSize: number; keyword: string | null; sort: string | null; published: boolean | null },
+      published,
+      type,
+      status,
+      time
+    }: {
+      pageNum: number
+      pageSize: number
+      keyword: string | null
+      sort: string | null
+      published: boolean | null
+      type: AuctionType | null
+      status: AuctionStatus | null
+      time: AuctionTime | null
+    },
     thunkAPI
   ) => {
     try {
-      const data = await fetchTrashedAuctionsAPI(pageNum, pageSize, keyword, sort, published)
+      const data = await fetchTrashedAuctionsAPI(pageNum, pageSize, keyword, sort, published, type, status, time)
       return data
     } catch (error) {
       return thunkAPI.rejectWithValue(error)

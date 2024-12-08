@@ -14,7 +14,6 @@ import com.xdpsx.auction.model.Wallet;
 import com.xdpsx.auction.model.enums.TransactionType;
 import com.xdpsx.auction.repository.TransactionRepository;
 import com.xdpsx.auction.repository.WalletRepository;
-import com.xdpsx.auction.security.UserContext;
 import com.xdpsx.auction.service.TransactionService;
 import com.xdpsx.auction.service.producer.TransactionProducer;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,6 @@ import java.math.BigDecimal;
 @Service
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
-    private final UserContext userContext;
     private final WalletRepository walletRepository;
     private final TransactionRepository transactionRepository;
     private final TransactionProducer transactionProducer;

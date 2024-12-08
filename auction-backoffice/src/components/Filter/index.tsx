@@ -6,9 +6,10 @@ import { useEffect, useState, useMemo, useCallback } from 'react'
 interface FilterProps {
   items: FilterItemType[]
   onFilterChange: (values: FilterItemKeyValue) => void
+  userRole?: string | null
 }
 
-function Filter({ items, onFilterChange }: FilterProps) {
+function Filter({ items, onFilterChange, userRole }: FilterProps) {
   const initialValues = useMemo(() => {
     return items.reduce((acc, item) => {
       acc[item.key] = item.value
@@ -53,22 +54,27 @@ function Filter({ items, onFilterChange }: FilterProps) {
         </Button>
       </PopoverTrigger>
       <PopoverContent className='w-80'>
-        <div className='flex w-full flex-col gap-6 px-2 py-4 mb-4'>
-          {items.map((item) => (
-            <RadioGroup
-              size='sm'
-              key={item.key}
-              label={item.label}
-              value={selectedValues[item.key]}
-              onValueChange={(value) => handleValueChange(item.key, value)}
-            >
-              {item.allOptions.map((option) => (
-                <Radio key={option.key} value={option.key}>
-                  {option.title}
-                </Radio>
-              ))}
-            </RadioGroup>
-          ))}
+        <div className='grid w-full grid-cols-2 gap-x-6 gap-y-4 px-2 py-4 mb-4'>
+          {items.map((item) => {
+            if (item.exceptRole && userRole && item.exceptRole === userRole) {
+              return null
+            }
+            return (
+              <RadioGroup
+                size='sm'
+                key={item.key}
+                label={item.label}
+                value={selectedValues[item.key]}
+                onValueChange={(value) => handleValueChange(item.key, value)}
+              >
+                {item.allOptions.map((option) => (
+                  <Radio key={option.key} value={option.key}>
+                    {option.title}
+                  </Radio>
+                ))}
+              </RadioGroup>
+            )
+          })}
         </div>
         <div className='pb-2'>
           <Button color='secondary' radius='sm' onPress={handleFilter}>

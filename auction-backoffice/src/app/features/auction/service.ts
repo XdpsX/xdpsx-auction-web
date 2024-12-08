@@ -1,4 +1,11 @@
-import { Auction, AuctionDetailsGet, AuctionPayload } from '~/app/features/auction/type'
+import {
+  Auction,
+  AuctionDetailsGet,
+  AuctionPayload,
+  AuctionStatus,
+  AuctionTime,
+  AuctionType
+} from '~/app/features/auction/type'
 import { Page } from '~/app/features/page/type'
 import api from '~/utils/api'
 import { Media } from '../media/type'
@@ -8,7 +15,10 @@ export const fetchAllAuctionsAPI = async (
   pageSize: number,
   keyword: string | null,
   sort: string | null,
-  published?: boolean | null
+  published: boolean | null,
+  type: AuctionType | null,
+  status: AuctionStatus | null,
+  time: AuctionTime | null
 ): Promise<Page<Auction>> => {
   const response = await api.get<Page<Auction>>('/backoffice/auctions/all', {
     params: {
@@ -16,7 +26,10 @@ export const fetchAllAuctionsAPI = async (
       pageSize,
       keyword,
       sort,
-      published
+      published,
+      type,
+      status,
+      time
     }
   })
   return response.data
@@ -27,7 +40,10 @@ export const fetchTrashedAuctionsAPI = async (
   pageSize: number,
   keyword: string | null,
   sort: string | null,
-  published?: boolean | null
+  published: boolean | null,
+  type: AuctionType | null,
+  status: AuctionStatus | null,
+  time: AuctionTime | null
 ): Promise<Page<Auction>> => {
   const response = await api.get<Page<Auction>>('/backoffice/auctions/trashed', {
     params: {
@@ -35,7 +51,10 @@ export const fetchTrashedAuctionsAPI = async (
       pageSize,
       keyword,
       sort,
-      published
+      published,
+      type,
+      status,
+      time
     }
   })
   return response.data
@@ -46,7 +65,9 @@ export const fetchMyAuctionsAPI = async (
   pageSize: number,
   keyword: string | null,
   sort: string | null,
-  published?: boolean | null
+  type: AuctionType | null,
+  status: AuctionStatus | null,
+  time: AuctionTime | null
 ): Promise<Page<Auction>> => {
   const response = await api.get<Page<Auction>>('/backoffice/auctions/me', {
     params: {
@@ -54,7 +75,9 @@ export const fetchMyAuctionsAPI = async (
       pageSize,
       keyword,
       sort,
-      published
+      type,
+      status,
+      time
     }
   })
   return response.data

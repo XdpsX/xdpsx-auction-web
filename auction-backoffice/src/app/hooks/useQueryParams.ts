@@ -42,7 +42,10 @@ export default function useQueryParams() {
       published: params.published || DEFAULT_PUBLISHED.key,
       sort: params.sort || DEFAULT_SORT.key,
       sellerStatus: params.sellerStatus || 'APPROVED',
-      withdrawalStatuses: params.status || 'all'
+      withdrawalStatuses: params.status || 'all',
+      auctionStatus: params.status || 'all',
+      auctionType: params.type || 'all',
+      auctionTime: params.time || 'all'
     },
     setParams,
     deleteParam,
