@@ -55,7 +55,7 @@ public class WalletController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/storefront/wallets/withdraw")
+    @PostMapping({"/storefront/wallets/withdraw", "/backoffice/wallets/withdraw"})
     ResponseEntity<WithdrawRequestDto> withdraw(@Valid @RequestBody CreateWithdrawRequest request) {
         WithdrawRequestDto response = walletService.createWithdrawRequest(userContext.getLoggedUser().getId(), request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);

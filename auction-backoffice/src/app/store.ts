@@ -7,6 +7,7 @@ import sellerReducer from './features/seller'
 import notificationReducer from './features/notification'
 import orderReducer from './features/order'
 import withdrawalReducer from './features/withdrawal/slice'
+import walletReducer from './features/wallet'
 
 export const store = configureStore({
   reducer: {
@@ -17,7 +18,8 @@ export const store = configureStore({
     seller: sellerReducer,
     notification: notificationReducer,
     order: orderReducer,
-    withdrawal: withdrawalReducer
+    withdrawal: withdrawalReducer,
+    wallet: walletReducer
   }
 })
 

@@ -92,11 +92,7 @@ const privateRoutes = [
       },
       {
         path: '/withdrawal',
-        element: (
-          <RoleProtected roles={['ADMIN']}>
-            <WithdrawalList page='list' />
-          </RoleProtected>
-        )
+        element: <WithdrawalList page='list' />
       },
       {
         path: '/withdrawal/request-list',

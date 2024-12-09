@@ -18,15 +18,17 @@ import {
 } from '@nextui-org/react'
 import { Key, useCallback, useState } from 'react'
 import { Page } from '~/app/features/page/type'
-import { updateWithdrawStatusAsync } from '~/app/features/withdrawal/slice'
+import { cancelWithdrawAsync, updateWithdrawStatusAsync } from '~/app/features/withdrawal/slice'
 import { UpdateWithdrawStatusPayload, Withdraw, WithdrawStatus } from '~/app/features/withdrawal/type'
 import useAppDispatch from '~/app/hooks/useAppDispatch'
+import useAppSelector from '~/app/hooks/useAppSelector'
 import { CopyText } from '~/components/CopyText'
 import { withdrawlsColumns } from '~/utils/columns'
 import { formatDateTime, formatPrice } from '~/utils/format'
 
 function WithdrawalTable({ withdrawalPage, isLoading }: { withdrawalPage: Page<Withdraw>; isLoading: boolean }) {
   const dispatch = useAppDispatch()
+  const { userRole } = useAppSelector((state) => state.user)
   const { isOpen, onOpen, onOpenChange } = useDisclosure()
   const [reason, setReason] = useState('')
   const [withdrawId, setWithdrawId] = useState<number | null>(null)
@@ -36,6 +38,10 @@ function WithdrawalTable({ withdrawalPage, isLoading }: { withdrawalPage: Page<W
     (withdrawId: number, status: WithdrawStatus) => {
       const payload: UpdateWithdrawStatusPayload = {
         status
+      }
+      if (status === 'CANCELLED') {
+        dispatch(cancelWithdrawAsync(withdrawId))
+        return
       }
       dispatch(updateWithdrawStatusAsync({ withdrawId, payload }))
     },
@@ -83,7 +89,17 @@ function WithdrawalTable({ withdrawalPage, isLoading }: { withdrawalPage: Page<W
         case 'actions':
           return (
             <div className='relative flex items-center justify-center gap-3'>
-              {withdrawal.status === 'PENDING' && (
+              {withdrawal.status === 'PENDING' && userRole === 'SELLER' && (
+                <Button
+                  color='danger'
+                  title='Cancel'
+                  isIconOnly
+                  onClick={onUpdate.bind(null, withdrawal.id, 'CANCELLED')}
+                >
+                  <Icon icon='mdi:close' width={24} />
+                </Button>
+              )}
+              {withdrawal.status === 'PENDING' && userRole === 'ADMIN' && (
                 <Button
                   color='primary'
                   title='Confimerd'
@@ -93,7 +109,7 @@ function WithdrawalTable({ withdrawalPage, isLoading }: { withdrawalPage: Page<W
                   <Icon icon='fluent-mdl2:processing' width={24} />
                 </Button>
               )}
-              {withdrawal.status === 'CONFIRMED' && (
+              {withdrawal.status === 'CONFIRMED' && userRole === 'ADMIN' && (
                 <>
                   <Button
                     color='success'

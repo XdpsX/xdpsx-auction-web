@@ -3,9 +3,12 @@ package com.xdpsx.auction.controller;
 import com.xdpsx.auction.dto.PageResponse;
 import com.xdpsx.auction.dto.auction.*;
 import com.xdpsx.auction.dto.error.ErrorDetailsDto;
+import com.xdpsx.auction.exception.NotFoundException;
+import com.xdpsx.auction.model.Auction;
 import com.xdpsx.auction.model.Media;
 import com.xdpsx.auction.model.enums.AuctionStatus;
 import com.xdpsx.auction.model.enums.AuctionType;
+import com.xdpsx.auction.repository.AuctionRepository;
 import com.xdpsx.auction.security.UserContext;
 import com.xdpsx.auction.service.AuctionService;
 import com.xdpsx.auction.service.MediaService;
@@ -24,6 +27,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.ZonedDateTime;
+
 import static com.xdpsx.auction.constant.FileConstants.*;
 import static com.xdpsx.auction.constant.PageConstant.*;
 import static org.springframework.http.MediaType.*;
@@ -35,6 +40,7 @@ public class AuctionController {
     private final AuctionService auctionService;
     private final MediaService mediaService;
     private final UserContext userContext;
+    private final AuctionRepository auctionRepository;
 
     @GetMapping("/backoffice/auctions/all")
     ResponseEntity<PageResponse<AuctionSellerInfo>> getAllPageAuctions(
@@ -133,6 +139,16 @@ public class AuctionController {
         AuctionDetailsGet response = auctionService.getSellerAuctionDetails(
                 userContext.getLoggedUser().getId(), id);
         return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/test/auctions/{id}/update-time")
+    public ResponseEntity<Void> updateEndingTime(@PathVariable Long id) {
+        Auction auction = auctionRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Not found"));
+        auction.setStartingTime(ZonedDateTime.now().minusMinutes(10));
+        auction.setEndingTime(ZonedDateTime.now().plusSeconds(15));
+        auctionRepository.save(auction);
+        return ResponseEntity.noContent().build();
     }
 
 }

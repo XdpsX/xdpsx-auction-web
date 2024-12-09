@@ -20,7 +20,7 @@ export const Status = memo(
         <Popover renderPopover={content} placement="bottom">
           <div
             ref={forwardedRef}
-            className={`flex w-fit items-center gap-[2px] border border-gray-200 rounded-md bg-gray-50 shadow-sm px-2 py-1 ${className}`}
+            className={`flex w-fit items-center gap-[2px] border border-gray-200 rounded-md bg-gray-50 shadow-sm p-1 ${className}`}
           >
             <CircleSvgIcon color={statusColor} />
             <span className="px-1 text-default-800">{status}</span>

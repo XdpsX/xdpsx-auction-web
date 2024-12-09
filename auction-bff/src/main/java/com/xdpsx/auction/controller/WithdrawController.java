@@ -24,7 +24,7 @@ public class WithdrawController {
     private final UserContext userContext;
     private final WithdrawService withdrawService;
 
-    @GetMapping("/storefront/wallets/me/withdraw")
+    @GetMapping({"/storefront/wallets/me/withdraw", "/backoffice/wallets/me/withdraw"})
     ResponseEntity<PageResponse<WithdrawRequestDto>> getMyWithdrawRequests(
             @RequestParam(defaultValue = PAGE_NUM, required = false) int pageNum,
             @RequestParam(defaultValue = PAGE_SIZE, required = false) @Max(MAX_PAGE_SIZE) int pageSize,
@@ -35,7 +35,7 @@ public class WithdrawController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/storefront/withdraw/{id}/cancel")
+    @PutMapping({"/storefront/withdraw/{id}/cancel", "/backoffice/withdraw/{id}/cancel"})
     ResponseEntity<Void> cancelWithdraw(@PathVariable Long id) {
         withdrawService.cancelWithdraw(userContext.getLoggedUser().getId(), id);
         return ResponseEntity.noContent().build();

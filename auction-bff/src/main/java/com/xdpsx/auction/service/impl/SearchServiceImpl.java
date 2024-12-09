@@ -33,16 +33,12 @@ public class SearchServiceImpl implements SearchService {
     public PageResponse<AuctionResponse> searchAuctions(String keyword, Integer categoryId,
                                                         BigDecimal minPrice, BigDecimal maxPrice, int page, int size,
                                                         AuctionType type, AuctionTime time, String sort) {
-        // 1. Lọc theo `categoryId` và `price range`
         Set<Long> filteredAuctions = filterByCriteria(categoryId, minPrice, maxPrice, type, time, sort);
 
-        // 2. Phân tích từ khóa
         Set<String> terms = extractTerms(keyword);
 
-        // 3. Tính toán điểm TF-IDF cho các đấu giá đã lọc
         Map<Long, Double> auctionScores = fetchRelevantAuctions(terms, filteredAuctions);
 
-        // 4. Phân trang kết quả
         int totalItems = auctionScores.size();
         int totalPages = (int) Math.ceil((double) totalItems / size);
         List<AuctionResponse> auctions = paginateAndFetch(auctionScores, page - 1, size);
@@ -61,7 +57,6 @@ public class SearchServiceImpl implements SearchService {
         return new HashSet<>(Arrays.asList(keyword.split("\\s+")));
     }
 
-    // Lọc các tài liệu theo category và price trước
     private Set<Long> filterByCriteria(Integer categoryId, BigDecimal minPrice, BigDecimal maxPrice,
                                        AuctionType type, AuctionTime time, String sort) {
 //        return auctionRepository.findAll().stream()
@@ -74,18 +69,15 @@ public class SearchServiceImpl implements SearchService {
                 .stream().map(Auction::getId).collect(Collectors.toSet());
     }
 
-    // Tính toán điểm TF-IDF cho các tài liệu đã lọc
     private Map<Long, Double> fetchRelevantAuctions(Set<String> terms, Set<Long> filteredAuctionIds) {
         Map<Long, Double> scores = new HashMap<>();
         long totalDocuments = filteredAuctionIds.size(); // Tổng số tài liệu đã lọc
 
         for (String term : terms) {
             invertedIndexRepository.findById(term).ifPresent(index -> {
-                // Tính IDF riêng cho title và description
                 double idfTitle = Math.log((double) totalDocuments / countDocuments(index.getAuctionIdsTitle()));
                 double idfDescription = Math.log((double) totalDocuments / countDocuments(index.getAuctionIdsDescription()));
 
-                // Cập nhật điểm số cho các tài liệu liên quan
                 updateScoresWithTfIdf(scores, index.getAuctionIdsTitle(), idfTitle, WEIGHT_NAME, term, filteredAuctionIds);
                 updateScoresWithTfIdf(scores, index.getAuctionIdsDescription(), idfDescription, WEIGHT_DESCRIPTION, term, filteredAuctionIds);
             });
@@ -98,11 +90,9 @@ public class SearchServiceImpl implements SearchService {
         return auctionIds.isEmpty() ? 0 : auctionIds.split(",").length;
     }
 
-    // Cập nhật điểm số TF-IDF cho các tài liệu đã lọc
     private void updateScoresWithTfIdf(Map<Long, Double> scores, String auctionIds, double idf, double weight, String term, Set<Long> filteredAuctionIds) {
         if (auctionIds == null || auctionIds.isEmpty()) return;
 
-        // Lấy giá trị TF
         Map<Long, Double> tfValues = calculateTf(auctionIds, weight == WEIGHT_NAME, term, filteredAuctionIds);
 
         for (Map.Entry<Long, Double> entry : tfValues.entrySet()) {
@@ -110,31 +100,26 @@ public class SearchServiceImpl implements SearchService {
             double tf = entry.getValue();
             double tfIdf = tf * idf * weight;
 
-            // Cập nhật điểm số
             scores.put(auctionId, scores.getOrDefault(auctionId, 0.0) + tfIdf);
         }
     }
 
-    // Tính toán TF cho các tài liệu đã lọc
     private Map<Long, Double> calculateTf(String auctionIds, boolean isTitle, String term, Set<Long> filteredAuctionIds) {
         Map<Long, Double> tfValues = new HashMap<>();
         if (auctionIds == null || auctionIds.isEmpty()) {
             return tfValues;
         }
 
-        // Lấy danh sách auction_id từ chuỗi
         List<Long> auctionIdList = Arrays.stream(auctionIds.split(","))
                 .map(Long::parseLong)
                 .filter(filteredAuctionIds::contains) // Lọc chỉ những auctionId đã được lọc trước
                 .collect(Collectors.toList());
 
-        // Truy vấn nội dung của các auction_id
         List<Auction> auctions = auctionRepository.findAllById(auctionIdList);
 
         for (Auction auction : auctions) {
             String text = isTitle ? auction.getName() : auction.getCleanedDescription();
             if (text != null) {
-                // Đếm số lần từ xuất hiện
                 int termFrequency = countOccurrences(text, term);
                 int totalWords = text.split("\\s+").length;
 
@@ -151,7 +136,7 @@ public class SearchServiceImpl implements SearchService {
         if (text == null || term == null || term.isEmpty()) {
             return 0;
         }
-        String[] words = text.toLowerCase().split("\\s+"); // Tách từ
+        String[] words = text.toLowerCase().split("\\s+");
         int count = 0;
         for (String word : words) {
             if (word.equals(term)) {

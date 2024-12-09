@@ -44,8 +44,8 @@ function AuctionCard({ auction }: { auction: Auction }) {
             {auction.type === 'ENGLISH' ? auction.numBids : '?'} bids
           </span>
         </div>
-        <div className="flex items-center justify-between">
-          <p className="text-gray-600 flex items-center gap-2">
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-gray-600 flex items-center gap-2 max-w-[120px]">
             <img
               src={
                 auction.seller.avatarUrl
