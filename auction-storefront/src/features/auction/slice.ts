@@ -1,15 +1,23 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { AuctionDetails } from '../../models/auction.type'
+import {
+  Auction,
+  AuctionDetails,
+  AuctionTime,
+  AuctionType,
+} from '../../models/auction.type'
 import { RootState } from '../../store/type'
-import { fetchAuctionDetailsAPI } from './service'
+import { fetchAuctionDetailsAPI, searchAuctionsAPI } from './service'
+import { Page } from '../../models/page.type'
 
 export interface AuctionState {
   auctionDetails: AuctionDetails | null
+  searchAuctions: Page<Auction> | null
   isLoading: boolean
 }
 
 const initialState: AuctionState = {
   auctionDetails: null,
+  searchAuctions: null,
   isLoading: false,
 }
 
@@ -35,6 +43,17 @@ export const auctionSlice = createSlice({
     builder.addCase(fetchAuctionDetailsAsync.rejected, (state) => {
       state.isLoading = false
     })
+    // searchAuctionsAsync
+    builder.addCase(searchAuctionsAsync.pending, (state) => {
+      state.isLoading = true
+    })
+    builder.addCase(searchAuctionsAsync.fulfilled, (state, action) => {
+      state.isLoading = false
+      state.searchAuctions = action.payload
+    })
+    builder.addCase(searchAuctionsAsync.rejected, (state) => {
+      state.isLoading = false
+    })
   },
 })
 
@@ -48,6 +67,45 @@ export const fetchAuctionDetailsAsync = createAsyncThunk(
   async (auctionId: number, thunkAPI) => {
     try {
       const data = await fetchAuctionDetailsAPI(auctionId)
+      return data
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error)
+    }
+  }
+)
+
+export const searchAuctionsAsync = createAsyncThunk(
+  'auction/searchAuctionsAsync',
+  async (
+    {
+      keyword,
+      pageNum,
+      categoryId,
+      minPrice,
+      maxPrice,
+      type,
+      time,
+    }: {
+      keyword: string
+      pageNum: number
+      categoryId: number | null
+      minPrice: number | null
+      maxPrice: number | null
+      type: AuctionType | null
+      time: AuctionTime | null
+    },
+    thunkAPI
+  ) => {
+    try {
+      const data = await searchAuctionsAPI(
+        keyword,
+        pageNum,
+        categoryId,
+        minPrice,
+        maxPrice,
+        type,
+        time
+      )
       return data
     } catch (error) {
       return thunkAPI.rejectWithValue(error)

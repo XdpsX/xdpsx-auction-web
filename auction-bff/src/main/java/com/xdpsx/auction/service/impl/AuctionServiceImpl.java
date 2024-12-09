@@ -19,6 +19,7 @@ import com.xdpsx.auction.security.CustomUserDetails;
 import com.xdpsx.auction.security.UserContext;
 import com.xdpsx.auction.service.AuctionService;
 import com.xdpsx.auction.service.MediaService;
+import com.xdpsx.auction.service.producer.AuctionProducer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,6 +37,7 @@ public class AuctionServiceImpl implements AuctionService {
     private final CategoryRepository categoryRepository;
     private final AuctionRepository auctionRepository;
     private final BidRepository bidRepository;
+    private final AuctionProducer auctionProducer;
 
     @PreAuthorize("hasRole('ADMIN')")
     @Override
@@ -100,6 +102,7 @@ public class AuctionServiceImpl implements AuctionService {
         auction.setStatus(AuctionStatus.LIVE);
 
         Auction savedAuction = auctionRepository.save(auction);
+        auctionProducer.produceAuctionTfIDF(savedAuction.getId());
         return AuctionMapper.INSTANCE.toDto(savedAuction);
     }
 

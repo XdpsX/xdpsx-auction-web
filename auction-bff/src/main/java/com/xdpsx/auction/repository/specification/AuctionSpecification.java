@@ -59,6 +59,18 @@ public class AuctionSpecification extends AbstractSpecification<Auction> {
                 .and(hasNotEnded());
     }
 
+    public Specification<Auction> getSearchSpec(Integer categoryId, String sort, AuctionType type, AuctionTime time,
+                                                BigDecimal minAmount, BigDecimal maxAmount) {
+        return Specification.where(hasTrashed(false))
+                .and(hasPublished(true))
+                .and(hasCategory(categoryId))
+                .and(getSortSpec(sort))
+                .and(hasType(type))
+                .and(hasAuctionTime(time))
+                .and(hasStartingPriceBetween(minAmount, maxAmount))
+                .and(hasNotEnded());
+    }
+
     private Specification<Auction> hasTrashed(Boolean trashed) {
         return (root, query, criteriaBuilder) -> {
             if (trashed == null) return criteriaBuilder.conjunction();

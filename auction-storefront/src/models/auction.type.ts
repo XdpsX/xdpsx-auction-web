@@ -14,6 +14,9 @@ export type Auction = {
   numBids: number | null
 }
 
+export type AuctionType = 'ENGLISH' | 'SEALED_BID'
+export type AuctionTime = 'UPCOMING' | 'LIVE'
+
 export type AuctionDetails = {
   id: number
   mainImage: string
@@ -23,7 +26,7 @@ export type AuctionDetails = {
   stepPrice: number
   startingTime: string
   endingTime: string
-  type: 'ENGLISH' | 'SEALED_BID'
+  type: AuctionType
   published: boolean
   category: string
   images: string[]
@@ -35,5 +38,5 @@ export type AuctionInfo = {
   id: number
   name: string
   mainImage: string
-  type: 'ENGLISH' | 'SEALED_BID'
+  type: AuctionType
 }

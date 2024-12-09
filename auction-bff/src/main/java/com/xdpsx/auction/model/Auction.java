@@ -25,6 +25,8 @@ public class Auction extends AbstractAuditEntity{
 
     private String description;
 
+    private String cleanedDescription;
+
     private BigDecimal startingPrice;
 
     private BigDecimal stepPrice;

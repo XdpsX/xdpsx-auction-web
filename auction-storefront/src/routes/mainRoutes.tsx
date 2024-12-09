@@ -9,6 +9,7 @@ import PaymentSuccess from '../pages/handler/PaymentSuccess'
 import CheckoutPage from '../pages/CheckoutPage'
 import OrderSuccess from '../pages/handler/OrderSuccess'
 import OrderRedirect from '../pages/redirect/OrderRedirect'
+import SearchPage from '../pages/SearchPage'
 
 const mainRoutes = [
   {
@@ -34,6 +35,15 @@ const mainRoutes = [
         ),
       },
       {
+        path: '/search',
+        element: (
+          <>
+            <PageTitle title="Search" />
+            <SearchPage />
+          </>
+        ),
+      },
+      {
         path: '/checkout',
         element: (
           <ProtectedRoute>
@@ -42,14 +52,7 @@ const mainRoutes = [
           </ProtectedRoute>
         ),
       },
-      {
-        path: '/payment/success',
-        element: (
-          <ProtectedRoute>
-            <PaymentSuccess />
-          </ProtectedRoute>
-        ),
-      },
+
       {
         path: '/payment/failed',
         element: (
@@ -81,6 +84,14 @@ const mainRoutes = [
     element: (
       <ProtectedRoute>
         <OrderRedirect />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/payment/success',
+    element: (
+      <ProtectedRoute>
+        <PaymentSuccess />
       </ProtectedRoute>
     ),
   },
