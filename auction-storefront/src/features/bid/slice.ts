@@ -56,6 +56,13 @@ export const bidSlice = createSlice({
           state.bidHistories.items = [payload, ...state.bidHistories.items]
         } else {
           state.bidHistories.items = [payload, ...state.bidHistories.items]
+          if (state.bidHistories.items.length > state.bidHistories.pageSize) {
+            state.bidHistories.items.pop()
+          }
+          state.bidHistories.totalItems += 1
+          state.bidHistories.totalPages = Math.ceil(
+            state.bidHistories.totalItems / state.bidHistories.pageSize
+          )
         }
       } else {
         state.bidHistories = {

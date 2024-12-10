@@ -7,6 +7,7 @@ import {
   fetchAuctionBidHistoriesAsync,
   selectBid,
 } from '../../features/bid/slice'
+import { formatDateTime, formatPrice } from '../../utils/format'
 
 function BidHistories({ auctionId }: { auctionId: number }) {
   const dispatch = useAppDispatch()
@@ -86,7 +87,7 @@ function BidHistories({ auctionId }: { auctionId: number }) {
                       ' px-3 py-2 text-sm text-gray-500 '
                     )}
                   >
-                    {bid.amount}
+                    {formatPrice(bid.amount)}
                   </td>
                   <td
                     className={classNames(
@@ -94,7 +95,7 @@ function BidHistories({ auctionId }: { auctionId: number }) {
                       ' px-3 py-2 text-sm text-gray-500 '
                     )}
                   >
-                    {bid.updatedAt}
+                    {formatDateTime(bid.updatedAt)}
                   </td>
                 </tr>
               ))}

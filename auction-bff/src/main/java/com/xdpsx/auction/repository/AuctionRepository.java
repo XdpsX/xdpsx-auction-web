@@ -1,6 +1,7 @@
 package com.xdpsx.auction.repository;
 
 import com.xdpsx.auction.model.Auction;
+import com.xdpsx.auction.model.enums.AuctionType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -50,6 +51,16 @@ public interface AuctionRepository extends JpaRepository<Auction, Long>,
             "AND a.startingTime < CURRENT_TIMESTAMP " +
             "AND a.endingTime > CURRENT_TIMESTAMP")
     Optional<Auction> findLiveAuction(@Param("id") Long id);
+
+    @Query("SELECT a FROM Auction a " +
+            "JOIN FETCH a.seller " +
+            "WHERE a.id = :id " +
+            "AND a.trashed = false " +
+            "AND a.published = true " +
+            "AND a.startingTime < CURRENT_TIMESTAMP " +
+            "AND a.endingTime > CURRENT_TIMESTAMP " +
+            "AND a.type = :type")
+    Optional<Auction> findLiveAuction(@Param("id") Long id, @Param("type") AuctionType type);
 
     @Query("SELECT a FROM Auction a " +
             "WHERE a.status = 'LIVE' " +

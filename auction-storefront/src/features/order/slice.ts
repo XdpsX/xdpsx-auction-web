@@ -5,6 +5,7 @@ import {
   cancelOrderAPI,
   confirmOrderAPI,
   createOrderAPI,
+  createOrderBuyNowAPI,
   fetchMyOrdersAPI,
   fetchOrderDetailsAPI,
 } from './service'
@@ -14,6 +15,7 @@ import {
   OrderStatus,
   CreateOrderPayload,
   OrderDetails,
+  CreateOrderBuyNowPayload,
 } from '../../models/order.type'
 
 export interface OrderState {
@@ -166,6 +168,24 @@ export const fetchOrderDetailsAsync = createAsyncThunk(
   async (orderId: number, thunkAPI) => {
     try {
       const data = await fetchOrderDetailsAPI(orderId)
+      return data
+    } catch (error) {
+      return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))
+    }
+  }
+)
+
+export const createOrderBuyNowAsync = createAsyncThunk(
+  'order/createOrderBuyNowAsync',
+  async (
+    {
+      auctionId,
+      payload,
+    }: { auctionId: number; payload: CreateOrderBuyNowPayload },
+    thunkAPI
+  ) => {
+    try {
+      const data = await createOrderBuyNowAPI(auctionId, payload)
       return data
     } catch (error) {
       return thunkAPI.rejectWithValue(fromAxiosErrorToAPIErrorDetails(error))

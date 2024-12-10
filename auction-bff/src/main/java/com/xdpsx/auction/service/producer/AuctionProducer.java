@@ -12,4 +12,8 @@ public class AuctionProducer {
     public void produceAuctionTfIDF(Long auctionId){
         kafkaTemplate.send("auction-tfidf-topic", auctionId);
     }
+
+    public void produceAuctionEnd(Long auctionId){
+        kafkaTemplate.send("auction-end-topic", auctionId);
+    }
 }

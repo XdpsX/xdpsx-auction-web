@@ -18,4 +18,5 @@ public interface AuctionService {
     AuctionDetailsGet getAuctionDetails(Long id);
     AuctionDetailsGet getSellerAuctionDetails(Long sellerId, Long auctionId);
 
+    AuctionDto getByNowAuction(Long id);
 }

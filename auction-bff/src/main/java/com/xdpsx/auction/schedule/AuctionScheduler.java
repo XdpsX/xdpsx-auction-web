@@ -38,6 +38,7 @@ public class AuctionScheduler {
         for (Auction auction : endedAuctions) {
             List<Bid> allBids = bidRepository.findBidsByAuctionIdOrderByAmountDesc(auction.getId());
             if (!allBids.isEmpty()) {
+                auction.setStatus(AuctionStatus.END);
                 for (int i = 0; i < allBids.size(); i++) {
                     Bid bid = allBids.get(i);
                     if (i == 0) { // highestBid
@@ -48,6 +49,8 @@ public class AuctionScheduler {
                         handleLostBid(bid, auction);
                     }
                 }
+            } else {
+                auction.setStatus(AuctionStatus.NO_BID);
             }
             bidRepository.saveAll(allBids);
 
@@ -58,7 +61,6 @@ public class AuctionScheduler {
                     .build();
             notificationService.pushNotification(sellerNotification);
 
-            auction.setStatus(AuctionStatus.END);
             auctionRepository.save(auction);
         }
     }

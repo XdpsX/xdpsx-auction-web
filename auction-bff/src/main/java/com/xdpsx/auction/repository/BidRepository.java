@@ -70,4 +70,6 @@ public interface BidRepository extends JpaRepository<Bid, Long>, JpaSpecificatio
 
     @Query("SELECT b FROM Bid b WHERE b.auction.id = :auctionId")
     Page<Bid> findByAuctionId(@Param("auctionId") Long auctionId, Pageable pageable);
+
+    List<Bid> findByAuctionId(Long auctionId);
 }

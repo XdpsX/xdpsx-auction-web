@@ -15,6 +15,7 @@ import AuctionBid from '../components/auction/AuctionBid'
 import {
   fetchAuctionDetailsAsync,
   selectAuction,
+  setAuctionDetailsEndingTime,
   setHighestBid,
 } from '../features/auction/slice'
 import AuctionImages from '../components/auction/AuctionImages'
@@ -69,6 +70,31 @@ function AuctionDetailsPage() {
           setTimeout(() => {
             setIsBidUpdated(false)
           }, 1500)
+        })
+      },
+      onStompError: (frame) => {
+        console.error('STOMP error: ', frame)
+      },
+    })
+
+    stompClient.activate()
+    return () => {
+      stompClient.deactivate()
+      console.log('Disconnected')
+    }
+  }, [dispatch, id, userProfile?.id])
+
+  useEffect(() => {
+    const stompClient = new Client({
+      webSocketFactory: () => new SockJS(socketUrl),
+      onConnect: (frame) => {
+        console.log('Connected: ' + frame)
+        stompClient.subscribe(`/topic/auction/${id}/end`, (message) => {
+          const userId = JSON.parse(message.body)
+          dispatch(setAuctionDetailsEndingTime(new Date().toISOString()))
+          if (userId !== userProfile?.id) {
+            toast.warn('Auction has been bought')
+          }
         })
       },
       onStompError: (frame) => {

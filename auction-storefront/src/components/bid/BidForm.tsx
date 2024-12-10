@@ -16,6 +16,7 @@ import BidAttention from './BidAttention'
 import { formatPrice } from '../../utils/format'
 import { selectWallet } from '../../features/wallet/slice'
 import BidRefundModal from './BidRefundModal'
+import { Link } from 'react-router-dom'
 
 function BidForm({
   auction,
@@ -245,6 +246,14 @@ function BidForm({
           >
             Bid
           </Button>
+          {auction.type === 'SEALED_BID' && !userBid && (
+            <Link
+              to={`/auction/buy-now/${auction.id}`}
+              className="px-8 py-2 uppercase bg-red-500 text-white hover:bg-red-600"
+            >
+              Buy Now
+            </Link>
+          )}
           {userBid && (
             <Button
               disabled={isProcessing}

@@ -2,6 +2,7 @@ package com.xdpsx.auction.service;
 
 import com.xdpsx.auction.dto.PageResponse;
 import com.xdpsx.auction.dto.order.CreateOrderDto;
+import com.xdpsx.auction.dto.order.CreateOrderRequest;
 import com.xdpsx.auction.dto.order.OrderDetailsDto;
 import com.xdpsx.auction.dto.order.OrderDto;
 import com.xdpsx.auction.dto.payment.InitPaymentResponse;
@@ -23,4 +24,5 @@ public interface OrderService {
     OrderDetailsDto getOrderDetails(Long id);
     OrderDetailsDto getUserOrderDetails(Long userId, Long orderId);
     OrderDetailsDto getSellerOrderDetails(Long sellerId, Long orderId);
+    OrderDto buyNowAuction(Long auctionId, CreateOrderRequest request);
 }

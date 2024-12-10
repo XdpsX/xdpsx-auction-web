@@ -10,6 +10,7 @@ import CheckoutPage from '../pages/CheckoutPage'
 import OrderSuccess from '../pages/handler/OrderSuccess'
 import OrderRedirect from '../pages/redirect/OrderRedirect'
 import SearchPage from '../pages/SearchPage'
+import BuyNowPage from '../pages/BuyNowPage'
 
 const mainRoutes = [
   {
@@ -52,7 +53,15 @@ const mainRoutes = [
           </ProtectedRoute>
         ),
       },
-
+      {
+        path: '/auction/buy-now/:id',
+        element: (
+          <ProtectedRoute>
+            <PageTitle title="Buy Now" />
+            <BuyNowPage />
+          </ProtectedRoute>
+        ),
+      },
       {
         path: '/payment/failed',
         element: (

@@ -51,3 +51,8 @@ export const searchAuctionsAPI = async (
   })
   return response.data
 }
+
+export const fetchBuyNowAuctionAPI = async (id: number) => {
+  const response = await api.get<Auction>(`/storefront/auctions/${id}/buy-now`)
+  return response.data
+}

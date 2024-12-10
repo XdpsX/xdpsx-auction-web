@@ -4,6 +4,7 @@ import com.xdpsx.auction.constant.ErrorCode;
 import com.xdpsx.auction.dto.PageResponse;
 import com.xdpsx.auction.dto.notification.NotificationRequest;
 import com.xdpsx.auction.dto.order.CreateOrderDto;
+import com.xdpsx.auction.dto.order.CreateOrderRequest;
 import com.xdpsx.auction.dto.order.OrderDetailsDto;
 import com.xdpsx.auction.dto.order.OrderDto;
 import com.xdpsx.auction.dto.payment.InitPaymentRequest;
@@ -13,26 +14,27 @@ import com.xdpsx.auction.exception.BadRequestException;
 import com.xdpsx.auction.exception.NotFoundException;
 import com.xdpsx.auction.mapper.OrderMapper;
 import com.xdpsx.auction.mapper.PageMapper;
-import com.xdpsx.auction.model.Bid;
-import com.xdpsx.auction.model.Order;
-import com.xdpsx.auction.model.ShippingInfo;
-import com.xdpsx.auction.model.User;
+import com.xdpsx.auction.model.*;
 import com.xdpsx.auction.model.enums.*;
+import com.xdpsx.auction.repository.AuctionRepository;
 import com.xdpsx.auction.repository.BidRepository;
 import com.xdpsx.auction.repository.OrderRepository;
 import com.xdpsx.auction.security.CustomUserDetails;
 import com.xdpsx.auction.security.UserContext;
 import com.xdpsx.auction.service.*;
+import com.xdpsx.auction.service.producer.AuctionProducer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import static com.xdpsx.auction.constant.BidConstants.SECURITY_FEE_RATE;
@@ -47,6 +49,9 @@ public class OrderServiceImpl implements OrderService {
     private final UserContext userContext;
     private final WalletService walletService;
     private final PaymentService paymentService;
+    private final AuctionRepository auctionRepository;
+    private final SimpMessagingTemplate messagingTemplate;
+    private final AuctionProducer auctionProducer;
 
     @Override
     @Transactional
@@ -96,7 +101,7 @@ public class OrderServiceImpl implements OrderService {
         transactionService.createTransaction(transactionBidder);
 
         NotificationRequest bidderNotification = NotificationRequest.builder()
-                .title("Payment Bid")
+                .title("Payment Auction")
                 .message("Your payment for the product: %s has been successfully processed. Thank you for your purchase!".formatted(auctionName))
                 .userId(bidderId)
                 .build();
@@ -315,6 +320,46 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findByIdAndSellerId(orderId, sellerId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND, orderId));
         return OrderMapper.INSTANCE.toOrderDetailsDto(order);
+    }
+
+    @Override
+    @Transactional
+    public OrderDto buyNowAuction(Long auctionId, CreateOrderRequest request) {
+        Auction auction = auctionRepository.findLiveAuction(auctionId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.AUCTION_NOT_FOUND, auctionId));
+        if (!auction.isSealedBidAuction()) {
+            throw new BadRequestException("Can not buy now English Auction");
+        }
+        CustomUserDetails userDetails = userContext.getLoggedUser();
+        walletService.validateWalletBalance(userDetails.getId(), auction.getStartingPrice());
+
+        handlePayForBidder(auction.getStartingPrice(), userDetails.getId(), auction.getName());
+        handlePayForSeller(auction.getSeller().getId(), auction.getName());
+
+        ShippingInfo shippingInfo = ShippingInfo.builder()
+                .recipient(request.getRecipient())
+                .mobileNumber(request.getMobileNumber())
+                .shippingAddress(request.getShippingAddress())
+                .build();
+        Order order = Order.builder()
+                .trackNumber(UUID.randomUUID().toString())
+                .totalAmount(auction.getStartingPrice())
+                .status(OrderStatus.Pending)
+                .shippingInfo(shippingInfo)
+                .note(request.getNote())
+                .user(new User(userDetails.getId()))
+                .seller(auction.getSeller())
+                .auction(auction)
+                .paymentMethod(PaymentMethod.INTERNAL_WALLET)
+                .build();
+        Order savedOrder = orderRepository.save(order);
+
+        auction.setStatus(AuctionStatus.COMPLETED);
+        auction.setEndingTime(ZonedDateTime.now());
+        Auction savedAuction = auctionRepository.save(auction);
+        auctionProducer.produceAuctionEnd(savedAuction.getId());
+        messagingTemplate.convertAndSend("/topic/auction/" + auction.getId() + "/end", userDetails.getId());
+        return OrderMapper.INSTANCE.toOrderDto(savedOrder);
     }
 
     private Sort getSort(String sortParam) {

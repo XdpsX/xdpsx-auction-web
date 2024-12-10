@@ -62,3 +62,23 @@ export type OrderDetails = {
   shippingInfo: ShippingInfo
   seller: SellerInfo
 }
+
+export const createOrderBuyNowSchema = yup.object().shape({
+  recipient: yup
+    .string()
+    .required('Recipient is required')
+    .max(50, 'Recipient must not exceed 50 characters'),
+  mobileNumber: yup
+    .string()
+    .required('Mobile Number is required')
+    .max(20, 'Mobile Number must not exceed 20 characters'),
+  shippingAddress: yup
+    .string()
+    .required('Shipping address is required')
+    .max(255, 'Shipping address must not exceed 255 characters'),
+  note: yup.string().max(255, 'Note must not exceed 255 characters'),
+  paymentMethod: yup.string().required('Payment method is required'),
+})
+export type CreateOrderBuyNowPayload = yup.InferType<
+  typeof createOrderBuyNowSchema
+>

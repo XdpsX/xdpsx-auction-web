@@ -6,6 +6,7 @@ import { selectUser } from '../../features/user/slice'
 import { BidHistory } from '../../models/bid.type'
 import { Page } from '../../models/page.type'
 import { fetchAuctionBidHistoriesAPI } from '../../features/bid/service'
+import { formatDateTime, formatPrice } from '../../utils/format'
 
 function BidHistoriesModal({
   open,
@@ -111,7 +112,7 @@ function BidHistoriesModal({
                       ' px-3 py-2 text-sm text-gray-500 '
                     )}
                   >
-                    {bid.amount}
+                    {formatPrice(bid.amount)}
                   </td>
                   <td
                     className={classNames(
@@ -119,7 +120,7 @@ function BidHistoriesModal({
                       ' px-3 py-2 text-sm text-gray-500 '
                     )}
                   >
-                    {bid.updatedAt}
+                    {formatDateTime(bid.updatedAt)}
                   </td>
                 </tr>
               ))}

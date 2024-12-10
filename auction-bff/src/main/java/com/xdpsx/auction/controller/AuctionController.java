@@ -141,6 +141,12 @@ public class AuctionController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/storefront/auctions/{id}/buy-now")
+    ResponseEntity<AuctionDto> getBuyNowAuction(@PathVariable Long id) {
+        AuctionDto response = auctionService.getByNowAuction(id);
+        return ResponseEntity.ok(response);
+    }
+
     @PutMapping("/test/auctions/{id}/update-time")
     public ResponseEntity<Void> updateEndingTime(@PathVariable Long id) {
         Auction auction = auctionRepository.findById(id)

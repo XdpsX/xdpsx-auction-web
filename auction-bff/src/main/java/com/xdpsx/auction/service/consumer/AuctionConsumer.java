@@ -1,9 +1,17 @@
 package com.xdpsx.auction.service.consumer;
 
+import com.xdpsx.auction.dto.notification.NotificationRequest;
+import com.xdpsx.auction.dto.transaction.TransactionRequest;
 import com.xdpsx.auction.model.Auction;
 import com.xdpsx.auction.model.AuctionInvertedIndex;
+import com.xdpsx.auction.model.Bid;
+import com.xdpsx.auction.model.enums.BidStatus;
+import com.xdpsx.auction.model.enums.TransactionType;
 import com.xdpsx.auction.repository.AuctionInvertedIndexRepository;
 import com.xdpsx.auction.repository.AuctionRepository;
+import com.xdpsx.auction.repository.BidRepository;
+import com.xdpsx.auction.service.NotificationService;
+import com.xdpsx.auction.service.TransactionService;
 import com.xdpsx.auction.util.TextProcessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Slf4j
@@ -19,6 +28,9 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AuctionConsumer {
     private final AuctionRepository auctionRepository;
+    private final BidRepository bidRepository;
+    private final TransactionService transactionService;
+    private final NotificationService notificationService;
     private final AuctionInvertedIndexRepository auctionInvertedIndexRepository;
 
     @KafkaListener(topics = "auction-tfidf-topic", groupId = "auction-push-group", concurrency = "1")
@@ -78,4 +90,41 @@ public class AuctionConsumer {
 
         auctionInvertedIndexRepository.save(invertedIndex);
     }
+
+    @KafkaListener(topics = "auction-end-topic", groupId = "auction-push-group", concurrency = "1")
+    public void handleEndAuction(Long auctionId){
+        log.info("Auction End: {}", auctionId);
+        Auction auction = auctionRepository.findById(auctionId)
+                .orElse(null);
+        if (auction == null) return;
+
+        List<Bid> bids = bidRepository.findBidsByAuctionIdOrderByAmountDesc(auctionId);
+
+        if (!bids.isEmpty()) {
+            for (Bid bid : bids) {
+                bid.setStatus(BidStatus.LOST);
+                handleLostBid(bid, auction);
+            }
+        }
+        bidRepository.saveAll(bids);
+    }
+
+    private void handleLostBid(Bid bid, Auction auction) {
+        NotificationRequest lostNotification = NotificationRequest.builder()
+                .title("Lost Bid")
+                .message("You lost the bid in the auction: " + auction.getName())
+                .userId(bid.getBidder().getId())
+                .build();
+        notificationService.pushNotification(lostNotification);
+
+        // Refund
+        TransactionRequest transactionRequest = TransactionRequest.builder()
+                .amount(bid.getTransaction().getAmount())
+                .type(TransactionType.DEPOSIT)
+                .description("Refund for bid in auction: " + bid.getAuction().getName())
+                .userId(bid.getBidder().getId())
+                .build();
+        transactionService.createTransaction(transactionRequest);
+    }
+
 }

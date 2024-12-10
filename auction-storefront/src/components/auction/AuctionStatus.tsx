@@ -77,7 +77,7 @@ function AuctionStatus({
   }, [calculateTimeLeft, onAuctionEnd])
 
   const renderAuctionStatus = useCallback(() => {
-    if (!timeLeft) return null
+    if (!timeLeft) return <Status status="Ended" />
     switch (auctionStatus) {
       case 'Upcoming':
         return (
@@ -132,7 +132,7 @@ function AuctionStatus({
       case 'Ended':
         return <Status status="Ended" />
       default:
-        return null
+        return <Status status="Ended" />
     }
   }, [timeLeft, auctionStatus, startingDate, endingDate])
 

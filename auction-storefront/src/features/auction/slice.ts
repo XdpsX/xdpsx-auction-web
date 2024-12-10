@@ -6,18 +6,24 @@ import {
   AuctionType,
 } from '../../models/auction.type'
 import { RootState } from '../../store/type'
-import { fetchAuctionDetailsAPI, searchAuctionsAPI } from './service'
+import {
+  fetchAuctionDetailsAPI,
+  fetchBuyNowAuctionAPI,
+  searchAuctionsAPI,
+} from './service'
 import { Page } from '../../models/page.type'
 
 export interface AuctionState {
   auctionDetails: AuctionDetails | null
   searchAuctions: Page<Auction> | null
+  buyAuction: Auction | null
   isLoading: boolean
 }
 
 const initialState: AuctionState = {
   auctionDetails: null,
   searchAuctions: null,
+  buyAuction: null,
   isLoading: false,
 }
 
@@ -28,6 +34,11 @@ export const auctionSlice = createSlice({
     setHighestBid: (state, action) => {
       if (state.auctionDetails) {
         state.auctionDetails.highestBid = action.payload
+      }
+    },
+    setAuctionDetailsEndingTime: (state, action) => {
+      if (state.auctionDetails) {
+        state.auctionDetails.endingTime = action.payload
       }
     },
   },
@@ -54,13 +65,25 @@ export const auctionSlice = createSlice({
     builder.addCase(searchAuctionsAsync.rejected, (state) => {
       state.isLoading = false
     })
+    // fetchBuyNowAuctionAsync
+    builder.addCase(fetchBuyNowAuctionAsync.pending, (state) => {
+      state.isLoading = true
+    })
+    builder.addCase(fetchBuyNowAuctionAsync.fulfilled, (state, action) => {
+      state.isLoading = false
+      state.buyAuction = action.payload
+    })
+    builder.addCase(fetchBuyNowAuctionAsync.rejected, (state) => {
+      state.isLoading = false
+    })
   },
 })
 
 const auctionReducer = auctionSlice.reducer
 export default auctionReducer
 export const selectAuction = (state: RootState) => state.auction
-export const { setHighestBid } = auctionSlice.actions
+export const { setHighestBid, setAuctionDetailsEndingTime } =
+  auctionSlice.actions
 
 export const fetchAuctionDetailsAsync = createAsyncThunk(
   'auction/fetchAuctionDetailsAsync',
@@ -106,6 +129,18 @@ export const searchAuctionsAsync = createAsyncThunk(
         type,
         time
       )
+      return data
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error)
+    }
+  }
+)
+
+export const fetchBuyNowAuctionAsync = createAsyncThunk(
+  'auction/fetchBuyNowAuctionAsync',
+  async (auctionId: number, thunkAPI) => {
+    try {
+      const data = await fetchBuyNowAuctionAPI(auctionId)
       return data
     } catch (error) {
       return thunkAPI.rejectWithValue(error)

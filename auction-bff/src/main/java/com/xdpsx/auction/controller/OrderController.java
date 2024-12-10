@@ -3,6 +3,7 @@ package com.xdpsx.auction.controller;
 import com.xdpsx.auction.constant.VNPayParams;
 import com.xdpsx.auction.dto.PageResponse;
 import com.xdpsx.auction.dto.order.CreateOrderDto;
+import com.xdpsx.auction.dto.order.CreateOrderRequest;
 import com.xdpsx.auction.dto.order.OrderDetailsDto;
 import com.xdpsx.auction.dto.order.OrderDto;
 import com.xdpsx.auction.dto.payment.InitPaymentResponse;
@@ -144,6 +145,14 @@ public class OrderController {
     ){
         OrderDto response = orderService.confirmOrderDelivered(id, userContext.getLoggedUser().getId());
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/storefront/auctions/{auctionId}/buy")
+    ResponseEntity<OrderDto> buyNowAuction(
+            @PathVariable Long auctionId,
+            @Valid @RequestBody CreateOrderRequest request) {
+        OrderDto response =  orderService.buyNowAuction(auctionId, request);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
 }

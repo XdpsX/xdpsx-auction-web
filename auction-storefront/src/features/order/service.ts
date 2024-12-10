@@ -3,6 +3,7 @@ import {
   OrderStatus,
   CreateOrderPayload,
   OrderDetails,
+  CreateOrderBuyNowPayload,
 } from '../../models/order.type'
 import { Page } from '../../models/page.type'
 import api from '../../utils/api'
@@ -70,6 +71,17 @@ export const continueOrderPaymentAPI = async (orderId: number) => {
 export const fetchOrderDetailsAPI = async (orderId: number) => {
   const response = await api.get<OrderDetails>(
     `/storefront/users/me/orders/${orderId}`
+  )
+  return response.data
+}
+
+export const createOrderBuyNowAPI = async (
+  auctionId: number,
+  payload: CreateOrderBuyNowPayload
+) => {
+  const response = await api.post<Order>(
+    `/storefront/auctions/${auctionId}/buy`,
+    payload
   )
   return response.data
 }

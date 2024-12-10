@@ -157,6 +157,13 @@ public class AuctionServiceImpl implements AuctionService {
         return new AuctionDetailsGet(dto, highestBid);
     }
 
+    @Override
+    public AuctionDto getByNowAuction(Long id) {
+        Auction auction = auctionRepository.findLiveAuction(id, AuctionType.SEALED_BID)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.AUCTION_NOT_FOUND, id));
+        return AuctionMapper.INSTANCE.toDto(auction);
+    }
+
     private Category findPublishedCategory(Integer categoryId){
         return categoryRepository.findPublishedCategoryById(categoryId)
                 .orElseThrow(() -> new NotFoundException("Category with id=%s not found".formatted(categoryId)));
