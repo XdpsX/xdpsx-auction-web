@@ -8,7 +8,6 @@ import {
   fetchSellerOrderDetailsAPI,
   updateOrderStatusAPI
 } from './service'
-import { RootState } from '~/app/store'
 import { getUserRole2 } from '~/utils/helper'
 
 export interface OrderState {
@@ -71,24 +70,20 @@ export default orderReducer
 
 export const fetchOrdersAsync = createAsyncThunk(
   'order/fetchOrdersAsync',
-  async (
-    {
-      pageNum,
-      pageSize,
-      keyword,
-      sort,
-      status
-    }: {
-      pageNum: number
-      pageSize: number
-      keyword: string | null
-      sort: string
-      status: OrderStatus
-    },
-    thunkAPI
-  ) => {
-    const state = thunkAPI.getState() as RootState
-    const isAdmin = state.user.userRole === 'ADMIN'
+  async ({
+    pageNum,
+    pageSize,
+    keyword,
+    sort,
+    status
+  }: {
+    pageNum: number
+    pageSize: number
+    keyword: string | null
+    sort: string
+    status: OrderStatus
+  }) => {
+    const isAdmin = getUserRole2() === 'ADMIN'
     if (isAdmin) {
       const data = await fetchOrdersAPI(pageNum, pageSize, keyword, sort, status)
       return data

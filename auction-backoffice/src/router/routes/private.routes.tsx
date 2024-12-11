@@ -9,9 +9,9 @@ import WithdrawalList from '~/pages/withdrawal/WithdrawalList'
 import OrderDetailsPage from '~/pages/order/OrderDetailsPage'
 import NotFound from '~/pages/error/NotFound'
 import AuctionDetailsPage from '~/pages/auction/AuctionDetailsPage'
+import Dashboard from '~/pages/Dashboard'
 
 const CategoriesList = lazy(() => import('~/pages/category/CategoriesList'))
-const Dashboard = lazy(() => import('~/pages/Dashboard'))
 const AuctionsList = lazy(() => import('~/pages/auction/AuctionsList'))
 const AuctionAdd = lazy(() => import('~/pages/auction/AuctionAdd'))
 const SellerList = lazy(() => import('~/pages/seller/SellerList'))

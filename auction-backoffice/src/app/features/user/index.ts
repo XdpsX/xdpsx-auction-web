@@ -33,6 +33,9 @@ export const userSlice = createSlice({
   reducers: {
     setProfile: (state, { payload }) => {
       state.profile = payload
+      if (!state.profile) {
+        state.userRole = null
+      }
     },
     setRoles: (state, { payload: accessToken }) => {
       if (!accessToken) {

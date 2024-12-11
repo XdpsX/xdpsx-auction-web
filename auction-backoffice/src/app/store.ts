@@ -8,6 +8,7 @@ import notificationReducer from './features/notification'
 import orderReducer from './features/order'
 import withdrawalReducer from './features/withdrawal/slice'
 import walletReducer from './features/wallet'
+import reportReducer from './features/report'
 
 export const store = configureStore({
   reducer: {
@@ -19,7 +20,8 @@ export const store = configureStore({
     notification: notificationReducer,
     order: orderReducer,
     withdrawal: withdrawalReducer,
-    wallet: walletReducer
+    wallet: walletReducer,
+    report: reportReducer
   }
 })
 

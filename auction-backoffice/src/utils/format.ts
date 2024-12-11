@@ -41,3 +41,15 @@ export const formatNotificationDate = (dateString: string) => {
     return dateObj.toLocaleDateString()
   }
 }
+
+export const formatNumber = (amount: number) => {
+  if (amount > 1000000000) {
+    return (amount / 1000000000).toString() + 'B'
+  } else if (amount > 1000000) {
+    return (amount / 1000000).toString() + 'M'
+  } else if (amount > 1000) {
+    return (amount / 1000).toString() + 'K'
+  } else {
+    return amount.toString()
+  }
+}
