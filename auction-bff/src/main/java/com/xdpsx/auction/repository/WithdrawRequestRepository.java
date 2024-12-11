@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,4 +27,14 @@ public interface WithdrawRequestRepository extends JpaRepository<WithdrawRequest
             @Param("statuses") List<WithdrawStatus> statuses,
             Pageable pageable
     );
+
+    @Query("SELECT SUM(w.amount) FROM WithdrawRequest w WHERE w.user.id = :sellerId AND w.status = :status")
+    BigDecimal sumTotalWithdrawBySeller(@Param("sellerId") Long sellerId,
+        @Param("status") WithdrawStatus status);
+
+    @Query("SELECT SUM(w.amount) FROM WithdrawRequest w " +
+            "WHERE w.user.id = :sellerId AND w.status = :status " +
+            "AND FUNCTION('MONTH', w.createdAt) = :month AND FUNCTION('YEAR', w.createdAt) = :year")
+    BigDecimal sumWithdrawByMonthAndSeller(@Param("month") int month, @Param("year") int year,
+                                           @Param("sellerId") Long sellerId, @Param("status") WithdrawStatus status);
 }

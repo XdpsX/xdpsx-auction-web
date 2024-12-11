@@ -32,4 +32,9 @@ public interface SellerDetailsRepository extends JpaRepository<SellerDetails, Lo
             "s.status = 'PENDING' AND" +
             "(:name IS NULL OR s.name LIKE %:name%)")
     Page<SellerDetails> searchSellerRegister(@Param("name") String name, Pageable pageable);
+
+    @Query("SELECT COUNT(s) FROM SellerDetails s " +
+            "WHERE FUNCTION('MONTH', s.createdAt) = :month " +
+            "AND FUNCTION('YEAR', s.createdAt) = :year")
+    long countByCreatedAtMonth(@Param("month") int month, @Param("year") int year);
 }

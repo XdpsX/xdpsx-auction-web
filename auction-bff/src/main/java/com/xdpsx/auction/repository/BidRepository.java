@@ -71,5 +71,15 @@ public interface BidRepository extends JpaRepository<Bid, Long>, JpaSpecificatio
     @Query("SELECT b FROM Bid b WHERE b.auction.id = :auctionId")
     Page<Bid> findByAuctionId(@Param("auctionId") Long auctionId, Pageable pageable);
 
-    List<Bid> findByAuctionId(Long auctionId);
+    @Query("SELECT COUNT(DISTINCT b.bidder) FROM Bid b " +
+            "WHERE b.auction.seller.id = :sellerId")
+    long countDistinctBiddersBySellerId(@Param("sellerId") Long sellerId);
+
+    @Query("SELECT COUNT(DISTINCT b.bidder) FROM Bid b " +
+            "WHERE FUNCTION('MONTH', b.createdAt) = :month " +
+            "AND FUNCTION('YEAR', b.createdAt) = :year " +
+            "AND b.auction.seller.id = :sellerId")
+    long countDistinctBiddersByMonthAndYear(@Param("month") int month,
+                                            @Param("year") int year,
+                                            @Param("sellerId") Long sellerId);
 }

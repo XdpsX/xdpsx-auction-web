@@ -91,4 +91,9 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
     public boolean isEnabled() {
         return enabled;
     }
+
+    public boolean isAdmin() {
+        return roles.stream()
+                .anyMatch(role -> role.getName().equals(Role.ADMIN));
+    }
 }

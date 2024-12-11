@@ -66,4 +66,28 @@ public interface AuctionRepository extends JpaRepository<Auction, Long>,
             "WHERE a.status = 'LIVE' " +
             "AND a.endingTime < CURRENT_TIMESTAMP")
     List<Auction> findEndingAuction();
+
+    @Query("SELECT COUNT(a) FROM Auction a WHERE a.seller.id = :sellerId")
+    long countBySellerId(@Param("sellerId") Long sellerId);
+
+    @Query("SELECT COUNT(a) FROM Auction a " +
+            "WHERE FUNCTION('MONTH', a.createdAt) = :month " +
+            "AND FUNCTION('YEAR', a.createdAt) = :year")
+    long countByCreatedAtMonth(@Param("month") int month, @Param("year") int year);
+
+    @Query("SELECT COUNT(a) FROM Auction a " +
+            "WHERE FUNCTION('MONTH', a.createdAt) = :month " +
+            "AND FUNCTION('YEAR', a.createdAt) = :year " +
+            "AND a.seller.id = :sellerId " +
+            "AND a.trashed = false " +
+            "AND a.published = true")
+    long countByCreatedAtMonthAndSellerId(@Param("month") int month, @Param("year") int year,
+                                          @Param("sellerId") Long sellerId);
+
+    @Query("SELECT COUNT(a) FROM Auction a WHERE a.type = :type")
+    long countAuctionsByType(@Param("type") AuctionType type);
+
+    @Query("SELECT COUNT(a) FROM Auction a " +
+            "WHERE a.seller.id = :sellerId AND a.type = :type")
+    long countAuctionsBySellerIdAndType(@Param("sellerId") Long sellerId, @Param("type") AuctionType type);
 }

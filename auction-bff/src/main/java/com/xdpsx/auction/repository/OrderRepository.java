@@ -69,4 +69,33 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Optional<Order> findByUserIdAndOrderIdAndStatus(@Param("userId") Long userId,
                                                 @Param("orderId") Long orderId,
                                                 @Param("status") OrderStatus status);
+
+    @Query("SELECT o FROM Order o " +
+            "WHERE o.status = :status " +
+            "AND o.updatedAt >= :startDate")
+    List<Order> findCompletedOrdersSince(@Param("status") OrderStatus status,
+                                         @Param("startDate") ZonedDateTime startDate);
+
+    @Query("SELECT o FROM Order o " +
+            "WHERE o.status = :status " +
+            "AND o.updatedAt >= :startDate " +
+            "AND o.seller.id = :sellerId")
+    List<Order> findCompletedOrdersForSellerSince(@Param("status") OrderStatus status,
+                                    @Param("startDate") ZonedDateTime startDate,
+                                    @Param("sellerId") Long sellerId);
+
+    @Query("SELECT COUNT(o) FROM Order o " +
+            "WHERE FUNCTION('MONTH', o.createdAt) = :month " +
+            "AND FUNCTION('YEAR', o.createdAt) = :year")
+    long countByCreatedAtMonth(@Param("month") int month, @Param("year") int year);
+
+    @Query("SELECT COUNT(o) FROM Order o " +
+            "WHERE FUNCTION('MONTH', o.createdAt) = :month " +
+            "AND FUNCTION('YEAR', o.createdAt) = :year " +
+            "AND o.seller.id = :sellerId")
+    long countByCreatedAtMonthAndSellerId(@Param("month") int month, @Param("year") int year,
+                                                @Param("sellerId") Long sellerId);
+
+    @Query("SELECT COUNT(o) FROM Order o WHERE o.seller.id = :sellerId")
+    long countBySellerId(@Param("sellerId") Long sellerId);
 }
