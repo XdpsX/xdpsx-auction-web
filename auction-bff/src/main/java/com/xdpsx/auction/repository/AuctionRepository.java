@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AuctionRepository extends JpaRepository<Auction, Long>,
-        JpaSpecificationExecutor<Auction> {
+        JpaSpecificationExecutor<Auction>, AuctionRepositoryCustom {
     @Query("SELECT a FROM Auction a " +
             "JOIN FETCH a.mainImage " +
             "LEFT JOIN FETCH a.images " +
