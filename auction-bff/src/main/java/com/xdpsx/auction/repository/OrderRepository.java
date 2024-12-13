@@ -98,4 +98,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT COUNT(o) FROM Order o WHERE o.seller.id = :sellerId")
     long countBySellerId(@Param("sellerId") Long sellerId);
+
+    @Query("SELECT o FROM Order o " +
+            "WHERE o.status = :status " +
+            "AND o.updatedAt >= :since " +
+            "AND o.seller.id = :sellerId")
+    List<Order> findCancelledOrdersForSellerSince(OrderStatus status, ZonedDateTime since, Long sellerId);
 }

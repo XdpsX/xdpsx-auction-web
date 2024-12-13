@@ -152,7 +152,7 @@ public class AuctionController {
         Auction auction = auctionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Not found"));
         auction.setStartingTime(ZonedDateTime.now().minusMinutes(10));
-        auction.setEndingTime(ZonedDateTime.now().plusSeconds(15));
+        auction.setEndingTime(ZonedDateTime.now().plusSeconds(5));
         auctionRepository.save(auction);
         return ResponseEntity.noContent().build();
     }

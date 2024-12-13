@@ -82,4 +82,8 @@ public interface BidRepository extends JpaRepository<Bid, Long>, JpaSpecificatio
     long countDistinctBiddersByMonthAndYear(@Param("month") int month,
                                             @Param("year") int year,
                                             @Param("sellerId") Long sellerId);
+
+    @Query("SELECT b FROM Bid b WHERE b.status = :status AND b.auction.seller.id = :sellerId AND b.updatedAt >= :since")
+    List<Bid> findNoPaidBidsForSellerSince(BidStatus status, ZonedDateTime since, Long sellerId);
+
 }

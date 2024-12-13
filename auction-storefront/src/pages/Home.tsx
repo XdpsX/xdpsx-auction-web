@@ -4,35 +4,58 @@ import DropDown from '../components/ui/DropDown'
 import { Link } from 'react-router-dom'
 import Banner from '../components/ui/Banner'
 import AuctionList from '../components/auction/AuctionList'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useRef } from 'react'
 import { Auction } from '../models/auction.type'
 import { Page } from '../models/page.type'
 import { fetchCategoryAuctionsAPI } from '../features/auction/service'
-const NUMBER_CATEGORIES = 5
+
+const NUMBER_CATEGORIES = 3
+
 interface CategoryAuction {
   categoryId: number
   page: Page<Auction>
 }
+
 function Home() {
   const { categories } = useAppSelector(selectCategory)
   const [categoryAuction, setCategoryAuction] = useState<CategoryAuction[]>([])
+
+  const renderedCategoryIds = useRef<Set<number>>(new Set())
+
   const categoryIds = useMemo(() => {
-    return categories?.slice(0, NUMBER_CATEGORIES).map((cat) => cat.id)
+    return [...new Set(categories?.map((cat) => cat.id))]
   }, [categories])
 
   useEffect(() => {
-    categoryIds?.forEach(async (categoryId) => {
-      try {
-        const auctionPage = await fetchCategoryAuctionsAPI(categoryId, 1, 8)
-        setCategoryAuction((prev) => [
-          ...prev,
-          { categoryId, page: auctionPage },
-        ])
-      } catch (error) {
-        console.log('Failed to fetch auctions: ', error)
+    const fetchData = async () => {
+      for (const categoryId of categoryIds) {
+        if (!renderedCategoryIds.current.has(categoryId)) {
+          try {
+            const auctionPage = await fetchCategoryAuctionsAPI(categoryId, 1, 8)
+            setCategoryAuction((prev) => [
+              ...prev,
+              { categoryId, page: auctionPage },
+            ])
+
+            renderedCategoryIds.current.add(categoryId)
+          } catch (error) {
+            console.log('Failed to fetch auctions: ', error)
+          }
+        }
       }
-    })
-  }, [categoryIds])
+    }
+
+    if (categoryIds.length > 0 && categoryAuction.length === 0) {
+      fetchData()
+    }
+  }, [categoryIds, categoryAuction])
+
+  useEffect(() => {
+    return () => {
+      setCategoryAuction([])
+      renderedCategoryIds.current.clear()
+    }
+  }, [])
 
   return (
     <div>
@@ -42,18 +65,16 @@ function Home() {
             <DropDown
               renderDropDown={
                 <ul className="bg-white text-slate-600 font-medium">
-                  {categories?.map((cat) => {
-                    return (
-                      <li key={cat.id} className="">
-                        <Link
-                          to={`categories/${cat.slug}`}
-                          className="pl-4 pr-2 w-full md:min-w-[180px] py-2.5 text-sm block text-gray-700 font-semibold hover:bg-yellow-500 hover:text-white"
-                        >
-                          {cat.name}
-                        </Link>
-                      </li>
-                    )
-                  })}
+                  {categories?.map((cat) => (
+                    <li key={cat.id}>
+                      <Link
+                        to={`categories/${cat.slug}`}
+                        className="pl-4 pr-2 w-full md:min-w-[180px] py-2.5 text-sm block text-gray-700 font-semibold hover:bg-yellow-500 hover:text-white"
+                      >
+                        {cat.name}
+                      </Link>
+                    </li>
+                  ))}
                 </ul>
               }
             >
@@ -108,4 +129,5 @@ function Home() {
     </div>
   )
 }
+
 export default Home

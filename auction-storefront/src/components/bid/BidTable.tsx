@@ -90,6 +90,12 @@ function BidTable({
                 <tr>
                   <th
                     scope="col"
+                    className="py-3.5 px-3  text-left text-sm font-semibold text-gray-900 sm:pl-0"
+                  >
+                    ID
+                  </th>
+                  <th
+                    scope="col"
                     className="py-3.5 pl-4 pr-1 text-left text-sm font-semibold text-gray-900 sm:pl-0"
                   >
                     Auction
@@ -144,6 +150,9 @@ function BidTable({
               <tbody className="divide-y divide-gray-200">
                 {items.map((item) => (
                   <tr key={item.id}>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      {item.id}
+                    </td>
                     <td className=" whitespace-nowrap py-4 pl-4  font-medium text-gray-900 sm:pl-0">
                       <div className="flex items-center gap-2">
                         <div className="w-12 h-12">

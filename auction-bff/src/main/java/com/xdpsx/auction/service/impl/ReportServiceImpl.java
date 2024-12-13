@@ -1,8 +1,10 @@
 package com.xdpsx.auction.service.impl;
 
 import com.xdpsx.auction.dto.report.*;
+import com.xdpsx.auction.model.Bid;
 import com.xdpsx.auction.model.Order;
 import com.xdpsx.auction.model.enums.AuctionType;
+import com.xdpsx.auction.model.enums.BidStatus;
 import com.xdpsx.auction.model.enums.OrderStatus;
 import com.xdpsx.auction.model.enums.WithdrawStatus;
 import com.xdpsx.auction.repository.*;
@@ -46,8 +48,58 @@ public class ReportServiceImpl implements ReportService {
         ZonedDateTime twelveMonthsAgo = ZonedDateTime.now().minusMonths(12);
         List<Order> completedOrders =
                 orderRepository.findCompletedOrdersForSellerSince(OrderStatus.Completed, twelveMonthsAgo, sellerId);
+        List<Order> cancelledOrders =
+                orderRepository.findCancelledOrdersForSellerSince(OrderStatus.Cancelled, twelveMonthsAgo, sellerId);
+        List<Bid> noPaidBids =
+                bidRepository.findNoPaidBidsForSellerSince(BidStatus.NO_PAID, twelveMonthsAgo, sellerId);
 
-        return getMonthlyRevenues(completedOrders, BigDecimal.ONE.subtract(SECURITY_FEE_RATE));
+
+        List<Order> allRelevantOrders = new ArrayList<>();
+        allRelevantOrders.addAll(completedOrders);
+        allRelevantOrders.addAll(cancelledOrders);
+
+        BigDecimal rate = BigDecimal.ONE.subtract(SECURITY_FEE_RATE);
+
+        Map<String, BigDecimal> revenueMap = new HashMap<>();
+        addOrderRevenuesToMap(allRelevantOrders, rate, revenueMap);
+        addBidRevenuesToMap(noPaidBids, revenueMap);
+
+        return convertRevenueMapToMonthlyRevenues(revenueMap);
+
+    }
+
+    private void addOrderRevenuesToMap(List<Order> orders, BigDecimal rate, Map<String, BigDecimal> revenueMap) {
+        DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("yyyy-MM");
+
+        for (Order order : orders) {
+            String month = order.getUpdatedAt().format(monthFormatter);
+            BigDecimal revenue = order.getTotalAmount().multiply(rate);
+            revenueMap.put(month, revenueMap.getOrDefault(month, BigDecimal.ZERO).add(revenue));
+        }
+    }
+
+    private void addBidRevenuesToMap(List<Bid> bids, Map<String, BigDecimal> revenueMap) {
+        DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("yyyy-MM");
+
+        for (Bid bid : bids) {
+            String month = bid.getUpdatedAt().format(monthFormatter);
+            BigDecimal revenue = bid.getAmount(); // Có thể áp dụng tỷ lệ nếu cần
+            revenueMap.put(month, revenueMap.getOrDefault(month, BigDecimal.ZERO).add(revenue));
+        }
+    }
+
+    private List<MonthlyRevenue> convertRevenueMapToMonthlyRevenues(Map<String, BigDecimal> revenueMap) {
+        List<MonthlyRevenue> monthlyRevenues = new ArrayList<>();
+        DateTimeFormatter monthFormatter = DateTimeFormatter.ofPattern("yyyy-MM");
+
+        for (int i = 0; i < 12; i++) {
+            ZonedDateTime monthDate = ZonedDateTime.now().minusMonths(i);
+            String month = monthDate.format(monthFormatter);
+            BigDecimal revenue = revenueMap.getOrDefault(month, BigDecimal.ZERO);
+            monthlyRevenues.add(new MonthlyRevenue(month, revenue));
+        }
+
+        return monthlyRevenues;
     }
 
     private List<MonthlyRevenue> getMonthlyRevenues(List<Order> completedOrders, BigDecimal rate) {
