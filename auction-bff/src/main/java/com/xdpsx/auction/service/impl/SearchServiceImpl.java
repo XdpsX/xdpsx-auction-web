@@ -112,8 +112,9 @@ public class SearchServiceImpl implements SearchService {
         for (String term : extractedTerms) {
             int minLength = Math.max(1, term.length() - MAX_DISTANCE);
             int maxLength = term.length() + MAX_DISTANCE;
+            String prefix = term.substring(0, Math.min(term.length(), 1));
 
-            Set<String> filteredTerms = invertedIndexRepository.findTermsByLength(minLength, maxLength);
+            Set<String> filteredTerms = invertedIndexRepository.findTermsByLengthAndPrefix(minLength, maxLength, prefix);
 
             for (String dbTerm : filteredTerms) {
                 int distance = LevenshteinDistance.calLevenshteinDistance(term, dbTerm);

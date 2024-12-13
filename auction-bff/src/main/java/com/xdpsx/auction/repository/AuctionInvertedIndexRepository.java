@@ -12,8 +12,11 @@ public interface AuctionInvertedIndexRepository extends JpaRepository<AuctionInv
     Set<String> findAllTerms();
 
     @Query("SELECT a.term FROM AuctionInvertedIndex a " +
-            "WHERE LENGTH(a.term) BETWEEN :minLength AND :maxLength")
-    Set<String> findTermsByLength(@Param("minLength") int minLength, @Param("maxLength") int maxLength);
+            "WHERE LENGTH(a.term) BETWEEN :minLength AND :maxLength " +
+            "AND a.term LIKE :prefix%")
+    Set<String> findTermsByLengthAndPrefix(@Param("minLength") int minLength,
+                                           @Param("maxLength") int maxLength,
+                                           @Param("prefix") String prefix);
 
     @Query("SELECT a.term FROM AuctionInvertedIndex a WHERE a.term LIKE %:prefix%")
     Set<String> findTermsByPrefix(@Param("prefix") String prefix);
