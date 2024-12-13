@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 public class SearchServiceImpl implements SearchService {
     private static final double WEIGHT_NAME = 2.0;
     private static final double WEIGHT_DESCRIPTION = 1.0;
-    private static final int MAX_DISTANCE = 2;
+//    private static final int MAX_DISTANCE = 2;
 
     private final AuctionInvertedIndexRepository invertedIndexRepository;
     private final AuctionRepository auctionRepository;
@@ -73,7 +73,6 @@ public class SearchServiceImpl implements SearchService {
 
             try {
                 String auctionScoresJson = objectMapper.writeValueAsString(auctionScores);
-                // Store the JSON string in Redis
                 redisTemplate.opsForValue().set(cacheKey, auctionScoresJson, 30, TimeUnit.SECONDS);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
@@ -104,7 +103,10 @@ public class SearchServiceImpl implements SearchService {
         // preprocessing
         keyword = TextProcessor.processName(keyword);
         Set<String> extractedTerms = new HashSet<>(Arrays.asList(keyword.split("\\s+")));
-
+        int MAX_DISTANCE = 2;
+        if (extractedTerms.size() == 1) {
+         MAX_DISTANCE = 1;
+        }
         // fetch similar terms
         Set<String> terms =  new HashSet<>();
         for (String term : extractedTerms) {

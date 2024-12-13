@@ -77,7 +77,7 @@ function SearchPage() {
         </div>
         <div>
           {searchAuctions.items.length > 0 ? (
-            <>
+            <div className="space-y-6">
               <AuctionList
                 auctions={searchAuctions.items}
                 className="xl:grid-cols-4 3xl:grid-cols-5"
@@ -89,7 +89,7 @@ function SearchPage() {
                   onPageChange={onPageChange}
                 />
               )}
-            </>
+            </div>
           ) : (
             <div className="text-center text-gray-500 text-lg">
               No auction found

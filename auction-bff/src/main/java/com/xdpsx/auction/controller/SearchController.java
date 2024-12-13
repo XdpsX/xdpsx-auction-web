@@ -24,7 +24,7 @@ public class SearchController {
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
             @RequestParam(defaultValue = "1") int pageNum,
-            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(defaultValue = "8") int pageSize,
             @RequestParam(required = false) AuctionType type,
             @RequestParam(required = false) AuctionTime time,
             @RequestParam(required = false) String sort) {

@@ -56,8 +56,9 @@ function HeaderBottom() {
     console.log(categoryId)
     if (!categoryId) {
       navigate(`/search?keyword=${keyword}&categoryId=all`)
+    } else {
+      navigate(`/search?keyword=${keyword}&categoryId=${categoryId}`)
     }
-    navigate(`/search?keyword=${keyword}&categoryId=${categoryId}`)
     setKeyword('')
   }
 

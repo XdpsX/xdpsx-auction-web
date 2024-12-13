@@ -124,8 +124,8 @@ function AuctionDetailsPage() {
   const highestBid = auctionDetails.highestBid
 
   return (
-    <main className="lg:w-[65%] md:w-[80%] w-[90%] h-full mx-auto py-16 space-y-4">
-      <div className="grid md:grid-cols-2 grid-cols-1 gap-12 ">
+    <main className="lg:w-[65%] md:w-[95%] w-[90%] h-full mx-auto py-16 space-y-4">
+      <div className="grid md:grid-cols-2 grid-cols-1 gap-6 lg:gap-12 ">
         <AuctionImages auction={auctionDetails} />
         <div>
           <div className="flex flex-col gap-3 pb-4 border-b mb-5">
