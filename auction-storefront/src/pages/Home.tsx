@@ -8,10 +8,14 @@ import { useEffect, useMemo, useState } from 'react'
 import { Auction } from '../models/auction.type'
 import { Page } from '../models/page.type'
 import { fetchCategoryAuctionsAPI } from '../features/auction/service'
-const NUMBER_CATEGORIES = 3
+const NUMBER_CATEGORIES = 5
+interface CategoryAuction {
+  categoryId: number
+  page: Page<Auction>
+}
 function Home() {
   const { categories } = useAppSelector(selectCategory)
-  const [auctionPages, setAuctionPages] = useState<Page<Auction>[]>([])
+  const [categoryAuction, setCategoryAuction] = useState<CategoryAuction[]>([])
   const categoryIds = useMemo(() => {
     return categories?.slice(0, NUMBER_CATEGORIES).map((cat) => cat.id)
   }, [categories])
@@ -20,7 +24,10 @@ function Home() {
     categoryIds?.forEach(async (categoryId) => {
       try {
         const auctionPage = await fetchCategoryAuctionsAPI(categoryId, 1, 8)
-        setAuctionPages((prev) => [...prev, auctionPage])
+        setCategoryAuction((prev) => [
+          ...prev,
+          { categoryId, page: auctionPage },
+        ])
       } catch (error) {
         console.log('Failed to fetch auctions: ', error)
       }
@@ -75,16 +82,18 @@ function Home() {
 
       <div className="container mx-auto py-20 px-8 lg:px-20 space-y-10">
         <section>
-          {auctionPages.map((page, index) => {
-            if (page.items.length === 0 || !categories?.[index]) return null
+          {categoryAuction.map((catAuction, index) => {
+            const category = categories?.find(
+              (cat) => cat.id === catAuction.categoryId
+            )
+            const page = catAuction.page
+            if (page.items.length === 0 || !category) return null
             return (
               <div key={index} className="mb-10">
                 <div className="flex items-center gap-4 mb-10">
-                  <h2 className="text-2xl font-semibold">
-                    {categories?.[index].name}
-                  </h2>
+                  <h2 className="text-2xl font-semibold">{category.name}</h2>
                   <Link
-                    to={`/categories/${categories?.[index].slug}`}
+                    to={`/categories/${category.slug}`}
                     className="text-blue-700 hover:text-blue-500 underline text-sm"
                   >
                     View more

@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -54,11 +55,10 @@ public class SearchServiceImpl implements SearchService {
         if (Boolean.TRUE.equals(redisTemplate.hasKey(cacheKey))) {
             cachedData =  redisTemplate.opsForValue().get(cacheKey);
             if (cachedData instanceof String json) {
-                log.info("Cahce Strng");
+                log.info("Cache Search");
                 try {
                     auctionScores = objectMapper.readValue(json, new TypeReference<>() {
                     });
-                    log.info("auctionScores Caching{}", auctionScores);
                 } catch (Exception e) {
                     log.error("Error deserializing cached data", e);
                 }
@@ -74,7 +74,7 @@ public class SearchServiceImpl implements SearchService {
             try {
                 String auctionScoresJson = objectMapper.writeValueAsString(auctionScores);
                 // Store the JSON string in Redis
-                redisTemplate.opsForValue().set(cacheKey, auctionScoresJson);
+                redisTemplate.opsForValue().set(cacheKey, auctionScoresJson, 30, TimeUnit.SECONDS);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }

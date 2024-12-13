@@ -40,7 +40,7 @@ export const validateImage = (file: File): Promise<ImageValidationResult> => {
     img.src = URL.createObjectURL(file)
     img.onload = () => {
       if (img.width < MIN_WIDTH) {
-        resolve({ isValid: false, errorMessage: 'Image width must be at least 800px' })
+        resolve({ isValid: false, errorMessage: 'Image width must be at least ' + MIN_WIDTH + 'px' })
       } else {
         resolve({ isValid: true, errorMessage: null })
       }

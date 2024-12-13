@@ -69,6 +69,7 @@ export const orderActions: { [key in OrderStatus]: string[] } = {
   Pending: ['View', 'Update', 'Cancel'],
   Confirmed: ['View', 'Update', 'Cancel'],
   Shipped: ['View', 'Update', 'Cancel'],
+  Completed: ['View'],
   Delivered: ['View'],
   Cancelled: ['View'],
   Returned: ['View']

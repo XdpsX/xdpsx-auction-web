@@ -17,8 +17,9 @@ public class TextProcessor {
     public static String processDescription(String description) {
 
         String textWithoutHtml = removeHtmlTags(description);
-
-        return processName(textWithoutHtml);
+        String lowercaseText = textWithoutHtml.toLowerCase();
+        String textWithoutPunctuation = removePunctuationAndNum(lowercaseText);
+        return removeStopWords(textWithoutPunctuation);
     }
 
     public static String processName(String name){
@@ -35,6 +36,10 @@ public class TextProcessor {
 //        return input.replaceAll("\\p{Punct}", "");
 //        return input.replaceAll("[^a-zA-Z\\s]", " ");
         return input.replaceAll("[^a-zA-Z0-9]", " ");
+    }
+
+    private static String removePunctuationAndNum(String input) {
+        return input.replaceAll("[^a-zA-Z\\s]", " ");
     }
 
     private static String removeStopWords(String input) {

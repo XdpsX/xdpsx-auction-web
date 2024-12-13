@@ -106,8 +106,8 @@ public class WalletServiceImpl implements WalletService {
                 .description("Deposit  money to the wallet")
                 .build();
 
-        transactionService.createTransaction(transactionRequest);
         redisTemplate.delete(CacheKey.getTransactionKey(transactionId));
+        transactionService.createTransaction(transactionRequest);
     }
 
 

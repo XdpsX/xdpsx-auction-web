@@ -8,7 +8,9 @@ import com.xdpsx.auction.dto.order.OrderDetailsDto;
 import com.xdpsx.auction.dto.order.OrderDto;
 import com.xdpsx.auction.dto.payment.InitPaymentResponse;
 import com.xdpsx.auction.exception.BadRequestException;
+import com.xdpsx.auction.model.Order;
 import com.xdpsx.auction.model.enums.OrderStatus;
+import com.xdpsx.auction.repository.OrderRepository;
 import com.xdpsx.auction.security.UserContext;
 import com.xdpsx.auction.service.OrderService;
 import com.xdpsx.auction.service.PaymentService;
@@ -21,7 +23,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.ZonedDateTime;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.xdpsx.auction.constant.PageConstant.*;
 
@@ -31,6 +35,7 @@ public class OrderController {
     private final UserContext userContext;
     private final OrderService orderService;
     private final PaymentService paymentService;
+    private final OrderRepository orderRepository;
 
     @PostMapping("/storefront/orders")
     ResponseEntity<OrderDto> createOrder(@Valid @RequestBody CreateOrderDto request) {
@@ -153,6 +158,29 @@ public class OrderController {
             @Valid @RequestBody CreateOrderRequest request) {
         OrderDto response =  orderService.buyNowAuction(auctionId, request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/test/orders/{id}/update")
+    public ResponseEntity<?> updateOrderStatus(
+            @PathVariable Long id,
+            @RequestParam OrderStatus status
+    ) {
+        Optional<Order> optionalOrder = orderRepository.findById(id);
+
+        if (optionalOrder.isPresent()) {
+            Order order = optionalOrder.get();
+
+            order.setStatus(status);
+            ZonedDateTime twoDaysAgo = ZonedDateTime.now().minusDays(2);
+            order.setCreatedAt(twoDaysAgo);
+            order.setUpdatedAt(twoDaysAgo);
+
+            orderRepository.save(order);
+
+            return ResponseEntity.ok("Order updated successfully.");
+        } else {
+            return ResponseEntity.status(404).body("Order not found.");
+        }
     }
 
 }

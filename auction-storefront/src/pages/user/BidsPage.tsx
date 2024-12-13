@@ -11,7 +11,8 @@ const tabs = [
   { name: 'Active', href: '?status=ACTIVE', id: 'ACTIVE' },
   { name: 'Won', href: '?status=WON', id: 'WON' },
   { name: 'Lost', href: '?status=LOST', id: 'LOST' },
-  // { name: 'Paid', href: '?status=PAID', id: 'PAID' },
+  { name: 'No Paid', href: '?status=NO_PAID', id: 'NO_PAID' },
+  { name: 'Paid', href: '?status=PAID', id: 'PAID' },
 ]
 
 function classNames(...classes: string[]) {

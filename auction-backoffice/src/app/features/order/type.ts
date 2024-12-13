@@ -1,7 +1,7 @@
 import { AuctionInfo } from '../auction/type'
 import { SellerInfo } from '../seller/type'
 
-export type OrderStatus = 'Pending' | 'Confirmed' | 'Shipped' | 'Delivered' | 'Cancelled' | 'Returned'
+export type OrderStatus = 'Pending' | 'Confirmed' | 'Shipped' | 'Delivered' | 'Completed' | 'Cancelled' | 'Returned'
 
 export type ShippingInfo = {
   recipient: string

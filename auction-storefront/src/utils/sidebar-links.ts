@@ -74,6 +74,10 @@ export const sidebarLinks: SidebarLinkType[] = [
         title: 'Delivered Orders',
       },
       {
+        to: '/user/orders?status=Completed',
+        title: 'Completed Orders',
+      },
+      {
         to: '/user/orders?status=Cancelled',
         title: 'Cancelled Orders',
       },

@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import static com.xdpsx.auction.constant.BidConstants.EXPIRED_ORDER_DAYS;
 import static com.xdpsx.auction.constant.BidConstants.SECURITY_FEE_RATE;
 
 @Slf4j
@@ -27,7 +28,8 @@ public class OrderScheduler {
     private final TransactionService transactionService;
     private final NotificationService notificationService;
 
-    @Scheduled(cron = "0 * * * * ?")
+//    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(fixedRate = 15000)
     @Transactional
     public void handleExpiredDeliveredOrders() {
         List<Order> expiredDeliveredOrders= getExpiredDeliveredOrders();
@@ -61,7 +63,7 @@ public class OrderScheduler {
     }
 
     private List<Order> getExpiredDeliveredOrders() {
-        ZonedDateTime twoDaysAgo = ZonedDateTime.now().minusDays(2);
+        ZonedDateTime twoDaysAgo = ZonedDateTime.now().minusDays(EXPIRED_ORDER_DAYS);
         return orderRepository.findOrderOlderThanAndWithStatus(OrderStatus.Delivered, twoDaysAgo);
     }
 
@@ -101,7 +103,7 @@ public class OrderScheduler {
 
 
     private List<Order> getExpiredCreatingOrders() {
-        ZonedDateTime twoDaysAgo = ZonedDateTime.now().minusDays(2);
+        ZonedDateTime twoDaysAgo = ZonedDateTime.now().minusDays(EXPIRED_ORDER_DAYS);
         return orderRepository.findOrderOlderThanAndWithStatus(OrderStatus.Creating, twoDaysAgo);
     }
 }

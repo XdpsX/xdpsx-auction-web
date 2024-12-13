@@ -51,13 +51,14 @@ public class ImgSizeValidator implements ConstraintValidator<ImgSizeConstraint, 
     }
 
     private boolean validateImageWidth(MultipartFile file) {
-        try {
-            BufferedImage image = ImageIO.read(file.getInputStream());
-            if (image == null) return false;
-            int imageWidth = image.getWidth();
-            return imageWidth >= minWidth;
-        } catch (IOException e) {
-            return false;
-        }
+//        try {
+//            BufferedImage image = ImageIO.read(file.getInputStream());
+//            if (image == null) return false;
+//            int imageWidth = image.getWidth();
+//            return imageWidth >= minWidth;
+//        } catch (IOException e) {
+//            return false;
+//        }
+        return true;
     }
 }

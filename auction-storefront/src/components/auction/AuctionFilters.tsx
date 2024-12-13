@@ -27,11 +27,9 @@ function AuctionFilters() {
     setParams,
   } = useQueryParams()
 
-  // State for auction type and time
   const [selectedAuctionType, setSelectedAuctionType] = useState(type)
   const [selectedAuctionTime, setSelectedAuctionTime] = useState(time)
 
-  // State for price range
   const [minPrice, setMinPrice] = useState(min || '')
   const [maxPrice, setMaxPrice] = useState(max || '')
 
@@ -41,6 +39,7 @@ function AuctionFilters() {
       return
     }
     setParams({
+      pageNum: '1',
       type: selectedAuctionType,
       time: selectedAuctionTime,
       minPrice: minPrice || null,
@@ -54,6 +53,7 @@ function AuctionFilters() {
     // setMinPrice('')
     // setMaxPrice('')
     setParams({
+      pageNum: '1',
       type: 'all',
       time: 'all',
       minPrice: null,

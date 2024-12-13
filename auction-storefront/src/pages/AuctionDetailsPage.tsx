@@ -109,6 +109,12 @@ function AuctionDetailsPage() {
     }
   }, [dispatch, id, userProfile?.id])
 
+  useEffect(() => {
+    return () => {
+      setIsAuctionEnded(false)
+    }
+  })
+
   if (isLoading) {
     return <LoadingOverlay />
   }

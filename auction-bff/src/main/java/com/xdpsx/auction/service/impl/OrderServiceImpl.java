@@ -81,6 +81,8 @@ public class OrderServiceImpl implements OrderService {
                 .seller(bid.getAuction().getSeller())
                 .auction(bid.getAuction())
                 .paymentMethod(PaymentMethod.INTERNAL_WALLET)
+                .createdAt(ZonedDateTime.now())
+                .updatedAt(ZonedDateTime.now())
                 .build();
         Order savedOrder = orderRepository.save(order);
 

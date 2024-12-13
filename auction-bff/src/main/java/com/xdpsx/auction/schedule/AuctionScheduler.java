@@ -28,7 +28,8 @@ public class AuctionScheduler {
     private final BidRepository bidRepository;
     private final TransactionService transactionService;
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 15000)
+//    @Scheduled(fixedRate = 60000)
     // @Scheduled(cron = "0 * * * * ?")
     @Transactional
     public void handleEndedAuctions() {

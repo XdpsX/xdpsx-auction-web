@@ -7,6 +7,7 @@ import { AuctionTime, AuctionType } from '../models/auction.type'
 import LoadingOverlay from '../components/ui/LoadingOverlay'
 import AuctionFilters from '../components/auction/AuctionFilters'
 import AuctionList from '../components/auction/AuctionList'
+import Pagination from '../components/ui/Pagination'
 
 function SearchPage() {
   const {
@@ -19,6 +20,7 @@ function SearchPage() {
       minPrice,
       maxPrice,
     },
+    setParams,
   } = useQueryParams()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
@@ -52,6 +54,10 @@ function SearchPage() {
     type,
   ])
 
+  const onPageChange = (pageNum: number) => {
+    setParams({ pageNum: pageNum.toString() })
+  }
+
   if (isLoading) return <LoadingOverlay />
   if (!searchAuctions) return null
   console.log(searchAuctions)
@@ -62,16 +68,28 @@ function SearchPage() {
       </div>
       <div className="w-full md:w-10/12">
         <div className="py-4 bg-white mb-10 px-3 rounded-md flex justify-between items-start border">
-          <h2 className="text-lg font-medium text-slate-600">
+          <h1 className="text-2xl font-bold text-slate-900">
+            Search result for "{keyword}"
+          </h1>
+          <p className="text-lg font-medium text-slate-600">
             {searchAuctions.totalItems} Totals Auciton
-          </h2>
+          </p>
         </div>
         <div>
           {searchAuctions.items.length > 0 ? (
-            <AuctionList
-              auctions={searchAuctions.items}
-              className="xl:grid-cols-4 3xl:grid-cols-5"
-            />
+            <>
+              <AuctionList
+                auctions={searchAuctions.items}
+                className="xl:grid-cols-4 3xl:grid-cols-5"
+              />
+              {searchAuctions.totalPages > 1 && (
+                <Pagination
+                  pageNum={searchAuctions.pageNum}
+                  totalPages={searchAuctions.totalPages}
+                  onPageChange={onPageChange}
+                />
+              )}
+            </>
           ) : (
             <div className="text-center text-gray-500 text-lg">
               No auction found

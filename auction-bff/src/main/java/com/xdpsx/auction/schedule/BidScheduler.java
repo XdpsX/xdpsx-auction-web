@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import static com.xdpsx.auction.constant.BidConstants.EXPIRED_WON_BID_DAYS;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -29,8 +31,9 @@ public class BidScheduler {
     private final TransactionService transactionService;
     private final NotificationService notificationService;
 
+    @Scheduled(fixedRate = 15000)
 //    @Scheduled(fixedRate = 60000)
-    @Scheduled(cron = "0 * * * * ?")
+//    @Scheduled(cron = "0 * * * * ?")
     @Transactional
     public void handleExpiredWonBids() {
         List<Bid> expiredWonBids = getExpiredWonBids();
@@ -68,7 +71,7 @@ public class BidScheduler {
     }
 
     private List<Bid> getExpiredWonBids() {
-        ZonedDateTime oneDayAgo = ZonedDateTime.now().minusDays(1);
+        ZonedDateTime oneDayAgo = ZonedDateTime.now().minusDays(EXPIRED_WON_BID_DAYS);
         return bidRepository.findBidsOlderThanAndWithStatus(BidStatus.WON, oneDayAgo);
     }
 }

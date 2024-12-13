@@ -50,13 +50,15 @@ function HeaderBottom() {
     }
   }, [wallet, dispatch])
 
-  const onSearch = () => {
+  const onSearch = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
     if (!keyword) return
     console.log(categoryId)
     if (!categoryId) {
       navigate(`/search?keyword=${keyword}&categoryId=all`)
     }
-    // navigate(`/search?keyword=${keyword}&categoryId=${categoryId}`)
+    navigate(`/search?keyword=${keyword}&categoryId=${categoryId}`)
+    setKeyword('')
   }
 
   return (
@@ -70,7 +72,10 @@ function HeaderBottom() {
               className="hidden md:block md:w-204 lg:w-40"
             />
           </Link>
-          <div className="flex border-2 py-2 items-center relative gap-6 text-black border-blue-700 rounded-md">
+          <form
+            onSubmit={onSearch}
+            className="flex border-2 py-2 items-center relative gap-6 text-black border-blue-700 rounded-md"
+          >
             <div className="hidden lg:block divider-next after:bg-gray-400">
               <select
                 onChange={(e) => setCategoryId(+e.target.value)}
@@ -92,12 +97,13 @@ function HeaderBottom() {
               onChange={(e) => setKeyword(e.target.value)}
             />
             <button
-              onClick={onSearch}
+              type="submit"
+              // onClick={onSearch}
               className="text-sm md:text-base bg-blue-700 right-0 absolute px-4 h-full font-semibold uppercase text-white rounded-e-sm"
             >
               Search
             </button>
-          </div>
+          </form>
           {wallet ? (
             <div className="hidden sm:flex items-center gap-2 bg-gray-100 rounded-xl p-2 shadow-md">
               <div className="flex items-center gap-2 w-[100px]">

@@ -35,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -97,6 +98,7 @@ public class BidServiceImpl implements BidService {
 
     private Bid updateBidToLost(CustomUserDetails userDetails, Bid bid) {
         bid.setStatus(BidStatus.LOST);
+        bid.setUpdatedAt(ZonedDateTime.now());
         Bid savedBid = bidRepository.save(bid);
 
         TransactionRequest transactionRequest = TransactionRequest.builder()
@@ -183,6 +185,8 @@ public class BidServiceImpl implements BidService {
                 .auction(auction)
                 .status(BidStatus.ACTIVE)
                 .transaction(new Transaction(transactionResponse.getId()))
+                .createdAt(ZonedDateTime.now())
+                .updatedAt(ZonedDateTime.now())
                 .build();
         Bid savedBid = bidRepository.save(bid);
 
@@ -205,6 +209,7 @@ public class BidServiceImpl implements BidService {
         transactionService.updateTransaction(existingTransaction.getId(), transactionRequest);
 
         existingBid.setAmount(bidRequest.getAmount());
+        existingBid.setUpdatedAt(ZonedDateTime.now());
         Bid savedBid = bidRepository.save(existingBid);
 
         return BidMapper.INSTANCE.toBidResponseHistory(savedBid);
