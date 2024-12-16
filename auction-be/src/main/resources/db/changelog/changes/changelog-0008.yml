@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: 8
+      author: XdpsX
+      comment: 'Add is_refund column to bids table'
+      changes:
+        - sqlFile:
+            path: db/changelog/sql/changelog-0008.sql

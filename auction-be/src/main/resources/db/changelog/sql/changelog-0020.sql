@@ -1,0 +1,13 @@
+CREATE TABLE withdraw_requests (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    bank_name VARCHAR(100) NOT NULL,
+    account_number VARCHAR(50) NOT NULL,
+    holder_name VARCHAR(50) NOT NULL,
+    amount DECIMAL(19, 2) NOT NULL,
+    status TINYINT NOT NULL,
+    reason TEXT,
+    user_id BIGINT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);

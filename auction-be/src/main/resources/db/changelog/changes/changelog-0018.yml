@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: 18
+      author: XdpsX
+      comment: 'Add orders table'
+      changes:
+        - sqlFile:
+            path: db/changelog/sql/changelog-0018.sql

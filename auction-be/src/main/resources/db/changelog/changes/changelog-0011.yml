@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: 11
+      author: XdpsX
+      comment: 'Remove is_winner, is_refund and add status, payment_status columns to bids table'
+      changes:
+        - sqlFile:
+            path: db/changelog/sql/changelog-0011.sql
