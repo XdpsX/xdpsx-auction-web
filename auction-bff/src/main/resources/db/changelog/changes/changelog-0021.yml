@@ -1,8 +1,0 @@
-databaseChangeLog:
-  - changeSet:
-      id: 21
-      author: XdpsX
-      comment: 'Add auction_inverted_index table'
-      changes:
-        - sqlFile:
-            path: db/changelog/sql/changelog-0021.sql

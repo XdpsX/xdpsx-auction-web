@@ -1,8 +1,0 @@
-databaseChangeLog:
-  - changeSet:
-      id: 10
-      author: XdpsX
-      comment: 'Add is_end column to auctions table'
-      changes:
-        - sqlFile:
-            path: db/changelog/sql/changelog-0010.sql

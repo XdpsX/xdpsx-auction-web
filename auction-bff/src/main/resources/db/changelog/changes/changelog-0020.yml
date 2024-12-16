@@ -1,8 +1,0 @@
-databaseChangeLog:
-  - changeSet:
-      id: 20
-      author: XdpsX
-      comment: 'Add withdraw_requests table'
-      changes:
-        - sqlFile:
-            path: db/changelog/sql/changelog-0020.sql
